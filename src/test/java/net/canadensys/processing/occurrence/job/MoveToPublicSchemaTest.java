@@ -43,7 +43,9 @@ public class MoveToPublicSchemaTest {
     public void setupTest(){
     	jdbcTemplate.batchUpdate(new String[]{
     			"DELETE FROM buffer.occurrence",
+    			"DELETE FROM occurrence",
     			"DELETE FROM buffer.resource_contact",
+    			"DELETE FROM resource_contact",
     			"INSERT INTO buffer.occurrence (auto_id,dwcaid,stateprovince,sourcefileid) VALUES (1,'1','Delaware','qmor-specimens')",
     			"INSERT INTO buffer.occurrence (auto_id,dwcaid,stateprovince,sourcefileid) VALUES (2,'3','Florida','qmor-specimens')",
     			"INSERT INTO buffer.resource_contact (name,dataset_shortname) VALUES ('Louise Cloutier','qmor-specimens')"
