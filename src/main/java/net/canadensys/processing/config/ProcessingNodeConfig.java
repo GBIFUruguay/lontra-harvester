@@ -8,7 +8,6 @@ import javax.sql.DataSource;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
-import net.canadensys.processing.ExcludeTestClassesTypeFilter;
 import net.canadensys.processing.ItemProcessorIF;
 import net.canadensys.processing.ItemReaderIF;
 import net.canadensys.processing.ItemTaskIF;
@@ -47,7 +46,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -70,9 +69,7 @@ public class ProcessingNodeConfig {
     @Bean
     public static PropertyPlaceholderConfigurer properties(){
     	PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-    	ClassPathResource[] resources = new ClassPathResource[]
-    			{ new ClassPathResource( "harvester-config.properties" ) };
-    	ppc.setLocations( resources );
+    	ppc.setLocation( new FileSystemResource("config/harvester-config.properties") );
     	return ppc;
     }
     
