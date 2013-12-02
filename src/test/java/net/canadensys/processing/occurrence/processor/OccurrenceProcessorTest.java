@@ -38,7 +38,8 @@ public class OccurrenceProcessorTest {
 		rawModel.setEventdate("2011-12-26");
 		
 		try {
-			OccurrenceModel processedModel = occProcessor.process(rawModel, null);
+			OccurrenceModel processedModel = ProcessorRunner.runItemProcessor(occProcessor, rawModel, null);
+			
 			assertEquals("http://www.google.com; http://yahoo.ca", processedModel.getAssociatedmedia());
 			assertTrue(processedModel.getHasmedia());
 			assertEquals("South America", processedModel.getContinent());
