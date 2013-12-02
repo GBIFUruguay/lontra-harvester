@@ -1,6 +1,5 @@
 package net.canadensys.processing.config;
 
-import java.beans.PropertyVetoException;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -13,20 +12,28 @@ import net.canadensys.processing.ItemReaderIF;
 import net.canadensys.processing.ItemTaskIF;
 import net.canadensys.processing.ItemWriterIF;
 import net.canadensys.processing.ProcessingStepIF;
-import net.canadensys.processing.jms.JMSConsumer;
 import net.canadensys.processing.jms.JMSWriter;
 import net.canadensys.processing.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.processing.occurrence.job.ImportDwcaJob;
 import net.canadensys.processing.occurrence.job.MoveToPublicSchemaJob;
+import net.canadensys.processing.occurrence.mock.MockComputeGISDataTask;
 import net.canadensys.processing.occurrence.model.ImportLogModel;
-import net.canadensys.processing.occurrence.model.ResourceModel;
 import net.canadensys.processing.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.processing.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.processing.occurrence.processor.ResourceContactProcessor;
+import net.canadensys.processing.occurrence.reader.DwcaEmlReader;
 import net.canadensys.processing.occurrence.reader.DwcaItemReader;
 import net.canadensys.processing.occurrence.step.InsertRawOccurrenceStep;
 import net.canadensys.processing.occurrence.step.InsertResourceContactStep;
 import net.canadensys.processing.occurrence.step.ProcessInsertOccurrenceStep;
+import net.canadensys.processing.occurrence.step.StreamDwcaContentStep;
+import net.canadensys.processing.occurrence.step.StreamEmlContentStep;
+import net.canadensys.processing.occurrence.task.CheckProcessingCompletenessTask;
+import net.canadensys.processing.occurrence.task.CleanBufferTableTask;
+import net.canadensys.processing.occurrence.task.ComputeUniqueValueTask;
+import net.canadensys.processing.occurrence.task.PrepareDwcaTask;
+import net.canadensys.processing.occurrence.task.RecordImportTask;
+import net.canadensys.processing.occurrence.task.ReplaceOldOccurrenceTask;
 import net.canadensys.processing.occurrence.view.model.HarvesterViewModel;
 import net.canadensys.processing.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.processing.occurrence.writer.RawOccurrenceHibernateWriter;
@@ -40,30 +47,26 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
-/**
- * Configuration class using Spring annotations.
- * All the beans are created from here.
- * @author canadensys
- *
- */
 @Configuration
-@ComponentScan(basePackages ="net.canadensys.processing",
-	excludeFilters = { @Filter(type = FilterType.CUSTOM, value = { ExcludeTestClassesTypeFilter.class }),
-		@Filter(type = FilterType.ASSIGNABLE_TYPE, value = { ProcessingConfig.class })})
+@ComponentScan(basePackages ="net.canadensys.processing.occurrence",
+	excludeFilters = { @Filter(type=FilterType.ASSIGNABLE_TYPE, value=ProcessingConfig.class) })
 @EnableTransactionManagement
-public class ProcessingNodeConfig {
+public class ProcessingConfigTest {
 	
     @Bean
     public static PropertyPlaceholderConfigurer properties(){
     	PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-    	ppc.setLocation( new FileSystemResource("config/harvester-config.properties") );
+    	ClassPathResource[] resources = new ClassPathResource[]
+    			{ new ClassPathResource( "test-harvester-config.properties" ) };
+    	ppc.setLocations( resources );
     	return ppc;
     }
     
@@ -71,10 +74,6 @@ public class ProcessingNodeConfig {
     private String dbUrl;
     @Value( "${database.driver}" )
     private String dbDriverClassName;
-    @Value( "${database.username}" )
-    private String username;
-    @Value( "${database.password}" )
-    private String password;
     
     @Value( "${hibernate.dialect}" )
     private String hibernateDialect;
@@ -83,21 +82,20 @@ public class ProcessingNodeConfig {
     @Value( "${hibernate.buffer_schema}" )
     private String hibernateBufferSchema;
     
+    @Value( "${occurrence.idGenerationSQL}" )
+    private String idGenerationSQL;
+    
     @Value("${jms.broker_url}")
     private String jmsBrokerUrl;
     
     @Bean(name="datasource")
-    public DataSource dataSource() {    		
-    	ComboPooledDataSource ds = new ComboPooledDataSource();
-    	try {
-			ds.setDriverClass(dbDriverClassName);
-		} catch (PropertyVetoException e) {
-			e.printStackTrace();
-		}
-    	ds.setJdbcUrl(dbUrl);
-    	ds.setUser(username);
-    	ds.setPassword(password);
-    	return ds;
+    public DataSource dataSource() {
+		return new EmbeddedDatabaseBuilder()
+			.setType(EmbeddedDatabaseType.H2)
+		    .addScript("classpath:createTablesPublicSchema-batch.sql")
+		    .addScript("classpath:createTablesBufferSchema-batch.sql")
+		    .addScript("classpath:createTablesBatchSpecific.sql")
+		    .build();
     }
     
     @Bean(name="bufferSessionFactory")
@@ -111,7 +109,6 @@ public class ProcessingNodeConfig {
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
 		hibernateProperties.setProperty("hibernate.default_schema", hibernateBufferSchema);
-		hibernateProperties.setProperty("hibernate.connection.autocommit","false");
 		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
     	sb.setHibernateProperties(hibernateProperties);
     	return sb;
@@ -121,9 +118,9 @@ public class ProcessingNodeConfig {
     public LocalSessionFactoryBean publicSessionFactory() {
     	LocalSessionFactoryBean sb = new LocalSessionFactoryBean(); 
     	sb.setDataSource(dataSource()); 
-    	sb.setAnnotatedClasses(new Class[]{
-    			OccurrenceRawModel.class,OccurrenceModel.class,
-    			ImportLogModel.class, ResourceModel.class});
+    	sb.setAnnotatedClasses(new Class[]{OccurrenceRawModel.class,
+    			OccurrenceModel.class,
+    			ImportLogModel.class});
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -160,22 +157,23 @@ public class ProcessingNodeConfig {
 	}
 	@Bean
 	public MoveToPublicSchemaJob moveToPublicSchemaJob(){
-		return null;
+		return new MoveToPublicSchemaJob();
 	}
 	@Bean
 	public ComputeUniqueValueJob computeUniqueValueJob(){
-		return null;
+		return new ComputeUniqueValueJob();
 	}
 	
 	//---STEP---
 	@Bean(name="streamEmlContentStep")
 	public ProcessingStepIF streamEmlContentStep(){
-		return null;
+		return new StreamEmlContentStep();
 	}
 	@Bean(name="streamDwcaContentStep")
 	public ProcessingStepIF streamDwcaContentStep(){
-		return null;
+		return new StreamDwcaContentStep();
 	}
+	
 	@Bean(name="insertRawOccurrenceStep")
 	public ProcessingStepIF insertRawOccurrenceStep(){
 		return new InsertRawOccurrenceStep();
@@ -191,46 +189,53 @@ public class ProcessingNodeConfig {
 		return new InsertResourceContactStep();
 	}
 	
-	@Bean(name="updateResourceContactStep")
-	public ProcessingStepIF updateResourceContactStep(){
-		return null;
-	}
+	//---TASK wiring---
 	
-	@Bean(name="streamOccurrenceForStatsStep")
-	public ProcessingStepIF streamOccurrenceForStatsStep(){
-		return null;
-	}
-	
-	//---Unused TASK in processing node---
 	@Bean
 	public ItemTaskIF prepareDwcaTask(){
-		return null;
+		return new PrepareDwcaTask();
 	}
+	
 	@Bean
 	public ItemTaskIF cleanBufferTableTask(){
-		return null;
+		return new CleanBufferTableTask();
 	}
+	
 	@Bean
 	public ItemTaskIF computeGISDataTask(){
-		return null;
+		return new MockComputeGISDataTask();
 	}
+	
 	@Bean
 	public ItemTaskIF checkProcessingCompletenessTask(){
-		return null;
+		return new CheckProcessingCompletenessTask();
 	}
+	
 	@Bean
 	public ItemTaskIF getResourceInfoTask(){
 		return null;
 	}
+	
 	@Bean
-	public ItemTaskIF findUsedDwcaTermTask(){
-		return null;
+	public ItemTaskIF computeUniqueValueTask(){
+		return new ComputeUniqueValueTask();
+	}
+	
+	@Bean
+	public ItemTaskIF replaceOldOccurrenceTask(){
+		return new ReplaceOldOccurrenceTask();
+	}
+	@Bean
+	public ItemTaskIF recordImportTask(){
+		return new RecordImportTask();
 	}
 	
 	//---PROCESSOR wiring---
 	@Bean(name="lineProcessor")
 	public ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> lineProcessor(){
-		return new DwcaLineProcessor();
+		DwcaLineProcessor dwcaLineProcessor = new DwcaLineProcessor();
+		dwcaLineProcessor.setIdGenerationSQL(idGenerationSQL);
+		return dwcaLineProcessor;
 	}
 	
 	@Bean(name="occurrenceProcessor")
@@ -248,9 +253,10 @@ public class ProcessingNodeConfig {
 	public ItemReaderIF<OccurrenceRawModel> dwcaItemReader(){
 		return new DwcaItemReader();
 	}
+	
 	@Bean
 	public ItemReaderIF<Eml> dwcaEmlReader(){
-		return null;
+		return new DwcaEmlReader();
 	}
 	
 	//---WRITER wiring---
@@ -270,17 +276,13 @@ public class ProcessingNodeConfig {
 	}
 	
 	/**
-	 * node should not use this
+	 * Always return a new instance. We do not want to share JMS Writer instance.
 	 * @return
 	 */
 	@Bean
+	@Scope("prototype")
 	public JMSWriter jmsWriter(){
-		return null;
-	}
-	
-	@Bean(name="jmsConsumer")
-	public JMSConsumer jmsConsumer(){
-		return new JMSConsumer(jmsBrokerUrl);
+		return new JMSWriter(jmsBrokerUrl);
 	}
 	
 }
