@@ -34,6 +34,7 @@ import com.sun.syndication.io.XmlReader;
 @Component("stepController")
 public class StepController implements StepControllerIF{
 	
+	//TODO should be loaded from config
 	private static final String CANADENSYS_IPT_RSS_URL = "http://data.canadensys.net/ipt/rss.do";
 	
 	@Autowired
