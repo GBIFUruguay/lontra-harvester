@@ -26,7 +26,7 @@ import net.canadensys.processing.occurrence.reader.DwcaItemReader;
 import net.canadensys.processing.occurrence.step.InsertRawOccurrenceStep;
 import net.canadensys.processing.occurrence.step.InsertResourceContactStep;
 import net.canadensys.processing.occurrence.step.ProcessInsertOccurrenceStep;
-import net.canadensys.processing.occurrence.step.StreamDwcaContentStep;
+import net.canadensys.processing.occurrence.step.StreamDwcContentStep;
 import net.canadensys.processing.occurrence.step.StreamEmlContentStep;
 import net.canadensys.processing.occurrence.task.CheckProcessingCompletenessTask;
 import net.canadensys.processing.occurrence.task.CleanBufferTableTask;
@@ -169,9 +169,9 @@ public class ProcessingConfigTest {
 	public ProcessingStepIF streamEmlContentStep(){
 		return new StreamEmlContentStep();
 	}
-	@Bean(name="streamDwcaContentStep")
-	public ProcessingStepIF streamDwcaContentStep(){
-		return new StreamDwcaContentStep();
+	@Bean(name="streamDwcContentStep")
+	public ProcessingStepIF streamDwcContentStep(){
+		return new StreamDwcContentStep();
 	}
 	
 	@Bean(name="insertRawOccurrenceStep")
@@ -250,7 +250,7 @@ public class ProcessingConfigTest {
 	
 	//---READER wiring---
 	@Bean
-	public ItemReaderIF<OccurrenceRawModel> dwcaItemReader(){
+	public ItemReaderIF<OccurrenceRawModel> dwcItemReader(){
 		return new DwcaItemReader();
 	}
 	

@@ -17,17 +17,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
- * Step reading a DarwinCore archive line, process the line, writing the processed lines at a fixed interval as ProcessingMessageIF.
+ * Step reading a DarwinCore line, process the line, writing the processed lines at a fixed interval as ProcessingMessageIF.
  * NOT thread safe
  * @author canadensys
  *
  */
-public class StreamDwcaContentStep implements ProcessingStepIF{
+public class StreamDwcContentStep implements ProcessingStepIF{
 	
 	private static final int FLUSH_INTERVAL = 100;
 	
 	@Autowired
-	@Qualifier("dwcaItemReader")
+	@Qualifier("dwcItemReader")
 	private ItemReaderIF<OccurrenceRawModel> reader;
 	
 	@Autowired

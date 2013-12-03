@@ -3,11 +3,11 @@ package net.canadensys.processing.occurrence.job;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.canadensys.processing.AbstractProcessingJob;
 import net.canadensys.processing.ItemProgressListenerIF;
 import net.canadensys.processing.ItemTaskIF;
 import net.canadensys.processing.ProcessingStepIF;
 import net.canadensys.processing.occurrence.SharedParameterEnum;
-import net.canadensys.processing.occurrence.step.StreamDwcaContentStep;
 import net.canadensys.processing.occurrence.task.CheckProcessingCompletenessTask;
 import net.canadensys.processing.occurrence.task.CleanBufferTableTask;
 import net.canadensys.processing.occurrence.task.GetResourceInfoTask;
@@ -26,9 +26,7 @@ import com.google.common.util.concurrent.FutureCallback;
  * @author canadensys
  *
  */
-public class ImportDwcaJob{
-	
-	protected Map<SharedParameterEnum,Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
+public class ImportDwcaJob extends AbstractProcessingJob{
 	
 	//Task and step
 	@Autowired
@@ -44,19 +42,15 @@ public class ImportDwcaJob{
 	private ProcessingStepIF streamEmlContentStep;
 	
 	@Autowired
-	private ProcessingStepIF streamDwcaContentStep;
+	private ProcessingStepIF streamDwcContentStep;
 	
 	@Autowired
 	private ItemTaskIF checkProcessingCompletenessTask;
 	
-	public void addToSharedParameters(SharedParameterEnum key, Object obj){
-		sharedParameters.put(key, obj);
+	public ImportDwcaJob(){
+		sharedParameters = new HashMap<SharedParameterEnum, Object>();
 	}
-	
-	public Object getSharedParameter(SharedParameterEnum key){
-		return sharedParameters.get(key);
-	}
-	
+		
 	/**
 	 * Run the actual job
 	 */
@@ -69,17 +63,8 @@ public class ImportDwcaJob{
 		prepareDwcaTask.execute(sharedParameters);
 		cleanBufferTableTask.execute(sharedParameters);
 		
-		try {
-			streamEmlContentStep.preStep(sharedParameters);
-			streamEmlContentStep.doStep();
-			streamEmlContentStep.postStep();
-			
-			streamDwcaContentStep.preStep(sharedParameters);
-			streamDwcaContentStep.doStep();
-			streamDwcaContentStep.postStep();
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		}
+		executeStepSequentially(streamEmlContentStep, sharedParameters);
+		executeStepSequentially(streamDwcContentStep, sharedParameters);
 		
 		sharedParameters.put(SharedParameterEnum.CALLBACK,jobCallback);
 		checkProcessingCompletenessTask.execute(sharedParameters);
@@ -101,13 +86,9 @@ public class ImportDwcaJob{
 		this.cleanBufferTableTask = cleanBufferTableTask;
 	}
 
-	public void setReadDwcaStep(StreamDwcaContentStep readDwcaStep) {
-		this.streamDwcaContentStep = readDwcaStep;
-	}
-
-	public void setProcessingCompletion(
-			CheckProcessingCompletenessTask processingCompletion) {
-		this.checkProcessingCompletenessTask = processingCompletion;
+	public void setCheckProcessingCompletenessTask(
+			CheckProcessingCompletenessTask checkProcessingCompletenessTask) {
+		this.checkProcessingCompletenessTask = checkProcessingCompletenessTask;
 	}
 
 }

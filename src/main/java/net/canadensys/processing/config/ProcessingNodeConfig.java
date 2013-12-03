@@ -154,9 +154,10 @@ public class ProcessingNodeConfig {
 	}
 	
     //---JOB---
+	//Nodes should not initiate jobs
 	@Bean
 	public ImportDwcaJob importDwcaJob(){
-		return new ImportDwcaJob();
+		return null;
 	}
 	@Bean
 	public MoveToPublicSchemaJob moveToPublicSchemaJob(){
@@ -172,8 +173,8 @@ public class ProcessingNodeConfig {
 	public ProcessingStepIF streamEmlContentStep(){
 		return null;
 	}
-	@Bean(name="streamDwcaContentStep")
-	public ProcessingStepIF streamDwcaContentStep(){
+	@Bean(name="streamDwcContentStep")
+	public ProcessingStepIF streamDwcContentStep(){
 		return null;
 	}
 	@Bean(name="insertRawOccurrenceStep")

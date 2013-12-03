@@ -1,9 +1,10 @@
 package net.canadensys.processing.occurrence.job;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
+import net.canadensys.processing.AbstractProcessingJob;
 import net.canadensys.processing.ItemTaskIF;
 import net.canadensys.processing.occurrence.task.ComputeUniqueValueTask;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Job to compute the unique values and their counts from the current content of the database.
@@ -12,7 +13,7 @@ import net.canadensys.processing.occurrence.task.ComputeUniqueValueTask;
  * @author canadensys
  *
  */
-public class ComputeUniqueValueJob {
+public class ComputeUniqueValueJob extends AbstractProcessingJob{
 
 	@Autowired
 	private ItemTaskIF computeUniqueValueTask;

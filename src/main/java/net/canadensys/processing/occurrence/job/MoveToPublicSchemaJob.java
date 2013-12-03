@@ -1,24 +1,23 @@
 package net.canadensys.processing.occurrence.job;
 
 import java.util.HashMap;
-import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
+import net.canadensys.processing.AbstractProcessingJob;
 import net.canadensys.processing.ItemTaskIF;
 import net.canadensys.processing.occurrence.SharedParameterEnum;
 import net.canadensys.processing.occurrence.task.ComputeGISDataTask;
 import net.canadensys.processing.occurrence.task.RecordImportTask;
 import net.canadensys.processing.occurrence.task.ReplaceOldOccurrenceTask;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * This job allows to move all the data from the buffer schema to the public one. We are creating the GIS related data inside that step.
  * @author canadensys
  *
  */
-public class MoveToPublicSchemaJob {
-	protected Map<SharedParameterEnum,Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
-	
+public class MoveToPublicSchemaJob extends AbstractProcessingJob{
+
 	@Autowired
 	private ItemTaskIF computeGISDataTask;
 	
@@ -28,8 +27,8 @@ public class MoveToPublicSchemaJob {
 	@Autowired
 	private ItemTaskIF recordImportTask;
 	
-	public void addToSharedParameters(SharedParameterEnum key, Object obj){
-		sharedParameters.put(key, obj);
+	public MoveToPublicSchemaJob(){
+		sharedParameters = new HashMap<SharedParameterEnum, Object>();
 	}
 	
 	public void doJob(){
