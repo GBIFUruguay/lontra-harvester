@@ -14,10 +14,12 @@ Dependencies
 * [Postgresl](http://www.postgresql.org/)
 * [ActiveMQ](http://activemq.apache.org/)
 * [PostGIS](http://postgis.net/)
+
 ### Libraries
 * [Rome](https://github.com/rometools/rome)
 * [Jackson](https://github.com/FasterXML/jackson)
 * [Apache CLI](http://commons.apache.org/proper/commons-cli/)
+
 ### Projects
 * [Canadensys Data Access 2.2.1](https://github.com/Canadensys/canadensys-data-access)
 * [narwhal-processor 1.4](https://github.com/Canadensys/narwhal-processor)
