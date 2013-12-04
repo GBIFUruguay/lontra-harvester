@@ -12,6 +12,8 @@ import net.canadensys.processing.ItemReaderIF;
 import net.canadensys.processing.ItemTaskIF;
 import net.canadensys.processing.ItemWriterIF;
 import net.canadensys.processing.ProcessingStepIF;
+import net.canadensys.processing.config.harvester.HarvesterConfig;
+import net.canadensys.processing.config.harvester.HarvesterConfigIF;
 import net.canadensys.processing.jms.JMSConsumer;
 import net.canadensys.processing.jms.JMSWriter;
 import net.canadensys.processing.occurrence.job.ComputeUniqueValueJob;
@@ -100,6 +102,10 @@ public class ProcessingConfig {
     
     @Value("${occurrence.idGenerationSQL}")
     private String idGenerationSQL;
+    
+    //optional
+    @Value("${ipt.rss:}")
+    private String iptRssAddress;
     
     @Bean(name="datasource")
     public DataSource dataSource() {
@@ -297,6 +303,14 @@ public class ProcessingConfig {
 	@Bean(name="resourceContactWriter")
 	public ItemWriterIF<ResourceContactModel> resourceContactHibernateWriter(){
 		return new ResourceContactHibernateWriter();
+	}
+	
+	//---Config---
+	@Bean
+	public HarvesterConfigIF harvesterConfig(){
+		HarvesterConfig hc = new HarvesterConfig();
+		hc.setIptRssAddress(iptRssAddress);
+		return hc;
 	}
 	
 	/**

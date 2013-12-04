@@ -11,3 +11,4 @@ hibernate.jdbc.fetch_size=1000
 jms.broker_url=tcp://127.0.0.1:61616
 
 occurrence.idGenerationSQL=SELECT nextval('buffer.occurrence_raw_auto_id_seq') FROM generate_series(1,100)
+ipt.rss=http://data.canadensys.net/ipt/rss.do

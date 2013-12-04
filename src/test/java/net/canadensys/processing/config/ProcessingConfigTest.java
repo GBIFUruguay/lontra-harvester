@@ -12,6 +12,8 @@ import net.canadensys.processing.ItemReaderIF;
 import net.canadensys.processing.ItemTaskIF;
 import net.canadensys.processing.ItemWriterIF;
 import net.canadensys.processing.ProcessingStepIF;
+import net.canadensys.processing.config.harvester.HarvesterConfig;
+import net.canadensys.processing.config.harvester.HarvesterConfigIF;
 import net.canadensys.processing.jms.JMSWriter;
 import net.canadensys.processing.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.processing.occurrence.job.ImportDwcaJob;
@@ -275,6 +277,13 @@ public class ProcessingConfigTest {
 	@Bean(name="resourceContactWriter")
 	public ItemWriterIF<ResourceContactModel> resourceContactHibernateWriter(){
 		return new ResourceContactHibernateWriter();
+	}
+	
+	//---Config---
+	//not used in test
+	@Bean
+	public HarvesterConfigIF harvesterConfig(){
+		return null;
 	}
 	
 	/**

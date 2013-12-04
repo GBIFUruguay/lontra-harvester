@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.canadensys.processing.ItemProgressListenerIF;
+import net.canadensys.processing.config.harvester.HarvesterConfigIF;
 import net.canadensys.processing.occurrence.SharedParameterEnum;
 import net.canadensys.processing.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.processing.occurrence.job.ImportDwcaJob;
@@ -34,8 +35,8 @@ import com.sun.syndication.io.XmlReader;
 @Component("stepController")
 public class StepController implements StepControllerIF{
 	
-	//TODO should be loaded from config
-	private static final String CANADENSYS_IPT_RSS_URL = "http://data.canadensys.net/ipt/rss.do";
+	@Autowired
+	private HarvesterConfigIF harvesterConfig;
 	
 	@Autowired
 	@Qualifier(value="publicSessionFactory")
@@ -50,7 +51,6 @@ public class StepController implements StepControllerIF{
 	@Autowired
 	private ComputeUniqueValueJob computeUniqueValueJob;
 
-	
 	@Autowired
 	private HarvesterViewModel harvesterViewModel;
 	
@@ -108,7 +108,7 @@ public class StepController implements StepControllerIF{
 		List<IPTFeedModel> feedList = new ArrayList<IPTFeedModel>();
 		SyndFeedInput input = new SyndFeedInput();
 		try {
-			SyndFeed feed = input.build(new XmlReader(new URL(CANADENSYS_IPT_RSS_URL)));
+			SyndFeed feed = input.build(new XmlReader(new URL(harvesterConfig.getIptRssAddress())));
 			List<SyndEntry> feedEntries = feed.getEntries();
 			for (SyndEntry currEntry : feedEntries) {
 				IPTFeedModel feedModel = new IPTFeedModel();
