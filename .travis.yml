@@ -8,7 +8,7 @@ before_install:
  - git clone https://github.com/Canadensys/narwhal-processor.git
  - cd narwhal-processor
  - mvn install
- - cd ..
+ - cd ../canadensys-harvester
 jdk:
   - oraclejdk7
   - openjdk7
