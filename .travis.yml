@@ -1,0 +1,19 @@
+language: java
+before_install:
+	- git clone git@github.com:Canadensys/canadensys-data-access.git
+	- cd canadensys-data-access
+	- mvn install
+	- cd ..
+	- git clone git@github.com:Canadensys/narwhal-processor.git
+	- cd narwhal-processor
+	- mvn install
+install: mvn install -DskipTests=true -Dgpg.skip=true
+jdk:
+  - oraclejdk7
+  - openjdk7
+  - openjdk6
+  
+# whitelist
+branches:
+	only:
+		- master

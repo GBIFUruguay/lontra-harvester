@@ -6,8 +6,6 @@ import static org.junit.Assert.fail;
 import java.math.BigDecimal;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.sql.DataSource;
-
 import net.canadensys.processing.ProcessingStepIF;
 import net.canadensys.processing.config.ProcessingConfigTest;
 import net.canadensys.processing.jms.JMSConsumer;
@@ -20,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
@@ -54,6 +53,10 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 	private SessionFactory sessionFactory;
 	
 	@Autowired
+	@Qualifier(value="publicTransactionManager")
+	private HibernateTransactionManager txManager;
+	
+	@Autowired
 	private ImportDwcaJob importDwcaJob;
 	
 	@Autowired
@@ -68,16 +71,9 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 	@Qualifier("insertResourceContactStep")
 	private JMSConsumerMessageHandler insertResourceContactStep;
 	
-    private JdbcTemplate jdbcTemplate;
-    
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
-	
 	@Test
 	public void testImport(){
-				
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(txManager.getDataSource());
 		//add a local consumer to test the entire loop
 		setupTestConsumer();
 						
@@ -90,7 +86,8 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 				jobComplete.wait();
 				//validate content of the database
 				if(jobComplete.get()){
-					
+					int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.occurrence", BigDecimal.class).intValue();
+
 					String state = jdbcTemplate.queryForObject("SELECT stateprovince FROM buffer.occurrence where dwcaid='3'", String.class);
 					assertTrue("Florida".equals(state));
 					
@@ -99,8 +96,7 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 					
 					String resource_contact = jdbcTemplate.queryForObject("SELECT name FROM buffer.resource_contact where dataset_shortname='qmor-specimens'", String.class);
 					assertTrue("Louise Cloutier".equals(resource_contact));
-					
-					int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.occurrence",BigDecimal.class).intValue();
+
 					assertTrue(new Integer(11).equals(count));
 				}
 				else{
