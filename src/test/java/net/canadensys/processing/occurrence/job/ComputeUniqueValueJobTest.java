@@ -34,6 +34,11 @@ public class ComputeUniqueValueJobTest {
     
     @Before
     public void init(){
+    	jdbcTemplate.batchUpdate(new String[]{
+        	"DELETE FROM occurrence",
+        	"DELETE FROM unique_values"
+        });
+    	
     	jdbcTemplate.update("INSERT INTO occurrence (auto_id,dwcaid,country,locality,sourcefileid) VALUES (1,'1','Mexico','Acapulco','uom-occurrence')");
 		jdbcTemplate.update("INSERT INTO occurrence (auto_id,dwcaid,country,locality,sourcefileid) VALUES (2,'2','Australia','Sydney','uoa-occurrence')");
 		jdbcTemplate.update("INSERT INTO occurrence (auto_id,dwcaid,country,locality,sourcefileid) VALUES (3,'3','Côte d''Ivoire','Abidjan','uoic-occurrence')");
