@@ -1,10 +1,10 @@
 language: java
 before_install:
- - git clone git@github.com:Canadensys/canadensys-data-access.git
+ - git clone https://github.com/Canadensys/canadensys-data-access.git
  - cd canadensys-data-access
  - mvn install
  - cd ..
- - git clone git@github.com:Canadensys/narwhal-processor.git
+ - git clone https://github.com/Canadensys/narwhal-processor.git
  - cd narwhal-processor
  - mvn install
 install: mvn install -DskipTests=true -Dgpg.skip=true
