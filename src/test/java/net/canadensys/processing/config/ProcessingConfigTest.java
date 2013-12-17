@@ -12,7 +12,6 @@ import net.canadensys.processing.ItemReaderIF;
 import net.canadensys.processing.ItemTaskIF;
 import net.canadensys.processing.ItemWriterIF;
 import net.canadensys.processing.ProcessingStepIF;
-import net.canadensys.processing.config.harvester.HarvesterConfig;
 import net.canadensys.processing.config.harvester.HarvesterConfigIF;
 import net.canadensys.processing.jms.JMSWriter;
 import net.canadensys.processing.occurrence.job.ComputeUniqueValueJob;
