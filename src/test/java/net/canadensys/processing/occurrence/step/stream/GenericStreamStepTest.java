@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.canadensys.processing.jms.JMSConsumerMessageHandler;
+import net.canadensys.processing.message.ProcessingMessageIF;
 import net.canadensys.processing.occurrence.SharedParameterEnum;
 import net.canadensys.processing.occurrence.message.DefaultMessage;
 import net.canadensys.processing.occurrence.mock.MockHabitObject;
@@ -29,7 +30,7 @@ public class GenericStreamStepTest {
 	@Test
 	public void testGenericStreamStep(){
 		GenericStreamStep<MockHabitObject> streamHabitStep = new GenericStreamStep<MockHabitObject>();
-		MockObjectWriter<DefaultMessage> writer = new MockObjectWriter<DefaultMessage>();
+		MockObjectWriter<ProcessingMessageIF> writer = new MockObjectWriter<ProcessingMessageIF>();
 		Map<SharedParameterEnum,Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH,"src/test/resources/dwca-vascan-checklist");
 		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE,"description");
@@ -51,7 +52,7 @@ public class GenericStreamStepTest {
 		streamHabitStep.postStep();
 		
 		//get the message that would have been wrote to JMS
-		List<DefaultMessage> messages = writer.getContent();
+		List<ProcessingMessageIF> messages = writer.getContent();
 		DefaultMessage firstMessage = (DefaultMessage)messages.get(0);
 		
 		//ensure class name are preserved

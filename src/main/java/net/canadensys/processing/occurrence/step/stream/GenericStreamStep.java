@@ -9,6 +9,7 @@ import net.canadensys.processing.ItemReaderIF;
 import net.canadensys.processing.ItemWriterIF;
 import net.canadensys.processing.ProcessingStepIF;
 import net.canadensys.processing.jms.JMSConsumerMessageHandler;
+import net.canadensys.processing.message.ProcessingMessageIF;
 import net.canadensys.processing.occurrence.SharedParameterEnum;
 import net.canadensys.processing.occurrence.message.DefaultMessage;
 
@@ -22,7 +23,7 @@ import net.canadensys.processing.occurrence.message.DefaultMessage;
 public class GenericStreamStep<T> implements ProcessingStepIF{
 
 	private ItemReaderIF<T> reader;
-	private ItemWriterIF<DefaultMessage> writer;
+	private ItemWriterIF<ProcessingMessageIF> writer;
 	private ItemProcessorIF<T, T> lineProcessor;
 
 	private int numberOfRecords = 0;
@@ -102,7 +103,7 @@ public class GenericStreamStep<T> implements ProcessingStepIF{
 	public void setReader(ItemReaderIF<T> reader) {
 		this.reader = reader;
 	}
-	public void setWriter(ItemWriterIF<DefaultMessage> writer) {
+	public void setWriter(ItemWriterIF<ProcessingMessageIF> writer) {
 		this.writer = writer;
 	}
 	public void setDwcaLineProcessor(
