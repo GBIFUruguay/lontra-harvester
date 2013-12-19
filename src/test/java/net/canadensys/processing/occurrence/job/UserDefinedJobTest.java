@@ -1,6 +1,7 @@
 package net.canadensys.processing.occurrence.job;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,15 +10,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.canadensys.processing.AbstractProcessingJob;
 import net.canadensys.processing.ItemMapperIF;
+import net.canadensys.processing.ItemProcessorIF;
 import net.canadensys.processing.ProcessingStepIF;
 import net.canadensys.processing.jms.JMSConsumer;
 import net.canadensys.processing.jms.JMSConsumerMessageHandler;
 import net.canadensys.processing.jms.JMSWriter;
 import net.canadensys.processing.occurrence.SharedParameterEnum;
 import net.canadensys.processing.occurrence.mock.MockHabitObject;
+import net.canadensys.processing.occurrence.mock.MockProcessedHabitObject;
 import net.canadensys.processing.occurrence.mock.mapper.MockHabitMapper;
+import net.canadensys.processing.occurrence.mock.processor.MockHabitProcessor;
 import net.canadensys.processing.occurrence.mock.writer.MockObjectWriter;
 import net.canadensys.processing.occurrence.reader.DwcaExtensionReader;
+import net.canadensys.processing.occurrence.step.async.GenericAsyncProcessingStep;
 import net.canadensys.processing.occurrence.step.async.GenericAsyncStep;
 import net.canadensys.processing.occurrence.step.stream.GenericStreamStep;
 
@@ -32,17 +37,19 @@ import com.google.common.util.concurrent.FutureCallback;
  * Sequence:
  * -Read data from a DarwinCore extension file
  * -Map it to MockHabitObject
- * -Stream the MockHabitObject on the Java Messaging System (JMS)
- * -Create a node(mocked) that would receive the message containing the MockHabitObject
- * -Rebuild the MockHabitObject from the received message
- * -Write the object
+ * -Stream the MockHabitObject on the Java Messaging System (JMS) to 2 different targets
+ * -Create a node(mocked) that would receive the message through a GenericAsyncStep step
+ * -Create another node(mocked) that would receive the message through a GenericAsyncProcessingStep step
+ * -Rebuild the MockHabitObject from the received message (and process it in GenericAsyncProcessingStep)
+ * -Write the objects
  * @author canadensys
  *
  */
-public class UserDefinedJobTest implements FutureCallback<Void>{
+public class UserDefinedJobTest{
 	
 	private static final String TEST_BROKER_URL = "vm://localhost?broker.persistent=false";
-	private static AtomicBoolean jobComplete = new AtomicBoolean(false);
+	private static AtomicBoolean step1Completed = new AtomicBoolean(false);
+	private static AtomicBoolean step2Completed = new AtomicBoolean(false);
 	
 	//Job initiator related variables
 	private InnerUserDefinedJob userDefinedJob;
@@ -53,52 +60,124 @@ public class UserDefinedJobTest implements FutureCallback<Void>{
 	
 	//Node related variables
 	private GenericAsyncStep<MockHabitObject> asyncStep;
+	private GenericAsyncProcessingStep<MockHabitObject,MockProcessedHabitObject> asyncStepWithProcessing;
+	
 	private JMSConsumer jmsReader;
 	private MockObjectWriter<MockHabitObject> itemWriter;
+	private MockObjectWriter<MockProcessedHabitObject> processedItemWriter;
+	private ItemProcessorIF<MockHabitObject, MockProcessedHabitObject> itemProcessor;
 	
 	@Test
 	public void testEntireLoop(){
 		
-		//1- Build a item reader
+		//Build a item reader
 		itemReader = new DwcaExtensionReader<MockHabitObject>();
 		
-		//2- Build a mapper to control how DarwinCore properties are mapped to user defined object
+		//Build a mapper to control how DarwinCore properties are mapped to user defined object
 		ItemMapperIF<MockHabitObject> itemMapper = new MockHabitMapper();
 		
-		//3- Link the reader with our mapper
+		//Link the reader with our mapper
 		itemReader.setMapper(itemMapper);
 		
-		//4-Create a JMS writer
+		//Create a JMS writer
 		jmsWriter = new JMSWriter(TEST_BROKER_URL);
 		
-		//5- Declare the message handler classes. Which class(es) on the node(s) should handle the messages.
+		//Declare the message handler classes. Which class(es) on the node(s) should handle the messages.
+		//When more than one class is provided, each classes will receive the message.
 		List<Class<? extends JMSConsumerMessageHandler>> msgHandlerClassList = new ArrayList<Class<? extends JMSConsumerMessageHandler>>();
 		msgHandlerClassList.add(GenericAsyncStep.class);
+		msgHandlerClassList.add(GenericAsyncProcessingStep.class);
 		
-		//6- Create and configure the stream step
+		//Create and configure the stream step
 		streamStep = new GenericStreamStep<MockHabitObject>();
 		streamStep.setReader(itemReader);
 		streamStep.setWriter(jmsWriter);
 		streamStep.setMessageClasses(msgHandlerClassList);
 
-		//7- Create our job
+		//Create our job
 		userDefinedJob = new InnerUserDefinedJob();
 		
-		//8- Add our step
+		//Add our step to the job
 		userDefinedJob.setGenericStreamStep(streamStep);
 		
-		//add a local consumer to test the entire loop
-		setupTestConsumer(2);
+		jmsReader = new JMSConsumer(TEST_BROKER_URL);
+		
+		//add a local consumers to test the entire loop
+		setupMessageConsumerUsingGenericAsyncStep(2);
+		setupMessageConsumerUsingGenericAsyncProcessingStep(2);
+		
+		//Start listening
+		jmsReader.open();
 						
 		userDefinedJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH,"src/test/resources/dwca-vascan-checklist");
 		userDefinedJob.addToSharedParameters(SharedParameterEnum.DWCA_EXTENSION_TYPE,"description");
 
 		userDefinedJob.doJob();
-		synchronized (jobComplete) {
+		
+		waitAndValidateNodeResult();
+	}
+	
+	/**
+	 * This message consumer will write using a MockObjectWriter so we can get the written objects back.
+	 */
+	private void setupMessageConsumerUsingGenericAsyncStep(int numberOfRecord){
+		
+		//Create our async step that would run on a node
+		asyncStep = new GenericAsyncStep<MockHabitObject>(MockHabitObject.class);
+		
+		//Create and set our writer
+		itemWriter = new MockObjectWriter<MockHabitObject>();
+		//This callback mechanism is for testing purpose only
+		itemWriter.addCallback(new InnerCallback(step1Completed), numberOfRecord);
+		asyncStep.setWriter(itemWriter);
+		
+		//Register our step as an handler (JMSConsumerMessageHandler)
+		jmsReader.registerHandler(asyncStep);
+		
+		try {
+			((ProcessingStepIF)asyncStep).preStep(null);
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * This consumer will write using a MockObjectWriter so we can get the written objects back.
+	 */
+	private void setupMessageConsumerUsingGenericAsyncProcessingStep(int numberOfRecord){
+
+		//Create our async step that would run on a node
+		asyncStepWithProcessing = new GenericAsyncProcessingStep<MockHabitObject, MockProcessedHabitObject>(MockHabitObject.class);
+		
+		//Create and set our writer
+		processedItemWriter = new MockObjectWriter<MockProcessedHabitObject>();
+		itemProcessor = new MockHabitProcessor();
+		
+		//This callback mechanism is for testing purpose only
+		processedItemWriter.addCallback(new InnerCallback(step2Completed), numberOfRecord);
+		asyncStepWithProcessing.setWriter(processedItemWriter);
+		asyncStepWithProcessing.setItemProcessor(itemProcessor);
+		
+		//Register our step as an handler (JMSConsumerMessageHandler)
+		jmsReader.registerHandler(asyncStepWithProcessing);
+		
+		try {
+			((ProcessingStepIF)asyncStepWithProcessing).preStep(null);
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Wait after steps completion and validate the result.
+	 */
+	private void waitAndValidateNodeResult(){
+		//wait and validate result of Step 1 (GenericAsyncStep)
+		synchronized (step1Completed) {
 			try {
-				jobComplete.wait();
-				//validate content of the database
-				if(jobComplete.get()){
+				step1Completed.wait();
+				
+				if(step1Completed.get()){
 					List<MockHabitObject> objectWritten = itemWriter.getContent();
 					assertEquals("1941",objectWritten.get(0).getId());
 				}
@@ -109,47 +188,49 @@ public class UserDefinedJobTest implements FutureCallback<Void>{
 				fail();
 			}
 		}
+		
+		//wait and validate result of Step 2 (GenericAsyncProcessingStep)
+		synchronized (step2Completed) {
+			try {
+				step2Completed.wait();
+				
+				if(step2Completed.get()){
+					List<MockProcessedHabitObject> objectWritten = processedItemWriter.getContent();
+					assertEquals(1941,objectWritten.get(0).getId());
+				}
+				else{
+					fail();
+				}
+			}
+			catch (InterruptedException e) {
+				fail();
+			}
+		}
 	}
-	
+
 	/**
-	 * This consumer will write using a MockObjectWriter so we can get the written object back.
+	 * Inner class to handle callbacks with a synchronized object.
+	 * @author canadensys
+	 *
 	 */
-	private void setupTestConsumer(int numberOfRecord){
-		jmsReader = new JMSConsumer(TEST_BROKER_URL);
-		
-		//1- Create our async step that would run on a node
-		asyncStep = new GenericAsyncStep<MockHabitObject>(MockHabitObject.class);
-		
-		//2- Create and set our writer
-		itemWriter = new MockObjectWriter<MockHabitObject>();
-		//This callback mechanism is for testing purpose only
-		itemWriter.addCallback(this, numberOfRecord);
-		asyncStep.setWriter(itemWriter);
-		
-		//3- Register our step as an handler (JMSConsumerMessageHandler)
-		jmsReader.registerHandler(asyncStep);
-		
-		try {
-			((ProcessingStepIF)asyncStep).preStep(null);
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
+	private class InnerCallback implements FutureCallback<Void>{
+		private AtomicBoolean notifyObject;
+		public InnerCallback(AtomicBoolean notifyObject){
+			this.notifyObject = notifyObject;
 		}
 		
-		//4- Start listening
-		jmsReader.open();
-	}
-
-	@Override
-	public void onSuccess(Void result) {
-		synchronized (jobComplete) {
-			jobComplete.set(true);
-			jobComplete.notifyAll();
+		@Override
+		public void onSuccess(Void result) {
+			synchronized (notifyObject) {
+				notifyObject.set(true);
+				notifyObject.notifyAll();
+			}
 		}
-	}
 
-	@Override
-	public void onFailure(Throwable t) {
-		fail();
+		@Override
+		public void onFailure(Throwable t) {
+			fail();
+		}
 	}
 	
 	/**
@@ -172,5 +253,4 @@ public class UserDefinedJobTest implements FutureCallback<Void>{
 			executeStepSequentially(genericStreamStep, sharedParameters);
 		}
 	}
-
 }

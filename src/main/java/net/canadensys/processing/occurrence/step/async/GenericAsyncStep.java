@@ -12,6 +12,7 @@ import net.canadensys.processing.occurrence.message.DefaultMessage;
 /**
  * Generic asynchronous step that handles user defined object (defined by T) received though DefaultMessage.
  * The user defined object is then written to the defined writer.
+ * This class does NOT contain any ItemProcessorIF
  * @author canadensys
  *
  * @param <T>
@@ -23,7 +24,7 @@ public class GenericAsyncStep<T> implements ProcessingStepIF,JMSConsumerMessageH
 	
 	/**
 	 * 
-	 * @param classOfT class object of T to allow casting
+	 * @param classOfT class object of T to allow explicit cast
 	 */
 	public GenericAsyncStep(Class<T> classOfT){
 		messageContentClass = classOfT;
@@ -45,6 +46,14 @@ public class GenericAsyncStep<T> implements ProcessingStepIF,JMSConsumerMessageH
 	@Override
 	public Class<?> getMessageClass() {
 		return DefaultMessage.class;
+	}
+	
+	/**
+	 * This will be used to route object to the right GenericAsyncStep in case more than one is registered.
+	 * @return
+	 */
+	public Class<?> getMessageContentClass() {
+		return messageContentClass;
 	}
 
 	@Override

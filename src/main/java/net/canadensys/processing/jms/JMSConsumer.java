@@ -30,7 +30,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Java Messaging System message consumer.
- * 
+ * The routing of the message is done using the getMessageClass() of JMSConsumerMessageHandler.
+ * For DefaultMessage, the getMsgHandlerClass() will also be used to find the proper handler and another one will be added soon.
  * @author canadensys
  *
  */
@@ -126,8 +127,7 @@ public class JMSConsumer{
 	private class JMSMessageListener implements MessageListener{
 		@Override
 		public void onMessage(Message message) {
-			// There are many types of Message and TextMessage
-			// is just one of them. Producer sent us a TextMessage
+			// Producer sent us a TextMessage
 			// so we must cast to it to get access to its .getText()
 			// method.
 			if (message instanceof TextMessage) {
@@ -144,12 +144,13 @@ public class JMSConsumer{
 								//TODO write a DefaultMessage deserializer that would handle that
 								rootObj= om.readTree(msg.getText());
 								dmsg.setContent(om.readValue(rootObj.get("content").toString(),dmsg.getContentClass()));
-
+								
+								//TODO use contentClass to route to the right handler (generic handlers may be there more than once)
 								currMsgHandler.handleMessage(dmsg);
 								break;
 							}
 						}
-						else{//backward compatibility only, scheduled for removal
+						else{
 							if(currMsgHandler.getMessageClass().equals(msgClass)){
 								ProcessingMessageIF chunk = (ProcessingMessageIF)om.readValue(msg.getText(), msgClass);
 								currMsgHandler.handleMessage(chunk);
