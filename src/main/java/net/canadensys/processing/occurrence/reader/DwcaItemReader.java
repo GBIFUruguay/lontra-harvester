@@ -38,6 +38,7 @@ public class DwcaItemReader implements ItemReaderIF<OccurrenceRawModel>{
 	
 	private String dwcaFilePath = null;
 	private String[] headers;
+	private Map<String,String> defaultValues = null;
 	
 	private ItemMapperIF<OccurrenceRawModel> mapper = new OccurrenceMapper();
 	
@@ -58,6 +59,12 @@ public class DwcaItemReader implements ItemReaderIF<OccurrenceRawModel>{
 			properties.put(currHeader, data[i]);
 			i++;
 		}
+		//check if some default values must be handled
+		if(defaultValues != null){
+			for(String defaultValueCol : defaultValues.keySet()){
+				properties.put(defaultValueCol, defaultValues.get(defaultValueCol));
+			}
+		}
 		return mapper.mapElement(properties);
 	}
 
@@ -77,7 +84,7 @@ public class DwcaItemReader implements ItemReaderIF<OccurrenceRawModel>{
 			indexedColumns.add("id");
 			String headerName;
 			for(ArchiveField currArField : sortedFieldList){
-				//skip default column
+				//check if the field is a default column or not
 				if(currArField.getIndex() != null){
 					//take the name lower case and handle reserved words
 					headerName = currArField.getTerm().simpleName().toLowerCase();
@@ -86,8 +93,14 @@ public class DwcaItemReader implements ItemReaderIF<OccurrenceRawModel>{
 					}
 					indexedColumns.add(headerName);
 				}
+				else{
+					//lazy init, do not create if not needed for this archive
+					if(defaultValues == null){
+						defaultValues = new HashMap<String, String>();
+					}
+					defaultValues.put(currArField.getTerm().simpleName().toLowerCase(), currArField.getDefaultValue());
+				}
 			}
-			
 			headers = indexedColumns.toArray(new String[0]);
 			
 			//make sure those headers can be imported correctly
