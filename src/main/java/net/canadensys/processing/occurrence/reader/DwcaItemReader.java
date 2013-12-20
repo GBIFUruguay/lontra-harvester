@@ -28,7 +28,8 @@ import org.gbif.utils.file.ClosableIterator;
  */
 public class DwcaItemReader implements ItemReaderIF<OccurrenceRawModel>{
 	
-	private static final Map<String,String> RESERVED_WORDS = new HashMap<String, String>();
+	//TODO should be configurable
+	static final Map<String,String> RESERVED_WORDS = new HashMap<String, String>();
 	static{
 		RESERVED_WORDS.put("class", "_class");
 		RESERVED_WORDS.put("group", "_group");
@@ -82,23 +83,17 @@ public class DwcaItemReader implements ItemReaderIF<OccurrenceRawModel>{
 			List<ArchiveField> sortedFieldList = dwcaCore.getFieldsSorted();
 			ArrayList<String> indexedColumns = new ArrayList<String>();
 			indexedColumns.add("id");
-			String headerName;
 			for(ArchiveField currArField : sortedFieldList){
 				//check if the field is a default column or not
 				if(currArField.getIndex() != null){
-					//take the name lower case and handle reserved words
-					headerName = currArField.getTerm().simpleName().toLowerCase();
-					if(RESERVED_WORDS.get(headerName) != null){
-						headerName = RESERVED_WORDS.get(headerName);
-					}
-					indexedColumns.add(headerName);
+					indexedColumns.add(getHeaderName(currArField));
 				}
 				else{
 					//lazy init, do not create if not needed for this archive
 					if(defaultValues == null){
 						defaultValues = new HashMap<String, String>();
 					}
-					defaultValues.put(currArField.getTerm().simpleName().toLowerCase(), currArField.getDefaultValue());
+					defaultValues.put(getHeaderName(currArField), currArField.getDefaultValue());
 				}
 			}
 			headers = indexedColumns.toArray(new String[0]);
@@ -119,6 +114,19 @@ public class DwcaItemReader implements ItemReaderIF<OccurrenceRawModel>{
 	@Override
 	public void closeReader(){
 		rowsIt.close();
+	}
+	
+	/**
+	 * Handle reserved word and lowercase header from ArchiveField.
+	 * @param archiveField
+	 * @return
+	 */
+	private String getHeaderName(ArchiveField archiveField){
+		String headerName = archiveField.getTerm().simpleName().toLowerCase();
+		if(RESERVED_WORDS.get(headerName) != null){
+			headerName = RESERVED_WORDS.get(headerName);
+		}
+		return headerName;
 	}
 	
 	private void validateDwcaHeaders(){

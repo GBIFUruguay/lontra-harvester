@@ -30,5 +30,8 @@ public class DwcaExtensionReaderTest {
 		extReader.openReader(sharedParameters);
 		MockHabitObject obj = extReader.read();
 		assertEquals("herb", obj.getDescription());
+		
+		//ensure that we read default values
+		assertEquals("EN", obj.getLanguage());
 	}
 }

@@ -24,6 +24,7 @@ import org.gbif.utils.file.ClosableIterator;
 
 /**
  * Generic reader to read a DarwinCore Archive extension.
+ * TODO: Too much code duplicated from DwcaItemReader, rework needed
  * 
  * @author canadensys
  *
@@ -38,6 +39,7 @@ public class DwcaExtensionReader<T> implements ItemReaderIF<T>{
 	
 	private ClosableIterator<String[]> rowsIt;
 	private String[] headers;
+	private Map<String,String> defaultValues = null;
 	
 	@Override
 	public void openReader(Map<SharedParameterEnum, Object> sharedParameters) {
@@ -64,13 +66,17 @@ public class DwcaExtensionReader<T> implements ItemReaderIF<T>{
 			List<ArchiveField> sortedFieldList = dwcaContentFile.getFieldsSorted();
 			ArrayList<String> indexedColumns = new ArrayList<String>();
 			indexedColumns.add("id");
-			String headerName;
 			for(ArchiveField currArField : sortedFieldList){
-				//skip default column
+				//check if the field is a default column or not
 				if(currArField.getIndex() != null){
-					//take the name lower case
-					headerName = currArField.getTerm().simpleName().toLowerCase();
-					indexedColumns.add(headerName);
+					indexedColumns.add(getHeaderName(currArField));
+				}
+				else{
+					//lazy init, do not create if not needed for this archive
+					if(defaultValues == null){
+						defaultValues = new HashMap<String, String>();
+					}
+					defaultValues.put(getHeaderName(currArField), currArField.getDefaultValue());
 				}
 			}
 			
@@ -105,6 +111,12 @@ public class DwcaExtensionReader<T> implements ItemReaderIF<T>{
 			properties.put(currHeader, data[i]);
 			i++;
 		}
+		//check if some default values must be handled
+		if(defaultValues != null){
+			for(String defaultValueCol : defaultValues.keySet()){
+				properties.put(defaultValueCol, defaultValues.get(defaultValueCol));
+			}
+		}
 		return mapper.mapElement(properties);
 	}
 	
@@ -114,6 +126,19 @@ public class DwcaExtensionReader<T> implements ItemReaderIF<T>{
 	 */
 	public void setMapper(ItemMapperIF<T> mapper){
 		this.mapper = mapper;
+	}
+	
+	/**
+	 * Handle reserved word and lowercase header from ArchiveField.
+	 * @param archiveField
+	 * @return
+	 */
+	private String getHeaderName(ArchiveField archiveField){
+		String headerName = archiveField.getTerm().simpleName().toLowerCase();
+		if(DwcaItemReader.RESERVED_WORDS.get(headerName) != null){
+			headerName = DwcaItemReader.RESERVED_WORDS.get(headerName);
+		}
+		return headerName;
 	}
 	
 	/**
