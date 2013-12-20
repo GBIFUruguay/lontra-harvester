@@ -29,9 +29,11 @@ import org.apache.log4j.Logger;
 public class PrepareDwcaTask implements ItemTaskIF{
 	//get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(PrepareDwcaTask.class);
+	
 	private static final String IPT_PREFIX = "dwca-";
 	private static final String WORKING_FOLDER = "work";
 	
+	//see setAllowDatasetShortnameExtraction method comments
 	private boolean allowDatasetShortnameExtraction = false;
 	
 	/**
@@ -71,7 +73,7 @@ public class PrepareDwcaTask implements ItemTaskIF{
 		//make sure the files exists
 		if(dwcaFileLocation != null){
 			//Is this a URL?
-			UrlValidator urlValidator = new UrlValidator();
+			UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
 			if(urlValidator.isValid(dwcaFileLocation)){
 				File workFolder = new File(WORKING_FOLDER);
 				//make sure the folder exists
@@ -88,9 +90,9 @@ public class PrepareDwcaTask implements ItemTaskIF{
 			            dwcaFileLocation  = destinationFile;
 		        	}
 				} catch (MalformedURLException e) {
-					e.printStackTrace();
+					LOGGER.fatal(e);
 				} catch (IOException e) {
-					e.printStackTrace();
+					LOGGER.fatal(e);
 				}
 			}
 			dwcaFile = new File(dwcaFileLocation);
@@ -107,7 +109,6 @@ public class PrepareDwcaTask implements ItemTaskIF{
 		else{
 			dwcaIdentifier = FilenameUtils.getBaseName(dwcaFileLocation);
 		}
-		
 		
 		//remove common IPT prefix
 		if(StringUtils.startsWith(dwcaIdentifier, IPT_PREFIX)){
@@ -157,7 +158,7 @@ public class PrepareDwcaTask implements ItemTaskIF{
             
             success = true;
         } catch (Exception e) {
-            e.printStackTrace();
+        	LOGGER.fatal(e);
         } finally {
             if (os != null) { 
                 try {
@@ -176,6 +177,7 @@ public class PrepareDwcaTask implements ItemTaskIF{
 	public boolean isAllowDatasetShortnameExtraction() {
 		return allowDatasetShortnameExtraction;
 	}
+	
 	/**
 	 * Should we allow this task to set the SharedParameterEnum.DATASET_SHORTNAME using the name of the file
 	 * in case this parameter is not set?
@@ -185,5 +187,4 @@ public class PrepareDwcaTask implements ItemTaskIF{
 			boolean allowDatasetShortnameExtraction) {
 		this.allowDatasetShortnameExtraction = allowDatasetShortnameExtraction;
 	}
-
 }
