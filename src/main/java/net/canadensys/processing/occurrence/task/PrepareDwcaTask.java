@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import java.util.UUID;
 
 import net.canadensys.processing.ItemTaskIF;
 import net.canadensys.processing.exception.TaskExecutionException;
@@ -83,6 +84,12 @@ public class PrepareDwcaTask implements ItemTaskIF{
 					dlUrl = new URL(dwcaFileLocation);
 					//Get the filename as defined by Content-Disposition:filename="dwca-mt-specimens.zip"
 		        	String filename = dlUrl.openConnection().getHeaderField("Content-Disposition");
+		        	
+		        	//If the URL end point can not tell the name of the file, generate a UUID and keep the extension
+		        	if(StringUtils.isBlank(filename)){
+		        		filename = UUID.randomUUID().toString() + "." + FilenameUtils.getExtension(filename);
+		        	}
+		        	
 		        	if(StringUtils.isNotBlank(filename)){
 			            String destinationFile = workFolder.getAbsolutePath() +File.separator+ filename.replaceAll("\"", "").replace("filename=", "");
 			            
@@ -102,6 +109,7 @@ public class PrepareDwcaTask implements ItemTaskIF{
 			throw new TaskExecutionException("Could not find the DarwinCore archive file "  + dwcaFileLocation);
 		}
 		
+		//TODO: dwcaIdentifier should only be set if allowDatasetShortnameExtraction is true
 		//set the unique identifier for this resource
 		if(dwcaFile.isDirectory()){
 			dwcaIdentifier = dwcaFile.getName();

@@ -7,6 +7,7 @@ import net.canadensys.processing.exception.TaskExecutionException;
 import net.canadensys.processing.occurrence.SharedParameterEnum;
 
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -44,17 +45,23 @@ public class CleanBufferTableTask implements ItemTaskIF {
 			LOGGER.fatal("Misconfigured task : needs  datasetShortname");
 			throw new TaskExecutionException("Misconfigured task");
 		}
-		SQLQuery query = session.createSQLQuery("DELETE FROM buffer.occurrence_raw WHERE sourcefileid=?");
-		query.setString(0, datasetShortname);
-		query.executeUpdate();
-		
-		query = session.createSQLQuery("DELETE FROM buffer.occurrence WHERE sourcefileid=?");
-		query.setString(0, datasetShortname);
-		query.executeUpdate();
-		
-		query = session.createSQLQuery("DELETE FROM buffer.resource_contact WHERE dataset_shortname=?");
-		query.setString(0, datasetShortname);
-		query.executeUpdate();
+		try{
+			SQLQuery query = session.createSQLQuery("DELETE FROM buffer.occurrence_raw WHERE sourcefileid=?");
+			query.setString(0, datasetShortname);
+			query.executeUpdate();
+			
+			query = session.createSQLQuery("DELETE FROM buffer.occurrence WHERE sourcefileid=?");
+			query.setString(0, datasetShortname);
+			query.executeUpdate();
+			
+			query = session.createSQLQuery("DELETE FROM buffer.resource_contact WHERE dataset_shortname=?");
+			query.setString(0, datasetShortname);
+			query.executeUpdate();
+		}
+		catch(HibernateException hEx){
+			LOGGER.fatal("Can't remove previous records from the database.",hEx);
+			throw new TaskExecutionException("Can't remove previous records from the database.");
+		}
 	}
 
 	public void setSessionFactory(SessionFactory sessionFactory) {
