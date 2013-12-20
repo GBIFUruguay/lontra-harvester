@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
+ * This task should only be used if you do not have any indexing software (e.g. ElasticSearch ...)
  * Task to pre-compute all possible unique values and their counts for some fields.
  * To ensure maximum performance we run this once, after moving the data to public schema.
  * @author canadensys

@@ -16,6 +16,7 @@ import net.canadensys.processing.message.ControlMessageIF;
 import net.canadensys.processing.message.ProcessingMessageIF;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,6 +30,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class JMSProducer{
 
+	private static final Logger LOGGER = Logger.getLogger(JMSProducer.class);
+	
 	private String brokerURL;
 	
 	// Name of the queue we will sent messages into
@@ -70,7 +73,7 @@ public class JMSProducer{
 			publisher = topicSession.createPublisher(topicSession.createTopic(CONTROL_TOPIC));
 		}
 		catch(JMSException jEx){
-			jEx.printStackTrace();
+			LOGGER.fatal("Can not initialize JMSProducer", jEx);
 		}
 	}
 

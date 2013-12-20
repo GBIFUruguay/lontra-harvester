@@ -22,6 +22,7 @@ import net.canadensys.processing.occurrence.message.DefaultMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -36,6 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  */
 public class JMSConsumer{
+	private static final Logger LOGGER = Logger.getLogger(JMSConsumer.class);
 	
 	public String brokerURL;
 	private boolean isOpen = false;
@@ -111,7 +113,7 @@ public class JMSConsumer{
 			subscriber.setMessageListener(msgListener);
 		}
 		catch(JMSException jmsEx){
-			jmsEx.printStackTrace();
+			LOGGER.fatal("Can not initialize JMSConsumer", jmsEx);
 		}
 	}
 

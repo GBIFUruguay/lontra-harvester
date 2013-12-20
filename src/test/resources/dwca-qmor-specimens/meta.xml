@@ -8,7 +8,7 @@
     <field index="2" term="http://rs.tdwg.org/dwc/terms/georeferenceProtocol"/>
     <field index="3" term="http://rs.tdwg.org/dwc/terms/genus"/>
     <field index="4" term="http://rs.tdwg.org/dwc/terms/locality"/>
-    <field index="5" term="http://rs.tdwg.org/dwc/terms/basisOfRecord"/>
+    <field index="5" term="http://rs.tdwg.org/dwc/terms/acceptedNameUsageID"/>
     <field index="6" term="http://rs.tdwg.org/dwc/terms/behavior"/>
     <field index="7" term="http://rs.tdwg.org/dwc/terms/georeferencedBy"/>
     <field index="8" term="http://rs.tdwg.org/dwc/terms/continent"/>
@@ -69,6 +69,6 @@
     <field index="63" term="http://rs.tdwg.org/dwc/terms/georeferenceSources"/>
     <field index="64" term="http://rs.tdwg.org/dwc/terms/stateProvince"/>
     <field index="65" term="http://rs.tdwg.org/dwc/terms/typeStatus"/>
-    <field index="66" term="http://rs.tdwg.org/dwc/terms/country"/>
+    <field default="PreservedSpecimen" term="http://rs.tdwg.org/dwc/terms/basisOfRecord"/>
   </core>
 </archive>
