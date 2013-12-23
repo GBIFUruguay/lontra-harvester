@@ -33,4 +33,22 @@ public class DwcaReaderTest {
 		assertEquals("PreservedSpecimen", rawModel.getBasisofrecord());
 		assertEquals("Rigaud", rawModel.getMunicipality());
 	}
+	
+	/**
+	 * Test an archive where the id column is also a field (e.g. catalogNumber).
+	 */
+	@Test
+	public void testDwcaItemReaderIdColumn(){
+		Map<SharedParameterEnum,Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
+		sharedParameters.put(SharedParameterEnum.DWCA_PATH,"src/test/resources/dwca-qmor-specimens-id");
+		sharedParameters.put(SharedParameterEnum.DATASET_SHORTNAME,"qmor-specimens");
+		
+		ItemReaderIF<OccurrenceRawModel> dwcaItemReader = new DwcaItemReader();
+		dwcaItemReader.openReader(sharedParameters);
+		
+		OccurrenceRawModel rawModel = dwcaItemReader.read();
+		//ensure that we read default values
+		assertEquals("1", rawModel.getCatalognumber());
+		assertEquals("Gomphus", rawModel.getGenus());
+	}
 }

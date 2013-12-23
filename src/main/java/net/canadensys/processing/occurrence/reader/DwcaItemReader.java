@@ -2,9 +2,7 @@ package net.canadensys.processing.occurrence.reader;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
@@ -12,38 +10,25 @@ import net.canadensys.processing.ItemMapperIF;
 import net.canadensys.processing.ItemReaderIF;
 import net.canadensys.processing.occurrence.SharedParameterEnum;
 import net.canadensys.processing.occurrence.mapper.OccurrenceMapper;
+import net.canadensys.processing.occurrence.task.PrepareDwcaTask;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.gbif.dwc.text.Archive;
 import org.gbif.dwc.text.ArchiveFactory;
-import org.gbif.dwc.text.ArchiveField;
-import org.gbif.dwc.text.ArchiveFile;
 import org.gbif.dwc.text.UnsupportedArchiveException;
-import org.gbif.utils.file.ClosableIterator;
 
 /**
- * Item reader for Darwin Core Archive
+ * Item reader for Darwin Core Archive.
  * @author canadensys
  *
  */
-public class DwcaItemReader implements ItemReaderIF<OccurrenceRawModel>{
-	
-	//TODO should be configurable
-	static final Map<String,String> RESERVED_WORDS = new HashMap<String, String>();
-	static{
-		RESERVED_WORDS.put("class", "_class");
-		RESERVED_WORDS.put("group", "_group");
-		RESERVED_WORDS.put("order", "_order");
-		RESERVED_WORDS.put("references", "_references");
-	}
-	
-	private String dwcaFilePath = null;
-	private String[] headers;
-	private Map<String,String> defaultValues = null;
+public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemReaderIF<OccurrenceRawModel>{
+	//get log4j handler
+	private static final Logger LOGGER = Logger.getLogger(DwcaItemReader.class);
 	
 	private ItemMapperIF<OccurrenceRawModel> mapper = new OccurrenceMapper();
-	
-	private ClosableIterator<String[]> rowsIt;
 
 	@Override
 	public OccurrenceRawModel read(){
@@ -72,61 +57,31 @@ public class DwcaItemReader implements ItemReaderIF<OccurrenceRawModel>{
 	@Override
 	public void openReader(Map<SharedParameterEnum,Object> sharedParameters){
 		dwcaFilePath = (String)sharedParameters.get(SharedParameterEnum.DWCA_PATH);
-		
-		File dwcaFile = null;
-		try {
-			dwcaFile = new File(dwcaFilePath);
-			Archive dwcArchive = ArchiveFactory.openArchive(dwcaFile);
-			ArchiveFile dwcaCore = dwcArchive.getCore();
-			
-			//get headers
-			List<ArchiveField> sortedFieldList = dwcaCore.getFieldsSorted();
-			ArrayList<String> indexedColumns = new ArrayList<String>();
-			indexedColumns.add("id");
-			for(ArchiveField currArField : sortedFieldList){
-				//check if the field is a default column or not
-				if(currArField.getIndex() != null){
-					indexedColumns.add(getHeaderName(currArField));
-				}
-				else{
-					//lazy init, do not create if not needed for this archive
-					if(defaultValues == null){
-						defaultValues = new HashMap<String, String>();
-					}
-					defaultValues.put(getHeaderName(currArField), currArField.getDefaultValue());
-				}
-			}
-			headers = indexedColumns.toArray(new String[0]);
-			
-			//make sure those headers can be imported correctly
-			validateDwcaHeaders();
-			
-			//get rows
-			rowsIt = dwcaCore.getCSVReader().iterator();
-			
-		} catch (UnsupportedArchiveException e) {
-			e.printStackTrace();	
-		} catch (IOException e) {
-			e.printStackTrace();
+		if(mapper == null){
+			throw new IllegalStateException("No mapper defined");
 		}
+		if(StringUtils.isBlank(dwcaFilePath)){
+			throw new IllegalStateException("sharedParameters missing: DWCA_PATH is required.");
+		}
+		
+		File dwcaFile = new File(dwcaFilePath);
+		Archive dwcArchive;
+		try {
+			dwcArchive = ArchiveFactory.openArchive(dwcaFile);
+			prepareReader(dwcArchive.getCore());
+		} catch (UnsupportedArchiveException e) {
+			LOGGER.fatal("Can't open DwcaItemReader", e);
+		} catch (IOException e) {
+			LOGGER.fatal("Can't open DwcaItemReader", e);
+		}
+		
+		//make sure those headers can be imported correctly
+		validateDwcaHeaders();
 	}
 	
 	@Override
 	public void closeReader(){
-		rowsIt.close();
-	}
-	
-	/**
-	 * Handle reserved word and lowercase header from ArchiveField.
-	 * @param archiveField
-	 * @return
-	 */
-	private String getHeaderName(ArchiveField archiveField){
-		String headerName = archiveField.getTerm().simpleName().toLowerCase();
-		if(RESERVED_WORDS.get(headerName) != null){
-			headerName = RESERVED_WORDS.get(headerName);
-		}
-		return headerName;
+		closeReader();
 	}
 	
 	private void validateDwcaHeaders(){
@@ -137,5 +92,4 @@ public class DwcaItemReader implements ItemReaderIF<OccurrenceRawModel>{
 			}
 		}
 	}
-
 }

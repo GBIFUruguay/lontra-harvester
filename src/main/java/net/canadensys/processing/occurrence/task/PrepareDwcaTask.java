@@ -89,13 +89,11 @@ public class PrepareDwcaTask implements ItemTaskIF{
 		        	if(StringUtils.isBlank(filename)){
 		        		filename = UUID.randomUUID().toString() + "." + FilenameUtils.getExtension(filename);
 		        	}
-		        	
-		        	if(StringUtils.isNotBlank(filename)){
-			            String destinationFile = workFolder.getAbsolutePath() +File.separator+ filename.replaceAll("\"", "").replace("filename=", "");
+
+		        	String destinationFile = workFolder.getAbsolutePath() +File.separator+ filename.replaceAll("\"", "").replace("filename=", "");
 			            
-			            downloadDwca(dlUrl, destinationFile);
-			            dwcaFileLocation  = destinationFile;
-		        	}
+		        	downloadDwca(dlUrl, destinationFile);
+		        	dwcaFileLocation  = destinationFile;
 				} catch (MalformedURLException e) {
 					LOGGER.fatal(e);
 				} catch (IOException e) {
@@ -163,7 +161,6 @@ public class PrepareDwcaTask implements ItemTaskIF{
 
             //Download the file
             IOUtils.copy(is, os);
-            
             success = true;
         } catch (Exception e) {
         	LOGGER.fatal(e);
