@@ -10,6 +10,7 @@ import net.canadensys.processing.exception.TaskExecutionException;
 import net.canadensys.processing.occurrence.SharedParameterEnum;
 
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
@@ -43,9 +44,14 @@ public class DwcaLineProcessor implements ItemProcessorIF<OccurrenceRawModel, Oc
 	
 	@Override
 	public void init(){
-		session = sessionFactory.openStatelessSession();
-		session.beginTransaction();
-		sqlQuery = session.createSQLQuery(idGenerationSQL);
+		try{
+			session = sessionFactory.openStatelessSession();
+			session.beginTransaction();
+			sqlQuery = session.createSQLQuery(idGenerationSQL);
+		}
+		catch(HibernateException hEx){
+			LOGGER.fatal("Can't initialize DwcaLineProcessor", hEx);
+		}
 	}
 	
 	@Override
@@ -86,5 +92,4 @@ public class DwcaLineProcessor implements ItemProcessorIF<OccurrenceRawModel, Oc
 	public void setIdGenerationSQL(String idGenerationSQL) {
 		this.idGenerationSQL = idGenerationSQL;
 	}
-
 }
