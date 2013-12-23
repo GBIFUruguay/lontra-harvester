@@ -63,7 +63,7 @@ public class DwcaExtensionReader<T> extends AbstractDwcaReaderSupport implements
 
 	@Override
 	public void closeReader() {
-		closeReader();
+		super.closeReader();
 	}
 
 	@Override

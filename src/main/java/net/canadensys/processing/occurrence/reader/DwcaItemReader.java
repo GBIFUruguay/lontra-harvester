@@ -81,7 +81,7 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 	
 	@Override
 	public void closeReader(){
-		closeReader();
+		super.closeReader();
 	}
 	
 	private void validateDwcaHeaders(){

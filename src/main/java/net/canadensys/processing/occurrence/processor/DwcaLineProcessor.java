@@ -1,6 +1,5 @@
 package net.canadensys.processing.occurrence.processor;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -39,8 +38,8 @@ public class DwcaLineProcessor implements ItemProcessorIF<OccurrenceRawModel, Oc
 	private String idGenerationSQL = "SELECT nextval('buffer.occurrence_raw_auto_id_seq') FROM generate_series(1,100)";
 
 	//we take id by batch of 100 to reduce the number of calls
-	private BigInteger nextId = null;
-	private List<BigInteger> idPoll = null;
+	private Long nextId = null;
+	private List<Number> idPoll = null;
 	
 	@Override
 	public void init(){
@@ -75,9 +74,17 @@ public class DwcaLineProcessor implements ItemProcessorIF<OccurrenceRawModel, Oc
 		occModel.setSourcefileid(datasetShortname);
 
 		if(nextId == null || idPoll.isEmpty()){
-			idPoll = (List<BigInteger>)sqlQuery.list();
+			try{
+				idPoll = (List<Number>)sqlQuery.list();
+			}
+			catch(HibernateException hEx){
+				LOGGER.fatal("Can't get ID from sequence", hEx);
+			}
+			catch (ClassCastException ccEx) {
+				LOGGER.fatal("The call for the sequence must return a List of Number", ccEx);
+			}
 		}
-		nextId = idPoll.remove(0);
+		nextId = idPoll.remove(0).longValue();
 
 		occModel.setAuto_id(nextId.intValue());
 		
