@@ -1,7 +1,7 @@
 package net.canadensys;
 
-import net.canadensys.processing.main.JobInitiatorMain;
-import net.canadensys.processing.main.ProcessingNodeMain;
+import net.canadensys.harvester.main.JobInitiatorMain;
+import net.canadensys.harvester.main.ProcessingNodeMain;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
