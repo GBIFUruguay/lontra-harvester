@@ -93,8 +93,19 @@ public class ProcessingNodeMain {
 			newBrokerUrl = String.format(IP, newBrokerIp);
 		}
 		
+		//prepare to allow additional (user defined) messageHandler defined as step
+		List<MessageHandlerStep> additionalMessageHandler = null;
+		
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(ProcessingNodeConfig.class);
 		ProcessingNodeMain processingNodeBean = ctx.getBean(ProcessingNodeMain.class);
-		processingNodeBean.initiate(newBrokerUrl, null);
+		processingNodeBean.initiate(newBrokerUrl, additionalMessageHandler);
 	}
+	
+	/**
+	 * Inner class to satisfy the 2 interfaces list of ProcessingNodeMain initiate method.
+	 * TODO: Not very elegant, maybe define a real interface.
+	 * @author canadensys
+	 *
+	 */
+	private interface MessageHandlerStep extends JMSConsumerMessageHandler,ProcessingStepIF{}
 }
