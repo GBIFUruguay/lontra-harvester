@@ -206,6 +206,10 @@ public class UserDefinedJobTest{
 				fail();
 			}
 		}
+		
+		if(jmsReader != null){
+			jmsReader.close();
+		}
 	}
 
 	/**

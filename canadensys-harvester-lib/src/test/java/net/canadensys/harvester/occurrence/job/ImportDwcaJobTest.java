@@ -47,6 +47,8 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 	
 	private static final String TEST_BROKER_URL = "vm://localhost?broker.persistent=false";
 	private static AtomicBoolean jobComplete = new AtomicBoolean(false);
+	private static final int EXPECTED_NUMBER_OF_RESULTS = 11;
+	private static final int MAX_NUMBER_OF_ATTEMP = 5;
 	
 	@Autowired
 	@Qualifier(value="bufferSessionFactory")
@@ -55,6 +57,8 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 	@Autowired
 	@Qualifier(value="publicTransactionManager")
 	private HibernateTransactionManager txManager;
+	
+	private JMSConsumer reader;
 	
 	@Autowired
 	private ImportDwcaJob importDwcaJob;
@@ -87,7 +91,14 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 				//validate content of the database
 				if(jobComplete.get()){
 					int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.occurrence", BigDecimal.class).intValue();
-
+					//give a chance to the database to be updated (since it's triggered by a JMS message)
+					int nbOfAttemp = 0;
+					while(count != EXPECTED_NUMBER_OF_RESULTS && nbOfAttemp < MAX_NUMBER_OF_ATTEMP){
+						nbOfAttemp++;
+						Thread.sleep(1000);
+						count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.occurrence", BigDecimal.class).intValue();
+					}
+					
 					String state = jdbcTemplate.queryForObject("SELECT stateprovince FROM buffer.occurrence where dwcaid='3'", String.class);
 					assertTrue("Florida".equals(state));
 					
@@ -97,13 +108,16 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 					String resource_contact = jdbcTemplate.queryForObject("SELECT name FROM buffer.resource_contact where dataset_shortname='qmor-specimens'", String.class);
 					assertTrue("Louise Cloutier".equals(resource_contact));
 
-					assertTrue(new Integer(11).equals(count));
+					assertTrue(new Integer(EXPECTED_NUMBER_OF_RESULTS).equals(count));
 				}
 				else{
 					fail();
 				}
 			} catch (InterruptedException e) {
 				fail();
+			}
+			finally{
+				reader.close();
 			}
 		}
 	}
@@ -112,7 +126,7 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 	 * This consumer will write to the database specified by the sessionFactory bean
 	 */
 	private void setupTestConsumer(){
-		JMSConsumer reader = new JMSConsumer(TEST_BROKER_URL);
+		reader = new JMSConsumer(TEST_BROKER_URL);
 		reader.registerHandler(insertRawOccurrenceStep);
 		reader.registerHandler(processInsertOccurrenceStep);
 		reader.registerHandler(insertResourceContactStep);
