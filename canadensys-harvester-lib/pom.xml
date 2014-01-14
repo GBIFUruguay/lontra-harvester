@@ -19,6 +19,9 @@
 		<spring.version>3.2.4.RELEASE</spring.version>
 		<hibernate.version>4.1.12.Final</hibernate.version>
 		<narwhal.version>1.5</narwhal.version>
+			
+		<gbif-api.version>0.10</gbif-api.version>
+		<dwca-reader.version>1.14</dwca-reader.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
@@ -86,7 +89,12 @@
 		<dependency>
 			<groupId>org.gbif</groupId>
 			<artifactId>dwca-reader</artifactId>
-			<version>1.14</version>
+			<version>${dwca-reader.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.gbif</groupId>
+			<artifactId>gbif-api</artifactId>
+			<version>${gbif-api.version}</version>
 		</dependency>
 
 		<dependency>
