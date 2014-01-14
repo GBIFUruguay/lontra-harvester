@@ -11,7 +11,7 @@
 	<groupId>net.canadensys</groupId>
 	<artifactId>canadensys-harvester-ui</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1</version>
+	<version>0.2</version>
 	<name>canadensys-harvester-ui</name>
 
 	<properties>
