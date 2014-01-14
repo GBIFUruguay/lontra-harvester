@@ -11,3 +11,6 @@
 bin/**/*
 target/**/*
 build/**/*
+
+canadensys-harvester-lib/target
+canadensys-harvester-ui/target

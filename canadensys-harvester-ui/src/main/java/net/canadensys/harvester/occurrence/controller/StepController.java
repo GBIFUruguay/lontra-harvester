@@ -19,6 +19,7 @@ import net.canadensys.harvester.occurrence.model.ResourceModel;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +86,19 @@ public class StepController implements StepControllerIF{
 		return searchCriteria.list();
 	}
 	
+	@Transactional("publicTransactionManager")
+	@Override
+	public boolean updateResourceModel(ResourceModel resourceModel) {
+		try{
+			sessionFactory.getCurrentSession().saveOrUpdate(resourceModel);
+		}
+		catch(HibernateException hEx){
+			hEx.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
 	/**
 	 * Get the sorted ImportLogModel list using our own session. Sorted by desc
 	 * event_date
@@ -141,5 +155,4 @@ public class StepController implements StepControllerIF{
 	public void onSuccess(Void arg0) {
 		harvesterViewModel.setImportStatus(JobStatusEnum.DONE_SUCCESS);
 	}
-
 }
