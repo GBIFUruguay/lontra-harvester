@@ -3,6 +3,10 @@ canadensys-harvester
 
 Lightweight harvester used to feed the [canadensys-explorer](https://github.com/Canadensys/canadensys-explorer) from occurrence Darwin Core Archive. The ingested data are processed using the [narwhal-processor](https://github.com/Canadensys/narwhal-processor).
 
+Code Status
+-----------
+[![Build Status](https://travis-ci.org/Canadensys/canadensys-harvester.png)](https://travis-ci.org/Canadensys/canadensys-harvester)
+
 Documentation
 -------------
 Visit our [wiki](https://github.com/Canadensys/canadensys-harvester/wiki)
