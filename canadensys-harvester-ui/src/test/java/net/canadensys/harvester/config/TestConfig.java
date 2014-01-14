@@ -18,7 +18,6 @@ import net.canadensys.harvester.jms.JMSWriter;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
-import net.canadensys.harvester.occurrence.mock.MockComputeGISDataTask;
 import net.canadensys.harvester.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.occurrence.model.ResourceModel;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
@@ -123,7 +122,7 @@ public class TestConfig {
 
 	@Bean
 	public ItemTaskIF computeGISDataTask() {
-		return new MockComputeGISDataTask();
+		return null;
 	}
 
 	@Bean

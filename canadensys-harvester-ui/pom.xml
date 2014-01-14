@@ -96,7 +96,7 @@
 				<directory>${project.basedir}/src/test/resources</directory>
 			</testResource>
 			<testResource>
-				<directory>${project.basedir}/script</directory>
+				<directory>${project.basedir}/../script</directory>
 			</testResource>
 		</testResources>
 	</build>
