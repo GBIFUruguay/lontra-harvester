@@ -18,5 +18,6 @@ CREATE TABLE resource_management
   archive_url character varying(255),
   source_file_id character varying(50),
   last_updated timestamp,
-  CONSTRAINT resource_management_pkey PRIMARY KEY (resource_id )
+  CONSTRAINT resource_management_pkey PRIMARY KEY (resource_id ),
+  CONSTRAINT resource_management_source_file_id_key UNIQUE (source_file_id)
 );

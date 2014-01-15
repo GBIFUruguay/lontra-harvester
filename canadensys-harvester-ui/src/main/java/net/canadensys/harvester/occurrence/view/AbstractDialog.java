@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -23,6 +24,10 @@ public abstract class AbstractDialog extends JDialog {
 
 	protected JButton selectBtn = null;
 	protected JButton cancelBtn = null;
+
+	// initialize with CANCEL_OPTION to handle the case when the dialog is
+	// closed with the 'X'
+	protected int exitValue = JOptionPane.CANCEL_OPTION;
 
 	public AbstractDialog(String title) {
 
@@ -58,7 +63,6 @@ public abstract class AbstractDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				onSelect();
-				dispose();
 			}
 		});
 		c = new GridBagConstraints();
@@ -72,7 +76,6 @@ public abstract class AbstractDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				onCancel();
-				dispose();
 			}
 		});
 		c = new GridBagConstraints();
@@ -93,6 +96,15 @@ public abstract class AbstractDialog extends JDialog {
 		c.gridy = 1;
 		mainPanel.add(buttonPanel, c);
 		this.add(mainPanel, c);
+	}
+
+	/**
+	 * Returns the 'option' chosen to exit the dialog.
+	 * 
+	 * @return JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION
+	 */
+	public int getExitValue() {
+		return exitValue;
 	}
 
 	protected abstract void init(JPanel contentPanel);

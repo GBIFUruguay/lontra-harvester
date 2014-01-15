@@ -46,43 +46,47 @@ import org.springframework.stereotype.Component;
 
 /**
  * Main UI to control the harvester.
+ * 
  * @author canadensys
- *
+ * 
  */
 @Component
-public class OccurrenceHarvesterMainView implements ItemProgressListenerIF,PropertyChangeListener{
-	
+public class OccurrenceHarvesterMainView implements ItemProgressListenerIF,
+		PropertyChangeListener {
+
 	private JFrame harvesterFrame = null;
-	
+
 	private JPanel mainPanel = null;
 	private JTextField pathToImportTxt = null;
 	private ResourceModel resourceToImport = null;
-	
-	//Action buttons
+
+	// Action buttons
 	private JButton openFileBtn = null;
 	private JButton openResourceBtn = null;
 	private JButton importBtn = null;
 	private JButton moveToPublicBtn = null;
-	
+
 	private JTextField bufferSchemaTxt = null;
-	
+
 	private ImageIcon loadingImg = null;
 	private JLabel loadingLbl = null;
 	private JTextArea statuxTxtArea = null;
-	
+
 	private JButton viewImportLogBtn = null;
 	private JButton viewIPTFeedBtn = null;
-	
+
 	@Autowired
 	private HarvesterViewModel harvesterViewModel;
-	
+
 	@Autowired
-	@Qualifier(value="stepController")
+	@Qualifier(value = "stepController")
 	private StepControllerIF stepController;
-	
-	public void initView(){
-		loadingImg = new ImageIcon(OccurrenceHarvesterMainView.class.getResource("/ajax-loader.gif"));
-		
+
+	public void initView() {
+		loadingImg = new ImageIcon(
+				OccurrenceHarvesterMainView.class
+						.getResource("/ajax-loader.gif"));
+
 		harvesterFrame = new JFrame(Messages.getString("view.title"));
 		harvesterFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainPanel = new JPanel();
@@ -91,7 +95,8 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF,Prope
 		pathToImportTxt.setColumns(30);
 		pathToImportTxt.setEditable(false);
 		openFileBtn = new JButton(Messages.getString("view.button.openFile"));
-		openResourceBtn = new JButton(Messages.getString("view.button.openResource"));
+		openResourceBtn = new JButton(
+				Messages.getString("view.button.openResource"));
 		openFileBtn.setEnabled(false);
 		openFileBtn.addActionListener(new ActionListener() {
 			@Override
@@ -99,16 +104,17 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF,Prope
 				onChooseFile();
 			}
 		});
-		
+
 		openResourceBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				onOpenResourceBtn();
 			}
 		});
-		
+
 		importBtn = new JButton(Messages.getString("view.button.import"));
-		importBtn.setToolTipText(Messages.getString("view.button.import.tooltip"));
+		importBtn.setToolTipText(Messages
+				.getString("view.button.import.tooltip"));
 		importBtn.setEnabled(false);
 		importBtn.addActionListener(new ActionListener() {
 			@Override
@@ -116,73 +122,76 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF,Prope
 				onImportResource();
 			}
 		});
-		
-		int lineIdx=0;
+
+		int lineIdx = 0;
 		GridBagConstraints c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=lineIdx;
+		c.gridx = 0;
+		c.gridy = lineIdx;
 		c.anchor = GridBagConstraints.CENTER;
 		c.gridwidth = 3;
-		JLabel lbl = new JLabel(Messages.getString("view.info.currentDatabase") + harvesterViewModel.getDatabaseLocation());
+		JLabel lbl = new JLabel(Messages.getString("view.info.currentDatabase")
+				+ harvesterViewModel.getDatabaseLocation());
 		lbl.setForeground(Color.BLUE);
-		mainPanel.add(lbl,c);
-		
-		//UI line break
+		mainPanel.add(lbl, c);
+
+		// UI line break
 		lineIdx++;
 		c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=lineIdx;
+		c.gridx = 0;
+		c.gridy = lineIdx;
 		c.anchor = GridBagConstraints.WEST;
-		mainPanel.add(new JLabel(Messages.getString("view.info.import.dwca")),c);
-		
-		//UI line break
+		mainPanel.add(new JLabel(Messages.getString("view.info.import.dwca")),
+				c);
+
+		// UI line break
 		lineIdx++;
 		c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=lineIdx;
+		c.gridx = 0;
+		c.gridy = lineIdx;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 0.8;
-		mainPanel.add(pathToImportTxt,c);
-		
+		mainPanel.add(pathToImportTxt, c);
+
 		c = new GridBagConstraints();
-		c.gridx=1;
-		c.gridy=lineIdx;
-		mainPanel.add(openResourceBtn,c);
-		
+		c.gridx = 1;
+		c.gridy = lineIdx;
+		mainPanel.add(openResourceBtn, c);
+
 		c = new GridBagConstraints();
-		c.gridx=2;
-		c.gridy=lineIdx;
-		mainPanel.add(openFileBtn,c);
-		
-		//UI line break
+		c.gridx = 2;
+		c.gridy = lineIdx;
+		mainPanel.add(openFileBtn, c);
+
+		// UI line break
 		lineIdx++;
 		c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=lineIdx;
-		mainPanel.add(importBtn,c);
-		
-		//UI line break
+		c.gridx = 0;
+		c.gridy = lineIdx;
+		mainPanel.add(importBtn, c);
+
+		// UI line break
 		lineIdx++;
 		c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=lineIdx;
+		c.gridx = 0;
+		c.gridy = lineIdx;
 		c.gridwidth = 3;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		mainPanel.add(new JSeparator(),c);
-		
-		//UI line break
+		mainPanel.add(new JSeparator(), c);
+
+		// UI line break
 		lineIdx++;
 		c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=lineIdx;
+		c.gridx = 0;
+		c.gridy = lineIdx;
 		c.gridwidth = 2;
 		c.anchor = GridBagConstraints.WEST;
-		mainPanel.add(new JLabel(Messages.getString("view.info.move.dwca")),c);
-		
-		//UI line break
+		mainPanel.add(new JLabel(Messages.getString("view.info.move.dwca")), c);
+
+		// UI line break
 		lineIdx++;
 		moveToPublicBtn = new JButton(Messages.getString("view.button.move"));
-		moveToPublicBtn.setToolTipText(Messages.getString("view.button.move.tooltip"));
+		moveToPublicBtn.setToolTipText(Messages
+				.getString("view.button.move.tooltip"));
 		moveToPublicBtn.setEnabled(false);
 		moveToPublicBtn.addActionListener(new ActionListener() {
 			@Override
@@ -191,81 +200,83 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF,Prope
 			}
 		});
 		c = new GridBagConstraints();
-		c.gridx=2;
-		c.gridy=lineIdx;
+		c.gridx = 2;
+		c.gridy = lineIdx;
 		c.anchor = GridBagConstraints.SOUTH;
-		mainPanel.add(moveToPublicBtn ,c);
-		
+		mainPanel.add(moveToPublicBtn, c);
+
 		bufferSchemaTxt = new JTextField();
 		bufferSchemaTxt.setEnabled(false);
 		c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=lineIdx;
+		c.gridx = 0;
+		c.gridy = lineIdx;
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 0.8;
 		c.weighty = 0.8;
-		mainPanel.add(bufferSchemaTxt,c);
-		
-		//UI line break
+		mainPanel.add(bufferSchemaTxt, c);
+
+		// UI line break
 		lineIdx++;
 		c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=lineIdx;
+		c.gridx = 0;
+		c.gridy = lineIdx;
 		c.gridwidth = 3;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		mainPanel.add(new JSeparator(),c);
-		
-		//UI line break
+		mainPanel.add(new JSeparator(), c);
+
+		// UI line break
 		lineIdx++;
 		c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=lineIdx;
+		c.gridx = 0;
+		c.gridy = lineIdx;
 		c.anchor = GridBagConstraints.WEST;
-		mainPanel.add(new JLabel(Messages.getString("view.info.status")),c);
-		
-		//UI line break
+		mainPanel.add(new JLabel(Messages.getString("view.info.status")), c);
+
+		// UI line break
 		lineIdx++;
 		c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=lineIdx;
+		c.gridx = 0;
+		c.gridy = lineIdx;
 		c.anchor = GridBagConstraints.WEST;
-		loadingLbl = new JLabel(Messages.getString("view.info.status.waiting"),null, JLabel.CENTER);
-		mainPanel.add(loadingLbl,c);
-		
-		//UI line break
+		loadingLbl = new JLabel(Messages.getString("view.info.status.waiting"),
+				null, JLabel.CENTER);
+		mainPanel.add(loadingLbl, c);
+
+		// UI line break
 		lineIdx++;
 		c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=lineIdx;
+		c.gridx = 0;
+		c.gridy = lineIdx;
 		c.gridwidth = 3;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		mainPanel.add(new JSeparator(),c);
-		
-		//UI line break
+		mainPanel.add(new JSeparator(), c);
+
+		// UI line break
 		lineIdx++;
 		c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=lineIdx;
+		c.gridx = 0;
+		c.gridy = lineIdx;
 		c.gridwidth = 2;
 		c.anchor = GridBagConstraints.WEST;
-		mainPanel.add(new JLabel(Messages.getString("view.info.console")),c);
-		
-		//UI line break
+		mainPanel.add(new JLabel(Messages.getString("view.info.console")), c);
+
+		// UI line break
 		lineIdx++;
 		statuxTxtArea = new JTextArea();
 		statuxTxtArea.setRows(15);
 		c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=lineIdx;
+		c.gridx = 0;
+		c.gridy = lineIdx;
 		c.gridwidth = 2;
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-		mainPanel.add(new JScrollPane(statuxTxtArea),c);
-		
-		//UI line break
+		mainPanel.add(new JScrollPane(statuxTxtArea), c);
+
+		// UI line break
 		lineIdx++;
-		viewImportLogBtn = new JButton(Messages.getString("view.button.viewImportLog"));
+		viewImportLogBtn = new JButton(
+				Messages.getString("view.button.viewImportLog"));
 		viewImportLogBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -273,14 +284,15 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF,Prope
 			}
 		});
 		c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=lineIdx;
+		c.gridx = 0;
+		c.gridy = lineIdx;
 		c.anchor = GridBagConstraints.WEST;
-		mainPanel.add(viewImportLogBtn,c);
-		
-		//UI line break
+		mainPanel.add(viewImportLogBtn, c);
+
+		// UI line break
 		lineIdx++;
-		viewIPTFeedBtn = new JButton(Messages.getString("view.button.viewIPTrss"));
+		viewIPTFeedBtn = new JButton(
+				Messages.getString("view.button.viewIPTrss"));
 		viewIPTFeedBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -292,30 +304,30 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF,Prope
 		c.gridy = lineIdx;
 		c.anchor = GridBagConstraints.WEST;
 		mainPanel.add(viewIPTFeedBtn, c);
-		
-		//inner panel
+
+		// inner panel
 		c = new GridBagConstraints();
-		c.gridx=0;
-		c.gridy=0;
+		c.gridx = 0;
+		c.gridy = 0;
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-		
+
 		harvesterFrame.setLayout(new GridBagLayout());
-		harvesterFrame.add(mainPanel,c);
+		harvesterFrame.add(mainPanel, c);
 		harvesterFrame.pack();
 		harvesterFrame.setLocationRelativeTo(null);
 		harvesterFrame.setVisible(true);
-		
+
 		redirectSystemStreams();
 		stepController.registerProgressListener(this);
 		harvesterViewModel.addPropertyChangeListener(this);
 	}
-	
+
 	/**
 	 * Open a FileChooser to import a specific DarwinCore archive
 	 */
-	private void onChooseFile(){
+	private void onChooseFile() {
 		JFileChooser fc = new JFileChooser();
 		fc.setDialogTitle(Messages.getString("view.fileChooser.title"));
 		fc.setMultiSelectionEnabled(false);
@@ -325,108 +337,114 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF,Prope
 			public String getDescription() {
 				return Messages.getString("view.fileChooser.description");
 			}
+
 			@Override
 			public boolean accept(File file) {
-				if(FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("zip")){
+				if (FilenameUtils.getExtension(file.getName())
+						.equalsIgnoreCase("zip")) {
 					return true;
 				}
 				return false;
 			}
 		});
 		int returnVal = fc.showOpenDialog(harvesterFrame);
-		if(returnVal == JFileChooser.APPROVE_OPTION){
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			pathToImportTxt.setText(fc.getSelectedFile().getAbsolutePath());
 			importBtn.setEnabled(true);
 		}
 	}
-	
+
 	/**
 	 * Open a window to select a resource to import.
 	 */
-	private void onOpenResourceBtn(){
-		ResourceChooser urlChooser = new ResourceChooser(stepController.getResourceModelList());
-		urlChooser.setLocationRelativeTo(null);
+	private void onOpenResourceBtn() {
+		ResourceChooser urlChooser = new ResourceChooser(stepController,
+				stepController.getResourceModelList());
+		urlChooser.setLocationRelativeTo(harvesterFrame);
 		urlChooser.setVisible(true);
-		
+
 		ResourceModel selectedResource = urlChooser.getSelectedResource();
-		if(selectedResource != null){
+		if (selectedResource != null) {
 			pathToImportTxt.setText(selectedResource.getName());
 			importBtn.setEnabled(true);
 		}
-		//remember the last selected resource
+		// remember the last selected resource
 		resourceToImport = selectedResource;
 	}
-	
+
 	/**
 	 * Import a resource (asynchronously) using a SwingWorker.
 	 */
-	private void onImportResource(){
+	private void onImportResource() {
 		openResourceBtn.setEnabled(false);
 		importBtn.setEnabled(false);
 		moveToPublicBtn.setEnabled(false);
 		loadingLbl.setIcon(loadingImg);
-		
-		final SwingWorker<Void,Object> swingWorker = new SwingWorker<Void, Object>() {
-		       @Override
-		       public Void doInBackground() {
-		    	   stepController.importDwcA(resourceToImport.getResource_id());
-		    	   //async call, onImportDone(...) will be called once done
-		    	   return null;
-		       }
-		       @Override
-		       protected void done() {}
+
+		final SwingWorker<Void, Object> swingWorker = new SwingWorker<Void, Object>() {
+			@Override
+			public Void doInBackground() {
+				stepController.importDwcA(resourceToImport.getResource_id());
+				// async call, onImportDone(...) will be called once done
+				return null;
+			}
+
+			@Override
+			protected void done() {
+			}
 		};
 		swingWorker.execute();
 	}
-	
+
 	/**
-	 * Move the previously importer resource to the public schema using a SwingWorker.
+	 * Move the previously importer resource to the public schema using a
+	 * SwingWorker.
 	 */
-	private void onMoveToPublic(){
+	private void onMoveToPublic() {
 		moveToPublicBtn.setEnabled(false);
 		loadingLbl.setIcon(loadingImg);
-		
-		final SwingWorker<Boolean,Object> swingWorker = new SwingWorker<Boolean, Object>() {
-		       @Override
-		       public Boolean doInBackground() {
-					stepController.moveToPublicSchema(bufferSchemaTxt.getText());
-					return true;
-		       }
 
-		       @Override
-		       protected void done() {
-		    	   try {
-					if(get()){
-						   onMoveDone(JobStatusEnum.DONE_SUCCESS);
-					   }
-					   else{
-						   onMoveDone(JobStatusEnum.DONE_ERROR);
-					   }
-					} catch (InterruptedException e) {
-						 onMoveDone(JobStatusEnum.DONE_ERROR);
-					} catch (ExecutionException e) {
-						 onMoveDone(JobStatusEnum.DONE_ERROR);
+		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
+			@Override
+			public Boolean doInBackground() {
+				stepController.moveToPublicSchema(bufferSchemaTxt.getText());
+				return true;
+			}
+
+			@Override
+			protected void done() {
+				try {
+					if (get()) {
+						onMoveDone(JobStatusEnum.DONE_SUCCESS);
+					} else {
+						onMoveDone(JobStatusEnum.DONE_ERROR);
 					}
-		      }
+				} catch (InterruptedException e) {
+					onMoveDone(JobStatusEnum.DONE_ERROR);
+				} catch (ExecutionException e) {
+					onMoveDone(JobStatusEnum.DONE_ERROR);
+				}
+			}
 		};
 		swingWorker.execute();
 	}
-	
-	private void onViewImportLog(){
+
+	private void onViewImportLog() {
 		Vector<String> headers = new Vector<String>();
 		headers.add(Messages.getString("view.importLog.table.sourceFileId"));
 		headers.add(Messages.getString("view.importLog.table.recordQty"));
 		headers.add(Messages.getString("view.importLog.table.updatedBy"));
 		headers.add(Messages.getString("view.importLog.table.date"));
-		
+
 		ImportLogDialog dlg = new ImportLogDialog(headers);
-		
-		List<ImportLogModel> importLogModelList = stepController.getSortedImportLogModelList();
+
+		List<ImportLogModel> importLogModelList = stepController
+				.getSortedImportLogModelList();
 		dlg.loadData(importLogModelList);
 		dlg.setLocationRelativeTo(null);
 		dlg.setVisible(true);
 	}
-	
+
 	private void onViewIPTFeed() {
 		Vector<String> headers = new Vector<String>();
 		headers.add(Messages.getString("view.iptFeed.table.title"));
@@ -441,99 +459,120 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF,Prope
 		dlg.setLocationRelativeTo(null);
 		dlg.setVisible(true);
 	}
-	
-	private void onImportDone(JobStatusEnum status, String datasetShortName){
+
+	private void onImportDone(JobStatusEnum status, String datasetShortName) {
 		loadingLbl.setIcon(null);
-		 try {
-      	   if(JobStatusEnum.DONE_SUCCESS.equals(status)){
-      		   bufferSchemaTxt.setText(datasetShortName);
-      		   moveToPublicBtn.setEnabled(true);
-      		   
-      		   SwingUtilities.invokeLater(new Runnable() {
-      			    public void run() {
-      			    	loadingLbl.setText(Messages.getString("view.info.status.importDone"));
-      			    }
-      		   });
-      	   }
-      	   else{
-      		   JOptionPane.showMessageDialog(harvesterFrame, Messages.getString("view.info.status.error.details"), Messages.getString("OccurrenceHarvesterMainView.29"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-      		   SwingUtilities.invokeLater(new Runnable() {
-     			    public void run() {
-     			    	loadingLbl.setText(Messages.getString("view.info.status.error.importError"));
-     			    }
-     		   });
-      	   }
-         } catch (Exception e) {
-      	   e.printStackTrace();
-      	   JOptionPane.showMessageDialog(harvesterFrame, Messages.getString("view.info.status.error.details"), Messages.getString("view.info.status.error"), JOptionPane.ERROR_MESSAGE);
-  		   SwingUtilities.invokeLater(new Runnable() {
-			    public void run() {
-			    	loadingLbl.setText(Messages.getString("view.info.status.error.importError"));
-			    }
-		   });
-         }
+		try {
+			if (JobStatusEnum.DONE_SUCCESS.equals(status)) {
+				bufferSchemaTxt.setText(datasetShortName);
+				moveToPublicBtn.setEnabled(true);
+
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						loadingLbl.setText(Messages
+								.getString("view.info.status.importDone"));
+					}
+				});
+			} else {
+				JOptionPane
+						.showMessageDialog(
+								harvesterFrame,
+								Messages.getString("view.info.status.error.details"), Messages.getString("OccurrenceHarvesterMainView.29"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						loadingLbl.setText(Messages
+								.getString("view.info.status.error.importError"));
+					}
+				});
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(harvesterFrame,
+					Messages.getString("view.info.status.error.details"),
+					Messages.getString("view.info.status.error"),
+					JOptionPane.ERROR_MESSAGE);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					loadingLbl.setText(Messages
+							.getString("view.info.status.error.importError"));
+				}
+			});
+		}
 	}
-	
-	private void onMoveDone(JobStatusEnum status){
+
+	private void onMoveDone(JobStatusEnum status) {
 		loadingLbl.setIcon(null);
-		if(JobStatusEnum.DONE_SUCCESS.equals(status)){
-			JOptionPane.showMessageDialog(harvesterFrame, Messages.getString("view.info.status.moveCompleted"), Messages.getString("view.info.status.info"), JOptionPane.INFORMATION_MESSAGE);
+		if (JobStatusEnum.DONE_SUCCESS.equals(status)) {
+			JOptionPane.showMessageDialog(harvesterFrame,
+					Messages.getString("view.info.status.moveCompleted"),
+					Messages.getString("view.info.status.info"),
+					JOptionPane.INFORMATION_MESSAGE);
 			bufferSchemaTxt.setText("");
 			pathToImportTxt.setText("");
 			loadingLbl.setText(Messages.getString("view.info.status.moveDone"));
-		}
-		else{
-			JOptionPane.showMessageDialog(harvesterFrame, Messages.getString("view.info.status.error.details"), Messages.getString("view.info.status.error"), JOptionPane.ERROR_MESSAGE);
-			loadingLbl.setText(Messages.getString("view.info.status.error.moveError"));
+		} else {
+			JOptionPane.showMessageDialog(harvesterFrame,
+					Messages.getString("view.info.status.error.details"),
+					Messages.getString("view.info.status.error"),
+					JOptionPane.ERROR_MESSAGE);
+			loadingLbl.setText(Messages
+					.getString("view.info.status.error.moveError"));
 		}
 	}
-	
+
 	private void updateTextArea(final String text) {
 		SwingUtilities.invokeLater(new Runnable() {
-		    public void run() {
-		    	statuxTxtArea.append(text);
-		    }
-		  });
+			@Override
+			public void run() {
+				statuxTxtArea.append(text);
+			}
+		});
 	}
-	
+
 	/**
 	 * 
 	 */
 	private void redirectSystemStreams() {
-		  OutputStream out = new OutputStream() {
-		    @Override
-		    public void write(int b) throws IOException {
-		      updateTextArea(String.valueOf((char) b));
-		    }
-		 
-		    @Override
-		    public void write(byte[] b, int off, int len) throws IOException {
-		      updateTextArea(new String(b, off, len));
-		    }
-		 
-		    @Override
-		    public void write(byte[] b) throws IOException {
-		      write(b, 0, b.length);
-		    }
-		  };
-		 
-		  System.setOut(new PrintStream(out, true));
-		  System.setErr(new PrintStream(out, true));
+		OutputStream out = new OutputStream() {
+			@Override
+			public void write(int b) throws IOException {
+				updateTextArea(String.valueOf((char) b));
+			}
+
+			@Override
+			public void write(byte[] b, int off, int len) throws IOException {
+				updateTextArea(new String(b, off, len));
+			}
+
+			@Override
+			public void write(byte[] b) throws IOException {
+				write(b, 0, b.length);
+			}
+		};
+
+		System.setOut(new PrintStream(out, true));
+		System.setErr(new PrintStream(out, true));
 	}
 
 	@Override
 	public void onProgress(final int current, final int total) {
 		SwingUtilities.invokeLater(new Runnable() {
-		    public void run() {
-		    	loadingLbl.setText(current + "/" + total);
-		    }
-		  });
+			@Override
+			public void run() {
+				loadingLbl.setText(current + "/" + total);
+			}
+		});
 	}
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if("applicationStatus".equals(evt.getPropertyName())){
-			onImportDone(((ApplicationStatus)evt.getNewValue()).getImportStatus(),resourceToImport.getSource_file_id());
+		if ("applicationStatus".equals(evt.getPropertyName())) {
+			onImportDone(
+					((ApplicationStatus) evt.getNewValue()).getImportStatus(),
+					resourceToImport.getSource_file_id());
 		}
 	}
 }
