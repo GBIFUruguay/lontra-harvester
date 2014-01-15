@@ -1,7 +1,12 @@
 canadensys-harvester-ui
 =======================
 
-Swing based UI for the Canadensys harvester.
+Swing based management tool for the Canadensys harvester.
+
+This tool allows:
+* Trigger the harvest for a single resource
+* Add new resource
+* View import log
 
 
 Dependencies
