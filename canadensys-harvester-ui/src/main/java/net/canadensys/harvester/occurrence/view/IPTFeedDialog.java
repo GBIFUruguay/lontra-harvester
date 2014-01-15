@@ -8,19 +8,25 @@ import javax.swing.JDialog;
 
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 
-public class IPTFeedDialog extends AbstractTableBasedDialog{
-	
+/**
+ * Display IPT RSS feed information.
+ * 
+ * @author canadensys
+ * 
+ */
+public class IPTFeedDialog extends AbstractTableBasedDialog {
+
 	private static final long serialVersionUID = -2655708810547434951L;
 
-	public IPTFeedDialog(Vector<String> headers){
+	public IPTFeedDialog(Vector<String> headers) {
 		super(headers);
-		
+
 		this.setTitle(Messages.getString("iptRssFeed.title"));
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		mainPanel.setPreferredSize(new Dimension(800, 400));
 	}
-	
-	public void loadData(List<IPTFeedModel> feedList){
+
+	public void loadData(List<IPTFeedModel> feedList) {
 		Vector<Vector<Object>> rowData = new Vector<Vector<Object>>();
 		for (IPTFeedModel currIPTFeedModel : feedList) {
 			Vector<Object> row = new Vector<Object>();

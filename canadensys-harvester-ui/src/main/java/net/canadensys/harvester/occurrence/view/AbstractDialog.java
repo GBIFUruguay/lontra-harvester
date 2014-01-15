@@ -39,6 +39,7 @@ public abstract class AbstractDialog extends JDialog {
 		contentPanel = new JPanel();
 		init(contentPanel);
 		innerInit();
+		postInit();
 
 		pack();
 	}
@@ -107,7 +108,18 @@ public abstract class AbstractDialog extends JDialog {
 		return exitValue;
 	}
 
+	/**
+	 * Initialization function of the sub class.
+	 * 
+	 * @param contentPanel
+	 *            Panel to add user components
+	 */
 	protected abstract void init(JPanel contentPanel);
+
+	/**
+	 * Called after all initialization methods but before pack().
+	 */
+	protected abstract void postInit();
 
 	protected abstract void onSelect();
 

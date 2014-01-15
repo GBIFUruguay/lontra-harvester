@@ -13,7 +13,15 @@ import net.canadensys.harvester.occurrence.model.ResourceModel;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * View component to display and edit a resource.
+ * 
+ * @author canadensys
+ * 
+ */
 public class ResourceView extends AbstractDialog {
+
+	private static final long serialVersionUID = 1L;
 
 	private ResourceModel resourceModel = null;
 	private static final int TXT_FIELD_LENGTH = 50;
@@ -115,6 +123,7 @@ public class ResourceView extends AbstractDialog {
 	}
 
 	/**
+	 * Display a ResourceModel and allow user to update it.
 	 * 
 	 * @param resourceModel
 	 * @return updated ResourceModel or null if resourceModel in parameter was
@@ -133,6 +142,7 @@ public class ResourceView extends AbstractDialog {
 			nameTxt.setText(resourceModel.getName());
 			urlTxt.setText(resourceModel.getArchive_url());
 			sfIdTxt.setText(resourceModel.getSource_file_id());
+			// TODO test that URL is reachable
 
 			// modal dialog, blocking function until dispose() is called
 			setVisible(true);
@@ -166,5 +176,11 @@ public class ResourceView extends AbstractDialog {
 	protected void onCancel() {
 		exitValue = JOptionPane.CANCEL_OPTION;
 		dispose();
+	}
+
+	@Override
+	protected void postInit() {
+		// use 'OK' instead of 'Select'
+		selectBtn.setText(Messages.getString("view.button.ok"));
 	}
 }
