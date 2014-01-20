@@ -19,6 +19,7 @@
 		<spring.version>3.2.4.RELEASE</spring.version>
 		<hibernate.version>4.1.12.Final</hibernate.version>
 		<narwhal.version>1.5</narwhal.version>
+		<activemq.version>5.9.0</activemq.version>
 			
 		<gbif-api.version>0.10</gbif-api.version>
 		<dwca-reader.version>1.14</dwca-reader.version>
@@ -66,8 +67,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-core</artifactId>
-			<version>5.7.0</version>
+			<artifactId>activemq-all</artifactId>
+			<version>${activemq.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.canadensys</groupId>
