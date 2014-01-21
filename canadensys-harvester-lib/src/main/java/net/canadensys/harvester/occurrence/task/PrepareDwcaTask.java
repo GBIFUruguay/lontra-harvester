@@ -87,11 +87,14 @@ public class PrepareDwcaTask implements ItemTaskIF{
 		        	
 		        	//If the URL end point can not tell the name of the file, generate a UUID and keep the extension
 		        	if(StringUtils.isBlank(filename)){
-		        		filename = UUID.randomUUID().toString() + "." + FilenameUtils.getExtension(filename);
+		        		filename = UUID.randomUUID().toString() + "." + FilenameUtils.getExtension(dwcaFileLocation);
+		        	}
+		        	else{
+		        		filename = filename.replaceAll("\"", "").replace("filename=", "");
 		        	}
 
-		        	String destinationFile = workFolder.getAbsolutePath() +File.separator+ filename.replaceAll("\"", "").replace("filename=", "");
-			            
+		        	String destinationFile = workFolder.getAbsolutePath() +File.separator+ filename;
+		        	
 		        	downloadDwca(dlUrl, destinationFile);
 		        	dwcaFileLocation  = destinationFile;
 				} catch (MalformedURLException e) {
