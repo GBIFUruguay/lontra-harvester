@@ -1,6 +1,5 @@
 package net.canadensys.harvester.occurrence.task;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,9 +58,9 @@ public class CheckProcessingCompletenessTask implements ItemTaskIF{
 				SQLQuery query = session.createSQLQuery("SELECT count(*) FROM buffer.occurrence_raw WHERE sourcefileid=?");
 				query.setString(0, datasetShortname);
 				
-				BigInteger currNumberOfResult = (BigInteger)query.uniqueResult();
+				Number currNumberOfResult = (Number)query.uniqueResult();
 				while(currNumberOfResult.intValue() < numberOfRecords){
-					currNumberOfResult = (BigInteger)query.uniqueResult();
+					currNumberOfResult = (Number)query.uniqueResult();
 					//make sure we don't get stuck here is something goes wrong with the clients
 					if(previousCount == currNumberOfResult.intValue()){
 						secondsWaiting++;
