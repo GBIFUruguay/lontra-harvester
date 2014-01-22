@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  */
 public class StreamDwcContentStep implements ProcessingStepIF{
 	
-	private static final int FLUSH_INTERVAL = 100;
+	private static final int DEFAULT_FLUSH_INTERVAL = 100;
 	
 	@Autowired
 	@Qualifier("dwcItemReader")
@@ -40,6 +40,9 @@ public class StreamDwcContentStep implements ProcessingStepIF{
 	
 	private int numberOfRecords = 0;
 	private Map<SharedParameterEnum,Object> sharedParameters;
+	
+	//Flush interval, number of OccurrenceRawModel until we flush it (into a JMS message)
+	private int flushInterval = DEFAULT_FLUSH_INTERVAL;
 	
 	@Override
 	public void preStep(Map<SharedParameterEnum,Object> sharedParameters) throws IllegalStateException {
@@ -84,7 +87,7 @@ public class StreamDwcContentStep implements ProcessingStepIF{
 			currRawModel = reader.read();
 			numberOfRecords++;
 			
-			if(numberOfRecords % FLUSH_INTERVAL == 0){
+			if(numberOfRecords % flushInterval == 0){
 				writer.write(rom);
 				writer.write(com);
 				rom = new SaveRawOccurrenceMessage();
@@ -111,11 +114,17 @@ public class StreamDwcContentStep implements ProcessingStepIF{
 	public void setReader(ItemReaderIF<OccurrenceRawModel> reader) {
 		this.reader = reader;
 	}
+	
 	public void setWriter(ItemWriterIF<ProcessingMessageIF> writer) {
 		this.writer = writer;
 	}
+	
 	public void setDwcaLineProcessor(
 			ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> lineProcessor) {
 		this.lineProcessor = lineProcessor;
+	}
+	
+	public void setFlushInterval(int flushInterval){
+		this.flushInterval = flushInterval;
 	}
 }

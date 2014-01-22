@@ -5,6 +5,11 @@ import java.util.List;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.message.ProcessingMessageIF;
 
+/**
+ * JMS ItemWriterIF implementation.
+ * @author canadensys
+ *
+ */
 public class JMSWriter extends JMSProducer implements ItemWriterIF<ProcessingMessageIF>{
 
 	public JMSWriter(String brokerURL){

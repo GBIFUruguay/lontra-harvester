@@ -108,7 +108,7 @@ public class JMSProducer {
 					.writeValueAsString(controlMsg));
 			publisher.publish(message);
 		} catch (JMSException e) {
-			e.printStackTrace();
+			LOGGER.fatal("Can not publich control message", e);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
@@ -123,18 +123,16 @@ public class JMSProducer {
 		TextMessage message;
 		try {
 			message = session.createTextMessage(om.writeValueAsString(element));
-			message.setStringProperty("MessageClass", element.getClass()
-					.getCanonicalName());
+			message.setStringProperty("MessageClass", element.getClass().getCanonicalName());
 			producer.send(message);
 		} catch (JMSException e) {
 			LOGGER.fatal("Can not send message", e);
-			e.printStackTrace();
 		} catch (JsonGenerationException e) {
-			e.printStackTrace();
+			LOGGER.fatal("Can not send message", e);
 		} catch (JsonMappingException e) {
-			e.printStackTrace();
+			LOGGER.fatal("Can not send message", e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.fatal("Can not send message", e);
 		}
 	}
 }

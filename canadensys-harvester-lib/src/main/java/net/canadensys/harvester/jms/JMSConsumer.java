@@ -20,6 +20,7 @@ import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.occurrence.message.DefaultMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQPrefetchPolicy;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -38,6 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class JMSConsumer{
 	private static final Logger LOGGER = Logger.getLogger(JMSConsumer.class);
+	private static final int DEFAUT_PREFETCH_QUEUE = 100;
 	
 	public String brokerURL;
 	private boolean isOpen = false;
@@ -87,6 +89,10 @@ public class JMSConsumer{
 		BasicConfigurator.configure();
 		// Getting JMS connection from the server
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerURL);
+		
+		ActiveMQPrefetchPolicy app = new ActiveMQPrefetchPolicy();
+		app.setQueuePrefetch(DEFAUT_PREFETCH_QUEUE);
+		connectionFactory.setPrefetchPolicy(app);
 		
 		try{
 			connection = connectionFactory.createConnection();
@@ -154,8 +160,8 @@ public class JMSConsumer{
 						}
 						else{
 							if(currMsgHandler.getMessageClass().equals(msgClass)){
-								ProcessingMessageIF chunk = (ProcessingMessageIF)om.readValue(msg.getText(), msgClass);
-								currMsgHandler.handleMessage(chunk);
+								ProcessingMessageIF processingMessage = (ProcessingMessageIF)om.readValue(msg.getText(), msgClass);
+								currMsgHandler.handleMessage(processingMessage);
 								break;
 							}
 						}
@@ -164,15 +170,15 @@ public class JMSConsumer{
 						//TODO : raise error if no handler can process it
 					}
 				} catch (JMSException e) {
-					e.printStackTrace();
+					LOGGER.fatal("Can not consume message ", e);
 				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
+					LOGGER.fatal("Can not consume message ", e);
 				} catch (JsonParseException e) {
-					e.printStackTrace();
+					LOGGER.fatal("Can not consume message ", e);
 				} catch (JsonMappingException e) {
-					e.printStackTrace();
+					LOGGER.fatal("Can not consume message ", e);
 				} catch (IOException e) {
-					e.printStackTrace();
+					LOGGER.fatal("Can not consume message ", e);
 				}
 			}
 		}
