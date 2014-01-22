@@ -18,6 +18,7 @@ import net.canadensys.harvester.message.ProcessingMessageIF;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.log4j.Logger;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -67,6 +68,9 @@ public class JMSProducer {
 
 	public void init() {
 		om = new ObjectMapper();
+		//do not serialize null data
+		om.setSerializationInclusion(Include.NON_NULL);
+		
 		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(
 				brokerURL);
 

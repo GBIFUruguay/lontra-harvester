@@ -77,7 +77,9 @@ public class StreamDwcContentStep implements ProcessingStepIF{
 
 			//should be done by ChunkSplitter
 			rom.addRawModel(currRawModel);
+			rom.setWhen(Calendar.getInstance().getTime().toString());
 			com.addRawModel(currRawModel);
+			com.setWhen(Calendar.getInstance().getTime().toString());
 			
 			currRawModel = reader.read();
 			numberOfRecords++;
