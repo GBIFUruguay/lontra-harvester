@@ -61,7 +61,7 @@ public class JMSControlProducer {
 	
 	public void close() {
 		try {
-			//topicConnection.stop();
+			topicSession.close();
 			topicConnection.close();
 		} catch (JMSException e) {
 			e.printStackTrace();

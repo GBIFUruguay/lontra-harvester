@@ -17,6 +17,8 @@ import net.canadensys.harvester.message.control.NodeErrorControlMessage;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
 import org.hibernate.SessionFactory;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +54,7 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 	private static final String TEST_BROKER_URL = "vm://localhost?broker.persistent=false";
 	private static AtomicBoolean jobComplete = new AtomicBoolean(false);
 	private static AtomicBoolean controlMessageReceived = new AtomicBoolean(false);
+	private static final int MAX_WAIT = 60000;
 	
 	private static final int EXPECTED_NUMBER_OF_RESULTS = 11;
 	private static final int MAX_NUMBER_OF_ATTEMP = 5;
@@ -82,11 +85,43 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 	@Qualifier("insertResourceContactStep")
 	private JMSConsumerMessageHandlerIF insertResourceContactStep;
 	
+	/**
+	 * Setup Test Consumer
+	 * This consumer will write to the database specified by the sessionFactory bean.
+	 */
+	@Before
+	public void setup(){
+		reader = new JMSConsumer(TEST_BROKER_URL);
+		reader.registerHandler(insertRawOccurrenceStep);
+		reader.registerHandler(processInsertOccurrenceStep);
+		reader.registerHandler(insertResourceContactStep);
+		
+		try {
+			((ProcessingStepIF)insertRawOccurrenceStep).preStep(null);
+			((ProcessingStepIF)processInsertOccurrenceStep).preStep(null);
+			((ProcessingStepIF)insertResourceContactStep).preStep(null);
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		}
+		reader.open();
+		
+		controlConsumer = new JMSControlConsumer(TEST_BROKER_URL);
+		controlConsumer.registerHandler(new MockControlMessageHandler());
+		controlConsumer.open();
+	}
+
+	@After
+	public void destroy(){
+		reader.close();
+		controlConsumer.close();
+		((ProcessingStepIF)insertRawOccurrenceStep).postStep();
+		((ProcessingStepIF)processInsertOccurrenceStep).postStep();
+		((ProcessingStepIF)insertResourceContactStep).postStep();
+	}
+	
 	@Test
 	public void testImport(){
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(txManager.getDataSource());
-		//add a local consumer to test the entire loop
-		setupTestConsumer();
 						
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, "qmor-specimens");
@@ -94,7 +129,7 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 		importDwcaJob.doJob(this);
 		synchronized (jobComplete) {
 			try {
-				jobComplete.wait();
+				jobComplete.wait(MAX_WAIT);
 				//validate content of the database
 				if(jobComplete.get()){
 					int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.occurrence", BigDecimal.class).intValue();
@@ -123,10 +158,6 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 			} catch (InterruptedException e) {
 				fail();
 			}
-			finally{
-				reader.close();
-				controlConsumer.close();
-			}
 		}
 	}
 	
@@ -135,18 +166,14 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 	 * A common reason for failing is when data can not fit into the defined space in the database.
 	 */
 	@Test
-	public void testFailedImport(){
-		
-		//add a local consumer to test the entire loop
-		setupTestConsumer();
-						
+	public void testFailedImport(){						
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens-broken");
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, "qmor-specimens");
 		
 		importDwcaJob.doJob(this);
 		synchronized (controlMessageReceived) {
 			try {
-				controlMessageReceived.wait();
+				controlMessageReceived.wait(MAX_WAIT);
 				//validate content of the database
 				if(!controlMessageReceived.get()){
 					fail();
@@ -154,36 +181,9 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 			} catch (InterruptedException e) {
 				fail();
 			}
-			finally{
-				reader.close();
-				controlConsumer.close();
-			}
 		}
-		
 	}
-	
-	/**
-	 * This consumer will write to the database specified by the sessionFactory bean
-	 */
-	private void setupTestConsumer(){
-		reader = new JMSConsumer(TEST_BROKER_URL);
-		reader.registerHandler(insertRawOccurrenceStep);
-		reader.registerHandler(processInsertOccurrenceStep);
-		reader.registerHandler(insertResourceContactStep);
-		
-		try {
-			((ProcessingStepIF)insertRawOccurrenceStep).preStep(null);
-			((ProcessingStepIF)processInsertOccurrenceStep).preStep(null);
-			((ProcessingStepIF)insertResourceContactStep).preStep(null);
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		}
-		reader.open();
-		
-		controlConsumer = new JMSControlConsumer(TEST_BROKER_URL);
-		controlConsumer.registerHandler(new MockControlMessageHandler());
-		controlConsumer.open();
-	}
+
 	
 	@Override
 	public void onSuccess(Void arg0) {
@@ -200,6 +200,11 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 		}
 	}
 	
+	/**
+	 * JMSControlConsumerMessageHandlerIF implementation for unit testing.
+	 * @author canadensys
+	 *
+	 */
 	private class MockControlMessageHandler implements JMSControlConsumerMessageHandlerIF, FutureCallback<Void>{
 
 		@Override
@@ -210,7 +215,6 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 		@Override
 		public boolean handleMessage(ControlMessageIF message) {
 			synchronized (controlMessageReceived) {
-				System.out.println(((NodeErrorControlMessage)message).getErrorMessage());
 				controlMessageReceived.set(true);
 				controlMessageReceived.notifyAll();
 			}

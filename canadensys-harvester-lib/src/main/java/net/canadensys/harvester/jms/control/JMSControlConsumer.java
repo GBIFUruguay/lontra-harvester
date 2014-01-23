@@ -71,10 +71,8 @@ public class JMSControlConsumer {
 	
 	public void close() {
 		try {
-			topicConnection.stop();
-			topicConnection.close();
-			subscriber.close();
 			subSession.close();
+			topicConnection.close();	
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
