@@ -32,7 +32,7 @@ public class JMSProducer {
 	private final String brokerURL;
 
 	// Name of the queue we will sent messages into
-	private static String QUEUE_NAME = "Importer.Queue";
+	public static String QUEUE_NAME = "Harvester.Queue";
 
 	private Connection connection;
 	private Session session;

@@ -15,6 +15,8 @@ import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.config.harvester.HarvesterConfig;
 import net.canadensys.harvester.config.harvester.HarvesterConfigIF;
 import net.canadensys.harvester.jms.JMSWriter;
+import net.canadensys.harvester.jms.control.JMSControlConsumer;
+import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
@@ -143,7 +145,7 @@ public class TestConfig {
 				.addScript(
 						"/script/occurrence/create_occurrence_tables_buffer_schema.sql")
 
-				.addScript("classpath:create_management_tables.sql").build();
+						.addScript("classpath:create_management_tables.sql").build();
 	}
 
 	@Bean
@@ -309,4 +311,12 @@ public class TestConfig {
 		return new StreamEmlContentStep();
 	}
 
+	@Bean
+	public JMSControlConsumer errorReceiver(){
+		return new JMSControlConsumer(jmsBrokerUrl);
+	}
+	@Bean
+	public JMSControlProducer errorReporter(){
+		return null;
+	}
 }

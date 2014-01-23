@@ -40,9 +40,6 @@ public class JMSConsumer{
 	
 	public String brokerURL;
 	private boolean isOpen = false;
-
-	// Name of the queue we will receive messages from
-	private static String QUEUE_NAME = "Importer.Queue";
 	
 	private Connection connection;
 	private MessageConsumer consumer;
@@ -96,8 +93,8 @@ public class JMSConsumer{
 	
 			JMSMessageListener msgListener = new JMSMessageListener();
 			
-			// Getting the queue
-			Queue queue = session.createQueue(QUEUE_NAME);
+			// Get the queue
+			Queue queue = session.createQueue(JMSProducer.QUEUE_NAME);
 	
 			// MessageConsumer is used for receiving (consuming) messages
 			consumer = session.createConsumer(queue);
