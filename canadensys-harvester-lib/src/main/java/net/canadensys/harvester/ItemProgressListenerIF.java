@@ -6,5 +6,12 @@ package net.canadensys.harvester;
  *
  */
 public interface ItemProgressListenerIF {
-	public void onProgress(int current,int total);
+	
+	/**
+	 * 
+	 * @param context representing the context of the progress. Allowing to have the same listener on different context.
+	 * @param current
+	 * @param total
+	 */
+	public void onProgress(String context,int current,int total);
 }

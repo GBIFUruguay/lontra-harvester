@@ -51,8 +51,7 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-public class OccurrenceHarvesterMainView implements ItemProgressListenerIF,
-		PropertyChangeListener {
+public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, PropertyChangeListener {
 
 	private JFrame harvesterFrame = null;
 
@@ -85,7 +84,7 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF,
 	public void initView() {
 		loadingImg = new ImageIcon(
 				OccurrenceHarvesterMainView.class
-						.getResource("/ajax-loader.gif"));
+				.getResource("/ajax-loader.gif"));
 
 		harvesterFrame = new JFrame(Messages.getString("view.title"));
 		harvesterFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -476,9 +475,10 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF,
 				});
 			} else {
 				JOptionPane
-						.showMessageDialog(
-								harvesterFrame,
-								Messages.getString("view.info.status.error.details"), Messages.getString("OccurrenceHarvesterMainView.29"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+				.showMessageDialog(
+						harvesterFrame,
+						Messages.getString("view.info.status.error.details"),
+						Messages.getString("view.info.status.error"), JOptionPane.ERROR_MESSAGE);
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -558,7 +558,7 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF,
 	}
 
 	@Override
-	public void onProgress(final int current, final int total) {
+	public void onProgress(String context,final int current, final int total) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {

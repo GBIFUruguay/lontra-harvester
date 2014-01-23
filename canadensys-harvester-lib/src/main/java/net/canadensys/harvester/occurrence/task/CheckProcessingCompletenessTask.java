@@ -72,7 +72,7 @@ public class CheckProcessingCompletenessTask implements ItemTaskIF{
 						secondsWaiting = 0;
 					}
 					previousCount = currNumberOfResult.intValue();
-					notifyListeners(currNumberOfResult.intValue(),numberOfRecords);
+					notifyListeners("occurrence_raw",currNumberOfResult.intValue(),numberOfRecords);
 					
 					try {
 						Thread.sleep(1000);
@@ -98,10 +98,10 @@ public class CheckProcessingCompletenessTask implements ItemTaskIF{
 		this.sessionFactory = sessionFactory;
 	}
 	
-	private void notifyListeners(int current,int total){
+	private void notifyListeners(String context,int current,int total){
 		if(itemListenerList != null){
 			for(ItemProgressListenerIF currListener : itemListenerList){
-				currListener.onProgress(current, total);
+				currListener.onProgress(context,current, total);
 			}
 		}
 	}
