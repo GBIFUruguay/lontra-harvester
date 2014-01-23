@@ -13,7 +13,7 @@ import net.canadensys.harvester.ItemMapperIF;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.jms.JMSConsumer;
-import net.canadensys.harvester.jms.JMSConsumerMessageHandler;
+import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 import net.canadensys.harvester.jms.JMSWriter;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.mock.MockHabitObject;
@@ -84,7 +84,7 @@ public class UserDefinedJobTest{
 		
 		//Declare the message handler classes. Which class(es) on the node(s) should handle the messages.
 		//When more than one class is provided, each classes will receive the message.
-		List<Class<? extends JMSConsumerMessageHandler>> msgHandlerClassList = new ArrayList<Class<? extends JMSConsumerMessageHandler>>();
+		List<Class<? extends JMSConsumerMessageHandlerIF>> msgHandlerClassList = new ArrayList<Class<? extends JMSConsumerMessageHandlerIF>>();
 		msgHandlerClassList.add(GenericAsyncStep.class);
 		msgHandlerClassList.add(GenericAsyncProcessingStep.class);
 		

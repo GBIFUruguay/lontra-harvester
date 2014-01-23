@@ -9,7 +9,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.jms.JMSConsumer;
-import net.canadensys.harvester.jms.JMSConsumerMessageHandler;
+import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
+import net.canadensys.harvester.jms.control.JMSControlConsumer;
+import net.canadensys.harvester.jms.control.JMSControlConsumerMessageHandlerIF;
+import net.canadensys.harvester.message.ControlMessageIF;
+import net.canadensys.harvester.message.control.NodeErrorControlMessage;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
 import org.hibernate.SessionFactory;
@@ -47,6 +51,8 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 	
 	private static final String TEST_BROKER_URL = "vm://localhost?broker.persistent=false";
 	private static AtomicBoolean jobComplete = new AtomicBoolean(false);
+	private static AtomicBoolean controlMessageReceived = new AtomicBoolean(false);
+	
 	private static final int EXPECTED_NUMBER_OF_RESULTS = 11;
 	private static final int MAX_NUMBER_OF_ATTEMP = 5;
 	
@@ -59,21 +65,22 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 	private HibernateTransactionManager txManager;
 	
 	private JMSConsumer reader;
+	private JMSControlConsumer controlConsumer;
 	
 	@Autowired
 	private ImportDwcaJob importDwcaJob;
 	
 	@Autowired
 	@Qualifier("insertRawOccurrenceStep")
-	private JMSConsumerMessageHandler insertRawOccurrenceStep;
+	private JMSConsumerMessageHandlerIF insertRawOccurrenceStep;
 	
 	@Autowired
 	@Qualifier("processInsertOccurrenceStep")
-	private JMSConsumerMessageHandler processInsertOccurrenceStep;
+	private JMSConsumerMessageHandlerIF processInsertOccurrenceStep;
 	
 	@Autowired
 	@Qualifier("insertResourceContactStep")
-	private JMSConsumerMessageHandler insertResourceContactStep;
+	private JMSConsumerMessageHandlerIF insertResourceContactStep;
 	
 	@Test
 	public void testImport(){
@@ -118,8 +125,41 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 			}
 			finally{
 				reader.close();
+				controlConsumer.close();
 			}
 		}
+	}
+	
+	/**
+	 * Test the behavior of a failing import.
+	 * A common reason for failing is when data can not fit into the defined space in the database.
+	 */
+	@Test
+	public void testFailedImport(){
+		
+		//add a local consumer to test the entire loop
+		setupTestConsumer();
+						
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens-broken");
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, "qmor-specimens");
+		
+		importDwcaJob.doJob(this);
+		synchronized (controlMessageReceived) {
+			try {
+				controlMessageReceived.wait();
+				//validate content of the database
+				if(!controlMessageReceived.get()){
+					fail();
+				}
+			} catch (InterruptedException e) {
+				fail();
+			}
+			finally{
+				reader.close();
+				controlConsumer.close();
+			}
+		}
+		
 	}
 	
 	/**
@@ -139,6 +179,10 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 			e.printStackTrace();
 		}
 		reader.open();
+		
+		controlConsumer = new JMSControlConsumer(TEST_BROKER_URL);
+		controlConsumer.registerHandler(new MockControlMessageHandler());
+		controlConsumer.open();
 	}
 	
 	@Override
@@ -150,6 +194,37 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 	}
 	@Override
 	public void onFailure(Throwable arg0) {
-		fail();
+		synchronized (jobComplete) {
+			jobComplete.set(false);
+			jobComplete.notifyAll();
+		}
+	}
+	
+	private class MockControlMessageHandler implements JMSControlConsumerMessageHandlerIF, FutureCallback<Void>{
+
+		@Override
+		public Class<?> getMessageClass() {
+			return NodeErrorControlMessage.class;
+		}
+
+		@Override
+		public boolean handleMessage(ControlMessageIF message) {
+			synchronized (controlMessageReceived) {
+				System.out.println(((NodeErrorControlMessage)message).getErrorMessage());
+				controlMessageReceived.set(true);
+				controlMessageReceived.notifyAll();
+			}
+			return true;
+		}
+
+		@Override
+		public void onSuccess(Void result) {
+			//fail();
+		}
+
+		@Override
+		public void onFailure(Throwable t) {
+			//nothing, we handle that case through the ErrorControl Message.
+		}
 	}
 }

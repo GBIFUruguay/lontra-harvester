@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.harvester.ItemWriterIF;
+import net.canadensys.harvester.exception.WriterException;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -22,8 +23,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  */
 public class OccurrenceHibernateWriter implements ItemWriterIF<OccurrenceModel> {
 
-	private static final Logger LOGGER = Logger
-			.getLogger(OccurrenceHibernateWriter.class);
+	private static final Logger LOGGER = Logger.getLogger(OccurrenceHibernateWriter.class);
 
 	@Autowired
 	@Qualifier(value = "bufferSessionFactory")
@@ -46,7 +46,7 @@ public class OccurrenceHibernateWriter implements ItemWriterIF<OccurrenceModel> 
 	}
 
 	@Override
-	public void write(List<? extends OccurrenceModel> elementList) {
+	public void write(List<? extends OccurrenceModel> elementList) throws WriterException{
 		try {
 			Transaction tx = session.beginTransaction();
 			for (OccurrenceModel currOccurrence : elementList) {
@@ -58,11 +58,12 @@ public class OccurrenceHibernateWriter implements ItemWriterIF<OccurrenceModel> 
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
+			throw new WriterException(hEx.getMessage());
 		}
 	}
 
 	@Override
-	public void write(OccurrenceModel occModel) {
+	public void write(OccurrenceModel occModel) throws WriterException {
 		try {
 			Session currSession = sessionFactory.getCurrentSession();
 			currSession.beginTransaction();
@@ -73,6 +74,7 @@ public class OccurrenceHibernateWriter implements ItemWriterIF<OccurrenceModel> 
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
+			throw new WriterException(hEx.getMessage());
 		}
 	}
 }

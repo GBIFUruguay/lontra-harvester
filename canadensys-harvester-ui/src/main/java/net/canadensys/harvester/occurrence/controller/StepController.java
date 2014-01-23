@@ -8,6 +8,10 @@ import java.util.List;
 
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.config.harvester.HarvesterConfigIF;
+import net.canadensys.harvester.jms.control.JMSControlConsumer;
+import net.canadensys.harvester.jms.control.JMSControlConsumerMessageHandlerIF;
+import net.canadensys.harvester.message.ControlMessageIF;
+import net.canadensys.harvester.message.control.NodeErrorControlMessage;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
@@ -33,32 +37,42 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
+/**
+ * main controller
+ * @author canadensys
+ *
+ */
 @Component("stepController")
-public class StepController implements StepControllerIF{
-	
+public class StepController implements StepControllerIF, JMSControlConsumerMessageHandlerIF{
+
 	@Autowired
 	private HarvesterConfigIF harvesterConfig;
-	
+
 	@Autowired
 	@Qualifier(value="publicSessionFactory")
 	private SessionFactory sessionFactory;
-	
+
 	@Autowired
 	private ImportDwcaJob importDwcaJob;
-	
+
 	@Autowired
 	private MoveToPublicSchemaJob moveToPublicSchemaJob;
-	
+
 	@Autowired
 	private ComputeUniqueValueJob computeUniqueValueJob;
 
 	@Autowired
 	private HarvesterViewModel harvesterViewModel;
-	
+
+	//TODO abstract JMS or move to ImportDwcaJob
+	@Autowired
+	private JMSControlConsumer errorReceiver;
+
+	@Override
 	public void registerProgressListener(ItemProgressListenerIF progressListener){
 		importDwcaJob.setItemProgressListener(progressListener);
 	}
-	
+
 	/**
 	 * Starts the import process.
 	 * @param resourceId
@@ -66,26 +80,28 @@ public class StepController implements StepControllerIF{
 	 */
 	@Override
 	public void importDwcA(Integer resourceId){
+		errorReceiver.registerHandler(this);
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceId);
 		importDwcaJob.doJob(this);
 	}
-	
+
 	@Override
 	public void moveToPublicSchema(String datasetShortName){
 		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, datasetShortName);
 		moveToPublicSchemaJob.doJob();
-		
+
 		computeUniqueValueJob.doJob();
 	}
 
-	
+
+	@Override
 	@SuppressWarnings("unchecked")
 	@Transactional("publicTransactionManager")
 	public List<ResourceModel> getResourceModelList(){
 		Criteria searchCriteria = sessionFactory.getCurrentSession().createCriteria(ResourceModel.class);
 		return searchCriteria.list();
 	}
-	
+
 	@Transactional("publicTransactionManager")
 	@Override
 	public boolean updateResourceModel(ResourceModel resourceModel) {
@@ -98,13 +114,14 @@ public class StepController implements StepControllerIF{
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Get the sorted ImportLogModel list using our own session. Sorted by desc
 	 * event_date
 	 * 
 	 * @return
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	@Transactional("publicTransactionManager")
 	public List<ImportLogModel> getSortedImportLogModelList() {
@@ -112,12 +129,13 @@ public class StepController implements StepControllerIF{
 		criteria.addOrder(Order.desc("event_end_date_time"));
 		return criteria.list();
 	}
-	
+
 	/**
 	 * Get the list of IPTFeedModel from an IPT installation RSS feed.
 	 * @param feedURL
 	 * @return
 	 */
+	@Override
 	public List<IPTFeedModel> getIPTFeed() {
 		List<IPTFeedModel> feedList = new ArrayList<IPTFeedModel>();
 		SyndFeedInput input = new SyndFeedInput();
@@ -144,7 +162,6 @@ public class StepController implements StepControllerIF{
 		return feedList;
 	}
 
-	
 	@Override
 	public void onFailure(Throwable err) {
 		System.out.println("Import failed " + err.getMessage());
@@ -154,5 +171,16 @@ public class StepController implements StepControllerIF{
 	@Override
 	public void onSuccess(Void arg0) {
 		harvesterViewModel.setImportStatus(JobStatusEnum.DONE_SUCCESS);
+	}
+
+	@Override
+	public Class<?> getMessageClass() {
+		return NodeErrorControlMessage.class;
+	}
+
+	@Override
+	public boolean handleMessage(ControlMessageIF message) {
+		System.out.println(((NodeErrorControlMessage)message).getErrorMessage());
+		return true;
 	}
 }

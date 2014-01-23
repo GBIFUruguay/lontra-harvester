@@ -16,6 +16,8 @@ import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.config.harvester.HarvesterConfigIF;
 import net.canadensys.harvester.jms.JMSConsumer;
 import net.canadensys.harvester.jms.JMSWriter;
+import net.canadensys.harvester.jms.control.JMSControlConsumer;
+import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
@@ -56,57 +58,57 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
  */
 @Configuration
 @ComponentScan(basePackages ="net.canadensys.harvester",
-	excludeFilters = { @Filter(type = FilterType.CUSTOM, value = { ExcludeTestClassesTypeFilter.class }),
+excludeFilters = { @Filter(type = FilterType.CUSTOM, value = { ExcludeTestClassesTypeFilter.class }),
 		@Filter(type = FilterType.ASSIGNABLE_TYPE, value = { ProcessingConfig.class })})
 @EnableTransactionManagement
 public class ProcessingNodeConfig {
-	
-    @Bean
-    public static PropertyPlaceholderConfigurer properties(){
-    	PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-    	ppc.setLocation( new FileSystemResource("config/harvester-config.properties") );
-    	return ppc;
-    }
-    
-    @Value("${database.url}")
-    private String dbUrl;
-    @Value( "${database.driver}" )
-    private String dbDriverClassName;
-    @Value( "${database.username}" )
-    private String username;
-    @Value( "${database.password}" )
-    private String password;
-    
-    @Value( "${hibernate.dialect}" )
-    private String hibernateDialect;
-    @Value( "${hibernate.show_sql}" )
-    private String hibernateShowSql;
-    @Value( "${hibernate.buffer_schema}" )
-    private String hibernateBufferSchema;
-    
-    @Value("${jms.broker_url}")
-    private String jmsBrokerUrl;
-    
-    @Bean(name="datasource")
-    public DataSource dataSource() {    		
-    	ComboPooledDataSource ds = new ComboPooledDataSource();
-    	try {
+
+	@Bean
+	public static PropertyPlaceholderConfigurer properties(){
+		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
+		ppc.setLocation( new FileSystemResource("config/harvester-config.properties") );
+		return ppc;
+	}
+
+	@Value("${database.url}")
+	private String dbUrl;
+	@Value( "${database.driver}" )
+	private String dbDriverClassName;
+	@Value( "${database.username}" )
+	private String username;
+	@Value( "${database.password}" )
+	private String password;
+
+	@Value( "${hibernate.dialect}" )
+	private String hibernateDialect;
+	@Value( "${hibernate.show_sql}" )
+	private String hibernateShowSql;
+	@Value( "${hibernate.buffer_schema}" )
+	private String hibernateBufferSchema;
+
+	@Value("${jms.broker_url}")
+	private String jmsBrokerUrl;
+
+	@Bean(name="datasource")
+	public DataSource dataSource() {
+		ComboPooledDataSource ds = new ComboPooledDataSource();
+		try {
 			ds.setDriverClass(dbDriverClassName);
 		} catch (PropertyVetoException e) {
 			e.printStackTrace();
 		}
-    	ds.setJdbcUrl(dbUrl);
-    	ds.setUser(username);
-    	ds.setPassword(password);
-    	return ds;
-    }
-    
-    @Bean(name="bufferSessionFactory")
-    public LocalSessionFactoryBean bufferSessionFactory() {
-    	LocalSessionFactoryBean sb = new LocalSessionFactoryBean(); 
-    	sb.setDataSource(dataSource()); 
-    	sb.setAnnotatedClasses(new Class[]{OccurrenceRawModel.class,
-    			OccurrenceModel.class,ImportLogModel.class,ResourceContactModel.class});
+		ds.setJdbcUrl(dbUrl);
+		ds.setUser(username);
+		ds.setPassword(password);
+		return ds;
+	}
+
+	@Bean(name="bufferSessionFactory")
+	public LocalSessionFactoryBean bufferSessionFactory() {
+		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
+		sb.setDataSource(dataSource());
+		sb.setAnnotatedClasses(new Class[]{OccurrenceRawModel.class,
+				OccurrenceModel.class,ImportLogModel.class,ResourceContactModel.class});
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -114,47 +116,47 @@ public class ProcessingNodeConfig {
 		hibernateProperties.setProperty("hibernate.default_schema", hibernateBufferSchema);
 		hibernateProperties.setProperty("hibernate.connection.autocommit","false");
 		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
-    	sb.setHibernateProperties(hibernateProperties);
-    	return sb;
-    }
-    
-    @Bean(name="publicSessionFactory")
-    public LocalSessionFactoryBean publicSessionFactory() {
-    	LocalSessionFactoryBean sb = new LocalSessionFactoryBean(); 
-    	sb.setDataSource(dataSource()); 
-    	sb.setAnnotatedClasses(new Class[]{
-    			OccurrenceRawModel.class,OccurrenceModel.class,
-    			ImportLogModel.class, ResourceModel.class});
+		sb.setHibernateProperties(hibernateProperties);
+		return sb;
+	}
+
+	@Bean(name="publicSessionFactory")
+	public LocalSessionFactoryBean publicSessionFactory() {
+		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
+		sb.setDataSource(dataSource());
+		sb.setAnnotatedClasses(new Class[]{
+				OccurrenceRawModel.class,OccurrenceModel.class,
+				ImportLogModel.class, ResourceModel.class});
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
 		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
-    	sb.setHibernateProperties(hibernateProperties);
-    	return sb;
-    }
-    
-    @Bean(name="bufferTransactionManager")
-    public HibernateTransactionManager hibernateTransactionManager(){
-    	HibernateTransactionManager htmgr = new HibernateTransactionManager();
+		sb.setHibernateProperties(hibernateProperties);
+		return sb;
+	}
+
+	@Bean(name="bufferTransactionManager")
+	public HibernateTransactionManager hibernateTransactionManager(){
+		HibernateTransactionManager htmgr = new HibernateTransactionManager();
 		htmgr.setSessionFactory(bufferSessionFactory().getObject());
-    	return htmgr;
-    }
-    
-    @Bean(name="publicTransactionManager")
-    public HibernateTransactionManager publicHibernateTransactionManager(){
-    	HibernateTransactionManager htmgr = new HibernateTransactionManager();
+		return htmgr;
+	}
+
+	@Bean(name="publicTransactionManager")
+	public HibernateTransactionManager publicHibernateTransactionManager(){
+		HibernateTransactionManager htmgr = new HibernateTransactionManager();
 		htmgr.setSessionFactory(publicSessionFactory().getObject());
-    	return htmgr;
-    }
-    
-    //---VIEW MODEL---
+		return htmgr;
+	}
+
+	//---VIEW MODEL---
 	@Bean
 	public HarvesterViewModel harvesterViewModel(){
 		return null;
 	}
-	
-    //---JOB---
+
+	//---JOB---
 	//Nodes should not initiate jobs
 	@Bean
 	public ImportDwcaJob importDwcaJob(){
@@ -168,7 +170,7 @@ public class ProcessingNodeConfig {
 	public ComputeUniqueValueJob computeUniqueValueJob(){
 		return null;
 	}
-	
+
 	//---STEP---
 	@Bean(name="streamEmlContentStep")
 	public ProcessingStepIF streamEmlContentStep(){
@@ -182,27 +184,27 @@ public class ProcessingNodeConfig {
 	public ProcessingStepIF insertRawOccurrenceStep(){
 		return new InsertRawOccurrenceStep();
 	}
-	
+
 	@Bean(name="processInsertOccurrenceStep")
 	public ProcessingStepIF processInsertOccurrenceStep(){
 		return new ProcessInsertOccurrenceStep();
 	}
-	
+
 	@Bean(name="insertResourceContactStep")
 	public ProcessingStepIF insertResourceContactStep(){
 		return new InsertResourceContactStep();
 	}
-	
+
 	@Bean(name="updateResourceContactStep")
 	public ProcessingStepIF updateResourceContactStep(){
 		return null;
 	}
-	
+
 	@Bean(name="streamOccurrenceForStatsStep")
 	public ProcessingStepIF streamOccurrenceForStatsStep(){
 		return null;
 	}
-	
+
 	//---Unused TASK in processing node---
 	@Bean
 	public ItemTaskIF prepareDwcaTask(){
@@ -228,23 +230,23 @@ public class ProcessingNodeConfig {
 	public ItemTaskIF findUsedDwcaTermTask(){
 		return null;
 	}
-	
+
 	//---PROCESSOR wiring---
 	@Bean(name="lineProcessor")
 	public ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> lineProcessor(){
 		return new DwcaLineProcessor();
 	}
-	
+
 	@Bean(name="occurrenceProcessor")
 	public ItemProcessorIF<OccurrenceRawModel, OccurrenceModel> occurrenceProcessor(){
 		return new OccurrenceProcessor();
 	}
-	
+
 	@Bean(name="resourceContactProcessor")
 	public ItemProcessorIF<Eml, ResourceContactModel> resourceContactProcessor(){
 		return new ResourceContactProcessor();
 	}
-	
+
 	//---READER wiring---
 	@Bean
 	public ItemReaderIF<OccurrenceRawModel> dwcaItemReader(){
@@ -254,30 +256,30 @@ public class ProcessingNodeConfig {
 	public ItemReaderIF<Eml> dwcaEmlReader(){
 		return null;
 	}
-	
+
 	//---WRITER wiring---
 	@Bean(name="rawOccurrenceWriter")
 	public ItemWriterIF<OccurrenceRawModel> rawOccurrenceWriter(){
 		return new RawOccurrenceHibernateWriter();
 	}
-	
+
 	@Bean(name="occurrenceWriter")
 	public ItemWriterIF<OccurrenceModel> occurrenceWriter(){
 		return new OccurrenceHibernateWriter();
 	}
-	
+
 	@Bean(name="resourceContactWriter")
 	public ItemWriterIF<ResourceContactModel> resourceContactHibernateWriter(){
 		return new ResourceContactHibernateWriter();
 	}
-	
+
 	//---Config---
 	@Bean
 	public HarvesterConfigIF harvesterConfig(){
 		//currently not used by the nodes
 		return null;
 	}
-	
+
 	/**
 	 * node should not use this
 	 * @return
@@ -286,10 +288,18 @@ public class ProcessingNodeConfig {
 	public JMSWriter jmsWriter(){
 		return null;
 	}
-	
+
 	@Bean(name="jmsConsumer")
 	public JMSConsumer jmsConsumer(){
 		return new JMSConsumer(jmsBrokerUrl);
 	}
-	
+
+	@Bean
+	public JMSControlProducer errorReporter(){
+		return new JMSControlProducer(jmsBrokerUrl);
+	}
+	@Bean
+	public JMSControlConsumer errorReceiver(){
+		return null;
+	}
 }

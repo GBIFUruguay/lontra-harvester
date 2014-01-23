@@ -2,6 +2,8 @@ package net.canadensys.harvester;
 
 import java.util.List;
 
+import net.canadensys.harvester.exception.WriterException;
+
 /**
  * Item writing interface
  * @author canadensys
@@ -12,7 +14,7 @@ public interface ItemWriterIF<T> {
 	public void openWriter();
 	public void closeWriter();
 	
-	public void write(List<? extends T> elementList);
-	public void write(T element);
+	public void write(List<? extends T> elementList) throws WriterException;
+	public void write(T element) throws WriterException;
 }
 

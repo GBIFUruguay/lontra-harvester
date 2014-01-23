@@ -6,8 +6,11 @@ import java.util.Map;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.ProcessingStepIF;
-import net.canadensys.harvester.jms.JMSConsumerMessageHandler;
+import net.canadensys.harvester.exception.WriterException;
+import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
+import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.message.ProcessingMessageIF;
+import net.canadensys.harvester.message.control.NodeErrorControlMessage;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.message.SaveRawOccurrenceMessage;
 
@@ -20,23 +23,31 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author canadensys
  *
  */
-public class InsertRawOccurrenceStep implements ProcessingStepIF,JMSConsumerMessageHandler{
+public class InsertRawOccurrenceStep implements ProcessingStepIF,JMSConsumerMessageHandlerIF{
 	
 	@Autowired
 	@Qualifier("rawOccurrenceWriter")
 	private ItemWriterIF<OccurrenceRawModel> writer;
+	
+	@Autowired
+	private JMSControlProducer errorReporter;
 
 	@Override
 	public void preStep(Map<SharedParameterEnum,Object> sharedParameters) throws IllegalStateException{
 		if(writer == null){
 			throw new IllegalStateException("No writer defined");
 		}
+		if(errorReporter == null){
+			throw new IllegalStateException("No errorReporter defined");
+		}
 		writer.openWriter();
+		errorReporter.open();
 	}
 
 	@Override
 	public void postStep() {
 		writer.closeWriter();
+		errorReporter.close();
 	}
 	
 	@Override
@@ -45,11 +56,17 @@ public class InsertRawOccurrenceStep implements ProcessingStepIF,JMSConsumerMess
 	}
 
 	@Override
-	public void handleMessage(ProcessingMessageIF message) {
+	public boolean handleMessage(ProcessingMessageIF message) {
 		long t = System.currentTimeMillis();
 		List<OccurrenceRawModel> occRawList = ((SaveRawOccurrenceMessage)message).getRawModelList();
-		writer.write(occRawList);
+		try {
+			writer.write(occRawList);
+		} catch (WriterException e) {
+			errorReporter.publish(new NodeErrorControlMessage(e));
+			return false;
+		}
 		System.out.println("Reading msg + Writing raw :" + ( System.currentTimeMillis()-t) + "ms");
+		return true;
 	}
 	
 	/**

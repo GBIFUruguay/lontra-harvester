@@ -8,11 +8,13 @@ import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.message.ProcessOccurrenceMessage;
 import net.canadensys.harvester.occurrence.message.SaveRawOccurrenceMessage;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -24,6 +26,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  */
 public class StreamDwcContentStep implements ProcessingStepIF{
 	
+	private static final Logger LOGGER = Logger.getLogger(StreamDwcContentStep.class);
 	private static final int DEFAULT_FLUSH_INTERVAL = 100;
 	
 	@Autowired
@@ -70,41 +73,46 @@ public class StreamDwcContentStep implements ProcessingStepIF{
 
 	@Override
 	public void doStep() {
-		SaveRawOccurrenceMessage rom = new SaveRawOccurrenceMessage();
-		ProcessOccurrenceMessage com = new ProcessOccurrenceMessage();
-		
-		long t= System.currentTimeMillis();
-		OccurrenceRawModel currRawModel = reader.read();
-		while(currRawModel != null){
-			currRawModel = lineProcessor.process(currRawModel, sharedParameters);
-
-			//should be done by ChunkSplitter
-			rom.addRawModel(currRawModel);
-			rom.setWhen(Calendar.getInstance().getTime().toString());
-			com.addRawModel(currRawModel);
-			com.setWhen(Calendar.getInstance().getTime().toString());
+		try{
+			SaveRawOccurrenceMessage rom = new SaveRawOccurrenceMessage();
+			ProcessOccurrenceMessage com = new ProcessOccurrenceMessage();
 			
-			currRawModel = reader.read();
-			numberOfRecords++;
-			
-			if(numberOfRecords % flushInterval == 0){
+			long t= System.currentTimeMillis();
+			OccurrenceRawModel currRawModel = reader.read();
+			while(currRawModel != null){
+				currRawModel = lineProcessor.process(currRawModel, sharedParameters);
+	
+				//should be done by ChunkSplitter
+				rom.addRawModel(currRawModel);
+				rom.setWhen(Calendar.getInstance().getTime().toString());
+				com.addRawModel(currRawModel);
+				com.setWhen(Calendar.getInstance().getTime().toString());
+				
+				currRawModel = reader.read();
+				numberOfRecords++;
+				
+				if(numberOfRecords % flushInterval == 0){
+					writer.write(rom);
+					writer.write(com);
+					rom = new SaveRawOccurrenceMessage();
+					rom.setWhen(Calendar.getInstance().getTime().toString());
+					com = new ProcessOccurrenceMessage();
+					com.setWhen(Calendar.getInstance().getTime().toString());
+				}
+			}
+			//flush remaining content
+			if(rom.getRawModelList().size() > 0){
 				writer.write(rom);
 				writer.write(com);
-				rom = new SaveRawOccurrenceMessage();
-				rom.setWhen(Calendar.getInstance().getTime().toString());
-				com = new ProcessOccurrenceMessage();
-				com.setWhen(Calendar.getInstance().getTime().toString());
 			}
+			
+			System.out.println("Streaming the file took :" + (System.currentTimeMillis()-t) + " ms");
+			
+			sharedParameters.put(SharedParameterEnum.NUMBER_OF_RECORDS,numberOfRecords);
 		}
-		System.out.println("Streaming the file took :" + (System.currentTimeMillis()-t) + " ms");
-		
-		//flush remaining content
-		if(rom.getRawModelList().size() > 0){
-			writer.write(rom);
-			writer.write(com);
+		catch(WriterException e){
+			LOGGER.fatal(e);
 		}
-		
-		sharedParameters.put(SharedParameterEnum.NUMBER_OF_RECORDS,numberOfRecords);
 	}
 	
 	public int getNumberOfRecords(){

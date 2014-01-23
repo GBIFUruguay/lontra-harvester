@@ -13,6 +13,7 @@ import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.jms.JMSWriter;
+import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
@@ -275,6 +276,11 @@ public class ProcessingConfigTest {
 	@Scope("prototype")
 	public JMSWriter jmsWriter(){
 		return new JMSWriter(jmsBrokerUrl);
+	}
+	
+	@Bean
+	public JMSControlProducer errorReporter(){
+		return new JMSControlProducer(jmsBrokerUrl);
 	}
 	
 }

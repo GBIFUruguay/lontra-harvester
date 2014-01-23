@@ -8,6 +8,7 @@ import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.message.SaveResourceContactMessage;
@@ -73,6 +74,10 @@ public class StreamEmlContentStep implements ProcessingStepIF{
 		
 		srcm.setResourceContactModel(resourceContactModel);
 
-		writer.write(srcm);
+		try {
+			writer.write(srcm);
+		} catch (WriterException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -5,7 +5,8 @@ import java.util.Map;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.ProcessingStepIF;
-import net.canadensys.harvester.jms.JMSConsumerMessageHandler;
+import net.canadensys.harvester.exception.WriterException;
+import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.message.DefaultMessage;
@@ -18,7 +19,7 @@ import net.canadensys.harvester.occurrence.message.DefaultMessage;
  * @param <T> type of object received in the message and then sent to the processor
  * @param <S> type of object out of the processor that will be written
  */
-public class GenericAsyncProcessingStep<T,S> implements ProcessingStepIF,JMSConsumerMessageHandler{
+public class GenericAsyncProcessingStep<T,S> implements ProcessingStepIF,JMSConsumerMessageHandlerIF{
 	
 	private ItemProcessorIF<T, S> itemProcessor;
 	private ItemWriterIF<S> writer;
@@ -38,14 +39,17 @@ public class GenericAsyncProcessingStep<T,S> implements ProcessingStepIF,JMSCons
 	}
 
 	@Override
-	public void handleMessage(ProcessingMessageIF message) {
-		long t = System.currentTimeMillis();
+	public boolean handleMessage(ProcessingMessageIF message) {
 		Object obj = ((DefaultMessage)message).getContent();
 		T data = messageContentClass.cast(obj);
 		S processedData = itemProcessor.process(data,null);
 		
-		writer.write(processedData);
-		System.out.println("Reading msg + Writing raw :" + ( System.currentTimeMillis()-t) + "ms");
+		try {
+			writer.write(processedData);
+		} catch (WriterException e) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override

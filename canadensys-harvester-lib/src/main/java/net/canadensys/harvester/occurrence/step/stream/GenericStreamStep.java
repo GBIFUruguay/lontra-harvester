@@ -8,10 +8,13 @@ import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.ProcessingStepIF;
-import net.canadensys.harvester.jms.JMSConsumerMessageHandler;
+import net.canadensys.harvester.exception.WriterException;
+import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.message.DefaultMessage;
+
+import org.apache.log4j.Logger;
 
 /**
  * Generic step to stream user defined object (defined by T).
@@ -22,6 +25,8 @@ import net.canadensys.harvester.occurrence.message.DefaultMessage;
  */
 public class GenericStreamStep<T> implements ProcessingStepIF{
 
+	private static final Logger LOGGER = Logger.getLogger(GenericStreamStep.class);
+	
 	private ItemReaderIF<T> reader;
 	private ItemWriterIF<ProcessingMessageIF> writer;
 	private ItemProcessorIF<T, T> lineProcessor;
@@ -30,7 +35,7 @@ public class GenericStreamStep<T> implements ProcessingStepIF{
 	private Map<SharedParameterEnum,Object> sharedParameters;
 	
 	//List of message handlers that will received the streamed messages
-	private List<Class< ? extends JMSConsumerMessageHandler>> targetedMsgHandlerList;
+	private List<Class< ? extends JMSConsumerMessageHandlerIF>> targetedMsgHandlerList;
 
 	@Override
 	public void preStep(Map<SharedParameterEnum,Object> sharedParameters) throws IllegalStateException {
@@ -86,13 +91,18 @@ public class GenericStreamStep<T> implements ProcessingStepIF{
 	 * @param obj
 	 */
 	private void writeObject(Object obj){
-		for(Class<?> currClass : targetedMsgHandlerList){
-			DefaultMessage dmsg = new DefaultMessage();
-			dmsg.setTimestamp(Calendar.getInstance().getTime().toString());
-			dmsg.setMsgHandlerClass(currClass);
-			dmsg.setContent(obj);
-			dmsg.setContentClass(obj.getClass());
-			writer.write(dmsg);
+		try{
+			for(Class<?> currClass : targetedMsgHandlerList){
+				DefaultMessage dmsg = new DefaultMessage();
+				dmsg.setTimestamp(Calendar.getInstance().getTime().toString());
+				dmsg.setMsgHandlerClass(currClass);
+				dmsg.setContent(obj);
+				dmsg.setContentClass(obj.getClass());
+				writer.write(dmsg);
+			}
+		}
+		catch(WriterException e){
+			LOGGER.fatal(e);
 		}
 	}
 	
@@ -111,11 +121,11 @@ public class GenericStreamStep<T> implements ProcessingStepIF{
 		this.lineProcessor = lineProcessor;
 	}
 	
-	public List<Class<? extends JMSConsumerMessageHandler>> targetedStepList() {
+	public List<Class<? extends JMSConsumerMessageHandlerIF>> targetedStepList() {
 		return targetedMsgHandlerList;
 	}
 	public void setMessageClasses(
-			List<Class<? extends JMSConsumerMessageHandler>> targetedMsgHandlerList) {
+			List<Class<? extends JMSConsumerMessageHandlerIF>> targetedMsgHandlerList) {
 		this.targetedMsgHandlerList = targetedMsgHandlerList;
 	}
 }

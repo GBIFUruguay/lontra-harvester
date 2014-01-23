@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.harvester.ItemWriterIF;
+import net.canadensys.harvester.exception.WriterException;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -47,7 +48,7 @@ public class RawOccurrenceHibernateWriter implements
 	}
 
 	@Override
-	public void write(List<? extends OccurrenceRawModel> elementList) {
+	public void write(List<? extends OccurrenceRawModel> elementList) throws WriterException {
 		try {
 			Transaction tx = session.beginTransaction();
 			for (OccurrenceRawModel currRawOccurrence : elementList) {
@@ -59,11 +60,12 @@ public class RawOccurrenceHibernateWriter implements
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
+			throw new WriterException(hEx.getMessage());
 		}
 	}
 
 	@Override
-	public void write(OccurrenceRawModel rawModel) {
+	public void write(OccurrenceRawModel rawModel) throws WriterException {
 		try {
 			Session currSession = sessionFactory.getCurrentSession();
 			currSession.beginTransaction();
@@ -74,6 +76,7 @@ public class RawOccurrenceHibernateWriter implements
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
+			throw new WriterException(hEx.getMessage());
 		}
 	}
 

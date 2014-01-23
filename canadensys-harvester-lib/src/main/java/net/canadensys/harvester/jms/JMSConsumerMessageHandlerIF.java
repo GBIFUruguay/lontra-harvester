@@ -7,7 +7,7 @@ import net.canadensys.harvester.message.ProcessingMessageIF;
  * @author canadensys
  *
  */
-public interface JMSConsumerMessageHandler {
+public interface JMSConsumerMessageHandlerIF {
 	
 	/**
 	 * The the class of the message the implementation can handle
@@ -18,7 +18,8 @@ public interface JMSConsumerMessageHandler {
 	/**
 	 * Handle a message of the type given by getMessageClass() function.
 	 * @param message
+	 * @return the message was handled successfully or not
 	 */
-	public void handleMessage(ProcessingMessageIF message);
+	public boolean handleMessage(ProcessingMessageIF message);
 
 }

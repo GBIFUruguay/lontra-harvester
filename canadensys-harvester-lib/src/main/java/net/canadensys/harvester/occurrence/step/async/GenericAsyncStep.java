@@ -4,7 +4,8 @@ import java.util.Map;
 
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.ProcessingStepIF;
-import net.canadensys.harvester.jms.JMSConsumerMessageHandler;
+import net.canadensys.harvester.exception.WriterException;
+import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.message.DefaultMessage;
@@ -17,7 +18,7 @@ import net.canadensys.harvester.occurrence.message.DefaultMessage;
  *
  * @param <T>
  */
-public class GenericAsyncStep<T> implements ProcessingStepIF,JMSConsumerMessageHandler{
+public class GenericAsyncStep<T> implements ProcessingStepIF,JMSConsumerMessageHandlerIF{
 	
 	private ItemWriterIF<T> writer;
 	private Class<T> messageContentClass;
@@ -57,11 +58,14 @@ public class GenericAsyncStep<T> implements ProcessingStepIF,JMSConsumerMessageH
 	}
 
 	@Override
-	public void handleMessage(ProcessingMessageIF message) {
-		long t = System.currentTimeMillis();
+	public boolean handleMessage(ProcessingMessageIF message) {
 		Object obj = ((DefaultMessage)message).getContent();
-		writer.write(messageContentClass.cast(obj));
-		System.out.println("Reading msg + Writing raw :" + ( System.currentTimeMillis()-t) + "ms");
+		try {
+			writer.write(messageContentClass.cast(obj));
+		} catch (WriterException e) {
+			return false;
+		}
+		return true;
 	}
 	
 	/**

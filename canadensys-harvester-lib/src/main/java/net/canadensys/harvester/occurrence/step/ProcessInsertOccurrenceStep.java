@@ -9,11 +9,15 @@ import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.ProcessingStepIF;
-import net.canadensys.harvester.jms.JMSConsumerMessageHandler;
+import net.canadensys.harvester.exception.WriterException;
+import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
+import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.message.ProcessingMessageIF;
+import net.canadensys.harvester.message.control.NodeErrorControlMessage;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.message.ProcessOccurrenceMessage;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -23,8 +27,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author canadensys
  *
  */
-public class ProcessInsertOccurrenceStep implements ProcessingStepIF,JMSConsumerMessageHandler{
-
+public class ProcessInsertOccurrenceStep implements ProcessingStepIF,JMSConsumerMessageHandlerIF{
+	private static final Logger LOGGER = Logger.getLogger(ProcessInsertOccurrenceStep.class);
+	
 	@Autowired
 	@Qualifier("occurrenceProcessor")
 	private ItemProcessorIF<OccurrenceRawModel, OccurrenceModel> processor;
@@ -32,6 +37,9 @@ public class ProcessInsertOccurrenceStep implements ProcessingStepIF,JMSConsumer
 	@Autowired
 	@Qualifier("occurrenceWriter")
 	private ItemWriterIF<OccurrenceModel> writer;
+	
+	@Autowired
+	private JMSControlProducer errorReporter;
 	
 	@Override
 	public void preStep(Map<SharedParameterEnum,Object> sharedParameters) throws IllegalStateException {
@@ -41,12 +49,17 @@ public class ProcessInsertOccurrenceStep implements ProcessingStepIF,JMSConsumer
 		if(processor == null){
 			throw new IllegalStateException("No processor defined");
 		}
+		if(errorReporter == null){
+			throw new IllegalStateException("No errorReporter defined");
+		}
 		writer.openWriter();
+		errorReporter.open();
 	}
 
 	@Override
 	public void postStep() {
 		writer.closeWriter();
+		errorReporter.close();
 	}
 	
 	/**
@@ -61,14 +74,20 @@ public class ProcessInsertOccurrenceStep implements ProcessingStepIF,JMSConsumer
 	}
 
 	@Override
-	public void handleMessage(ProcessingMessageIF message) {
+	public boolean handleMessage(ProcessingMessageIF message) {
 		List<OccurrenceRawModel> occRawList = ((ProcessOccurrenceMessage)message).getRawModelList();
 		List<OccurrenceModel> occList = new ArrayList<OccurrenceModel>();
 		
 		for(OccurrenceRawModel currRawModel : occRawList){
 			occList.add(processor.process(currRawModel, null));
 		}
-		writer.write(occList);
+		try {
+			writer.write(occList);
+		} catch (WriterException e) {
+			errorReporter.publish(new NodeErrorControlMessage(e));
+			return false;
+		}
+		return true;
 	}
 	
 	public void setProcessor(ItemProcessorIF<OccurrenceRawModel, OccurrenceModel> processor){

@@ -11,6 +11,7 @@ import net.canadensys.harvester.exception.TaskExecutionException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -57,29 +58,32 @@ public class CheckProcessingCompletenessTask implements ItemTaskIF{
 				Session session = sessionFactory.openSession();
 				SQLQuery query = session.createSQLQuery("SELECT count(*) FROM buffer.occurrence_raw WHERE sourcefileid=?");
 				query.setString(0, datasetShortname);
-				
-				Number currNumberOfResult = (Number)query.uniqueResult();
-				while(currNumberOfResult.intValue() < numberOfRecords){
-					currNumberOfResult = (Number)query.uniqueResult();
-					//make sure we don't get stuck here is something goes wrong with the clients
-					if(previousCount == currNumberOfResult.intValue()){
-						secondsWaiting++;
-						if(secondsWaiting == MAX_WAITING_SECONDS){
+				try{
+					Number currNumberOfResult = (Number)query.uniqueResult();
+					while(currNumberOfResult.intValue() < numberOfRecords){
+						currNumberOfResult = (Number)query.uniqueResult();
+						//make sure we don't get stuck here is something goes wrong with the clients
+						if(previousCount == currNumberOfResult.intValue()){
+							secondsWaiting++;
+							if(secondsWaiting == MAX_WAITING_SECONDS){
+								break;
+							}
+						}
+						else{
+							secondsWaiting = 0;
+						}
+						previousCount = currNumberOfResult.intValue();
+						notifyListeners("occurrence_raw",currNumberOfResult.intValue(),numberOfRecords);
+						
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
 							break;
 						}
 					}
-					else{
-						secondsWaiting = 0;
-					}
-					previousCount = currNumberOfResult.intValue();
-					notifyListeners("occurrence_raw",currNumberOfResult.intValue(),numberOfRecords);
-					
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						break;
-					}
+				}catch(HibernateException hEx){
+					jobCallback.onFailure(hEx);
 				}
 				session.close();
 				

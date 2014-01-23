@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
 import net.canadensys.harvester.ItemWriterIF;
+import net.canadensys.harvester.exception.WriterException;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -45,7 +46,7 @@ public class ResourceContactHibernateWriter implements
 	}
 
 	@Override
-	public void write(List<? extends ResourceContactModel> elementList) {
+	public void write(List<? extends ResourceContactModel> elementList) throws WriterException{
 		try {
 			session.beginTransaction();
 			for (ResourceContactModel resourceContactModel : elementList) {
@@ -57,11 +58,12 @@ public class ResourceContactHibernateWriter implements
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
+			throw new WriterException(hEx.getMessage());
 		}
 	}
 
 	@Override
-	public void write(ResourceContactModel resourceContactModel) {
+	public void write(ResourceContactModel resourceContactModel) throws WriterException{
 		try {
 			session.beginTransaction();
 			session.save(resourceContactModel);
@@ -71,6 +73,7 @@ public class ResourceContactHibernateWriter implements
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
+			throw new WriterException(hEx.getMessage());
 		}
 	}
 }

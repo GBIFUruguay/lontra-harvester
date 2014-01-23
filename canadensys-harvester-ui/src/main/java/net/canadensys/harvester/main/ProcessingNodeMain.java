@@ -6,7 +6,7 @@ import java.util.List;
 import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.config.ProcessingNodeConfig;
 import net.canadensys.harvester.jms.JMSConsumer;
-import net.canadensys.harvester.jms.JMSConsumerMessageHandler;
+import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +39,10 @@ public class ProcessingNodeMain {
 	private ProcessingStepIF insertResourceContactStep;
 
 	private final List<ProcessingStepIF> registeredSteps;
-	private final List<JMSConsumerMessageHandler> registeredMsgHandlers;
+	private final List<JMSConsumerMessageHandlerIF> registeredMsgHandlers;
 
 	public ProcessingNodeMain() {
-		registeredMsgHandlers = new ArrayList<JMSConsumerMessageHandler>();
+		registeredMsgHandlers = new ArrayList<JMSConsumerMessageHandlerIF>();
 		registeredSteps = new ArrayList<ProcessingStepIF>();
 	}
 
@@ -54,7 +54,7 @@ public class ProcessingNodeMain {
 	 * @param additionalMessageHandler
 	 *            user defined message handler (optional)
 	 */
-	public <T extends JMSConsumerMessageHandler & ProcessingStepIF> void initiate(
+	public <T extends JMSConsumerMessageHandlerIF & ProcessingStepIF> void initiate(
 			String brokerURL, List<T> additionalMessageHandler) {
 		// check if we need to set a new broker URL
 		if (StringUtils.isNotBlank(brokerURL)) {
@@ -65,15 +65,15 @@ public class ProcessingNodeMain {
 
 		// Declare step handlers (maybe this should be configurable?)
 		registeredMsgHandlers
-				.add((JMSConsumerMessageHandler) insertRawOccurrenceStep);
+				.add((JMSConsumerMessageHandlerIF) insertRawOccurrenceStep);
 		registeredSteps.add(insertRawOccurrenceStep);
 
 		registeredMsgHandlers
-				.add((JMSConsumerMessageHandler) processInsertOccurrenceStep);
+				.add((JMSConsumerMessageHandlerIF) processInsertOccurrenceStep);
 		registeredSteps.add(processInsertOccurrenceStep);
 
 		registeredMsgHandlers
-				.add((JMSConsumerMessageHandler) insertResourceContactStep);
+				.add((JMSConsumerMessageHandlerIF) insertResourceContactStep);
 		registeredSteps.add(insertResourceContactStep);
 
 		if (additionalMessageHandler != null) {
@@ -82,7 +82,7 @@ public class ProcessingNodeMain {
 		}
 
 		// Register all message handlers to the JMS consumer
-		for (JMSConsumerMessageHandler currMsgHandler : registeredMsgHandlers) {
+		for (JMSConsumerMessageHandlerIF currMsgHandler : registeredMsgHandlers) {
 			jmsConsumer.registerHandler(currMsgHandler);
 		}
 
@@ -127,7 +127,7 @@ public class ProcessingNodeMain {
 	 * @author canadensys
 	 * 
 	 */
-	private interface MessageHandlerStep extends JMSConsumerMessageHandler,
+	private interface MessageHandlerStep extends JMSConsumerMessageHandlerIF,
 			ProcessingStepIF {
 	}
 }

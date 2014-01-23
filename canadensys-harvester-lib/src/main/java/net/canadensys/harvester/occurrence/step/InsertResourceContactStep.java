@@ -5,8 +5,11 @@ import java.util.Map;
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.ProcessingStepIF;
-import net.canadensys.harvester.jms.JMSConsumerMessageHandler;
+import net.canadensys.harvester.exception.WriterException;
+import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
+import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.message.ProcessingMessageIF;
+import net.canadensys.harvester.message.control.NodeErrorControlMessage;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.message.SaveResourceContactMessage;
 
@@ -19,23 +22,31 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author canadensys
  *
  */
-public class InsertResourceContactStep implements ProcessingStepIF,JMSConsumerMessageHandler{
+public class InsertResourceContactStep implements ProcessingStepIF,JMSConsumerMessageHandlerIF{
 
 	@Autowired
 	@Qualifier("resourceContactWriter")
 	private ItemWriterIF<ResourceContactModel> writer;
+	
+	@Autowired
+	private JMSControlProducer errorReporter;
 
 	@Override
 	public void preStep(Map<SharedParameterEnum,Object> sharedParameters) throws IllegalStateException{
 		if(writer == null){
 			throw new IllegalStateException("No writer defined");
 		}
+		if(errorReporter == null){
+			throw new IllegalStateException("No errorReporter defined");
+		}
 		writer.openWriter();
+		errorReporter.open();
 	}
 
 	@Override
 	public void postStep() {
 		writer.closeWriter();
+		errorReporter.close();
 	}
 	
 	@Override
@@ -44,11 +55,17 @@ public class InsertResourceContactStep implements ProcessingStepIF,JMSConsumerMe
 	}
 
 	@Override
-	public void handleMessage(ProcessingMessageIF message) {
+	public boolean handleMessage(ProcessingMessageIF message) {
 		long t = System.currentTimeMillis();
 		ResourceContactModel rcm = ((SaveResourceContactMessage)message).getResourceContactModel();
-		writer.write(rcm);
+		try {
+			writer.write(rcm);
+		} catch (WriterException e) {
+			errorReporter.publish(new NodeErrorControlMessage(e));
+			return false;
+		}
 		System.out.println("Reading msg + Writing Resource Contact :" + ( System.currentTimeMillis()-t) + "ms");
+		return true;
 	}
 	
 	/**

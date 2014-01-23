@@ -12,9 +12,6 @@ import javax.jms.MessageListener;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import javax.jms.TopicConnection;
-import javax.jms.TopicSession;
-import javax.jms.TopicSubscriber;
 
 import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.occurrence.message.DefaultMessage;
@@ -46,23 +43,18 @@ public class JMSConsumer{
 
 	// Name of the queue we will receive messages from
 	private static String QUEUE_NAME = "Importer.Queue";
-	private static String CONTROL_TOPIC = "Importer.Topic.Control";
 	
 	private Connection connection;
 	private MessageConsumer consumer;
 	
-	//Topic connection is used to public control commands
-	private TopicConnection topicConnection;
-	private TopicSubscriber subscriber;
-	
-	private List<JMSConsumerMessageHandler> registeredHandlers;
+	private List<JMSConsumerMessageHandlerIF> registeredHandlers;
 	
 	//Jackson Mapper to map JSON into Java object
 	private ObjectMapper om;
 	
 	public JMSConsumer(String brokerURL){
 		this.brokerURL = brokerURL;
-		registeredHandlers = new ArrayList<JMSConsumerMessageHandler>();
+		registeredHandlers = new ArrayList<JMSConsumerMessageHandlerIF>();
 	}
 	
 	public void setBrokerURL(String brokerURL){
@@ -80,7 +72,7 @@ public class JMSConsumer{
 	 * Register a handler to notify when we receive a message
 	 * @param handler
 	 */
-	public void registerHandler(JMSConsumerMessageHandler handler){
+	public void registerHandler(JMSConsumerMessageHandlerIF handler){
 		registeredHandlers.add(handler);
 	}
 	
@@ -110,13 +102,6 @@ public class JMSConsumer{
 			// MessageConsumer is used for receiving (consuming) messages
 			consumer = session.createConsumer(queue);
 			consumer.setMessageListener(msgListener);
-			
-			//Control message
-			topicConnection = connectionFactory.createTopicConnection();
-			topicConnection.start();
-			TopicSession subSession = topicConnection.createTopicSession(false,Session.AUTO_ACKNOWLEDGE);
-			subscriber = subSession.createSubscriber(subSession.createTopic(CONTROL_TOPIC));
-			subscriber.setMessageListener(msgListener);
 		}
 		catch(JMSException jmsEx){
 			LOGGER.fatal("Can not initialize JMSConsumer", jmsEx);
@@ -126,7 +111,6 @@ public class JMSConsumer{
 	public void close() {
 		try {
 			connection.close();
-			topicConnection.close();
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
@@ -144,7 +128,7 @@ public class JMSConsumer{
 				try {
 					Class<?> msgClass = Class.forName(ObjectUtils.defaultIfNull(msg.getStringProperty("MessageClass"), Object.class.getCanonicalName()));
 					//validate if we can instantiate
-					for(JMSConsumerMessageHandler currMsgHandler : registeredHandlers){
+					for(JMSConsumerMessageHandlerIF currMsgHandler : registeredHandlers){
 						if(DefaultMessage.class.equals(msgClass)){
 							DefaultMessage dmsg = om.readValue(msg.getText(), DefaultMessage.class);
 							if(currMsgHandler.getClass().equals(dmsg.getMsgHandlerClass())){
@@ -161,7 +145,9 @@ public class JMSConsumer{
 						else{
 							if(currMsgHandler.getMessageClass().equals(msgClass)){
 								ProcessingMessageIF processingMessage = (ProcessingMessageIF)om.readValue(msg.getText(), msgClass);
-								currMsgHandler.handleMessage(processingMessage);
+								if(!currMsgHandler.handleMessage(processingMessage)){
+									//throw new RuntimeException("Error while handling the message");
+								}
 								break;
 							}
 						}
