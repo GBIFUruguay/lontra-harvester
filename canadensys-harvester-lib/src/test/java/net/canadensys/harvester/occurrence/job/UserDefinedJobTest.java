@@ -256,5 +256,8 @@ public class UserDefinedJobTest{
 		public void doJob(){
 			executeStepSequentially(genericStreamStep, sharedParameters);
 		}
+
+		@Override
+		public void cancel() {}
 	}
 }

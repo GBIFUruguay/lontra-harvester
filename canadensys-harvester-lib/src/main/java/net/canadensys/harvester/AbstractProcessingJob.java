@@ -37,5 +37,10 @@ public abstract class AbstractProcessingJob {
 		step.doStep();
 		step.postStep();
 	}
+	
+	/**
+	 * Cancel the job
+	 */
+	public abstract void cancel();
 
 }

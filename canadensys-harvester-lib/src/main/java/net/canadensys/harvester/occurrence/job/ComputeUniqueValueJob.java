@@ -25,4 +25,8 @@ public class ComputeUniqueValueJob extends AbstractProcessingJob{
 	public void setComputeUniqueValueTask(ComputeUniqueValueTask computeUniqueValueTask) {
 		this.computeUniqueValueTask = computeUniqueValueTask;
 	}
+	
+	@Override
+	public void cancel(){
+	}
 }

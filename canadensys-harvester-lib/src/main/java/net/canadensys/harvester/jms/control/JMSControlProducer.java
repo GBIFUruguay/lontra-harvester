@@ -77,6 +77,7 @@ public class JMSControlProducer {
 	public void publish(ControlMessageIF controlMsg) {
 		TextMessage message;
 		try {
+			controlMsg.setNodeIdentifier(topicConnection.getClientID());
 			message = topicSession.createTextMessage(om.writeValueAsString(controlMsg));
 			message.setStringProperty("MessageClass", controlMsg.getClass().getCanonicalName());
 			publisher.publish(message);

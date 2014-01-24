@@ -11,11 +11,13 @@ public class NodeErrorControlMessage implements ControlMessageIF {
 	
 	private String nodeIdentifier;
 	private String errorMessage;
+	private Exception enclosedException;
 	
 	public NodeErrorControlMessage(){}
 	
 	public NodeErrorControlMessage(Exception ex){
 		errorMessage = ex.getMessage();
+		enclosedException = ex;
 	}
 	
 	public String getNodeIdentifier() {
@@ -30,6 +32,13 @@ public class NodeErrorControlMessage implements ControlMessageIF {
 	}
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
+	}
+	
+	public Exception getEnclosedException() {
+		return enclosedException;
+	}
+	public void setEnclosedException(Exception enclosedException) {
+		this.enclosedException = enclosedException;
 	}
 
 }

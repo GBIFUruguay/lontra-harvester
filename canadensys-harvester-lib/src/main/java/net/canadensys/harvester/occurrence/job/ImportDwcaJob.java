@@ -54,8 +54,8 @@ public class ImportDwcaJob extends AbstractProcessingJob{
 	 * Run the actual job
 	 */
 	public void doJob(FutureCallback<Void> jobCallback){
-		//optional task
-		if(getResourceInfoTask != null){
+		//optional task, could also import a DwcA from a local path but, at your own risk.
+		if(getResourceInfoTask != null && sharedParameters.containsKey(SharedParameterEnum.RESOURCE_ID)){
 			getResourceInfoTask.execute(sharedParameters);
 		}
 		
@@ -88,6 +88,10 @@ public class ImportDwcaJob extends AbstractProcessingJob{
 	public void setCheckProcessingCompletenessTask(
 			CheckProcessingCompletenessTask checkProcessingCompletenessTask) {
 		this.checkProcessingCompletenessTask = checkProcessingCompletenessTask;
+	}
+	
+	@Override
+	public void cancel(){
 	}
 
 }

@@ -8,7 +8,7 @@ package net.canadensys.harvester.occurrence.model;
  */
 public class ApplicationStatus {
 	
-	public static enum JobStatusEnum {UNDEFINED,WAITING,RUNNING,DONE_ERROR,DONE_SUCCESS};
+	public static enum JobStatusEnum {UNDEFINED,WAITING,RUNNING,CANCEL_NODE_ERROR,DONE_ERROR,DONE_SUCCESS};
 	
 	private JobStatusEnum importStatus = JobStatusEnum.UNDEFINED;
 	private JobStatusEnum moveStatus = JobStatusEnum.UNDEFINED;

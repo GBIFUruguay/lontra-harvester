@@ -108,6 +108,8 @@ public class ProcessingConfig {
 	//optional
 	@Value("${ipt.rss:}")
 	private String iptRssAddress;
+	@Value("${harvester.import.allow_localfile:false}")
+	private Boolean allowLocalFileImport;
 
 	@Bean(name="datasource")
 	public DataSource dataSource() {
@@ -221,10 +223,11 @@ public class ProcessingConfig {
 	}
 
 	//---TASK wiring---
-
 	@Bean
 	public ItemTaskIF prepareDwcaTask(){
-		return new PrepareDwcaTask();
+		PrepareDwcaTask pdwca = new PrepareDwcaTask();
+		pdwca.setAllowDatasetShortnameExtraction(allowLocalFileImport);
+		return pdwca;
 	}
 
 	@Bean
@@ -333,7 +336,8 @@ public class ProcessingConfig {
 	public JMSControlProducer errorReporter(){
 		return null;
 	}
-	@Bean
+
+	@Bean(destroyMethod="close")
 	public JMSControlConsumer errorReceiver(){
 		return new JMSControlConsumer(jmsBrokerUrl);
 	}

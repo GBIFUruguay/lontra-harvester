@@ -52,5 +52,9 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob{
 	public void setRecordImportTask(RecordImportTask recordImportTask) {
 		this.recordImportTask = recordImportTask;
 	}
+	
+	@Override
+	public void cancel(){
+	}
 
 }

@@ -40,6 +40,7 @@ import net.canadensys.harvester.occurrence.model.ResourceModel;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -383,7 +384,14 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, Prop
 		final SwingWorker<Void, Object> swingWorker = new SwingWorker<Void, Object>() {
 			@Override
 			public Void doInBackground() {
-				stepController.importDwcA(resourceToImport.getResource_id());
+				if(resourceToImport != null){
+					stepController.importDwcA(resourceToImport.getResource_id());
+				}
+				else{
+					if(StringUtils.isNotBlank(pathToImportTxt.getText())){
+						stepController.importDwcAFromLocalFile(pathToImportTxt.getText());
+					}
+				}
 				// async call, onImportDone(...) will be called once done
 				return null;
 			}
@@ -459,6 +467,7 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, Prop
 		dlg.setVisible(true);
 	}
 
+	//TODO write better code :)
 	private void onImportDone(JobStatusEnum status, String datasetShortName) {
 		loadingLbl.setIcon(null);
 		try {
@@ -473,12 +482,21 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, Prop
 								.getString("view.info.status.importDone"));
 					}
 				});
-			} else {
-				JOptionPane
-				.showMessageDialog(
+			} else if (JobStatusEnum.DONE_ERROR.equals(status)) {
+				//Avoid flooding the user
+				JOptionPane.showMessageDialog(
 						harvesterFrame,
 						Messages.getString("view.info.status.error.details"),
 						Messages.getString("view.info.status.error"), JOptionPane.ERROR_MESSAGE);
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						loadingLbl.setText(Messages
+								.getString("view.info.status.error.importError"));
+					}
+				});
+			}
+			else{
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -523,7 +541,7 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, Prop
 		}
 	}
 
-	private void updateTextArea(final String text) {
+	private void appendToTextArea(final String text) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -533,18 +551,18 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, Prop
 	}
 
 	/**
-	 * 
+	 * TODO remove this hack.
 	 */
 	private void redirectSystemStreams() {
 		OutputStream out = new OutputStream() {
 			@Override
 			public void write(int b) throws IOException {
-				updateTextArea(String.valueOf((char) b));
+				appendToTextArea(String.valueOf((char) b));
 			}
 
 			@Override
 			public void write(byte[] b, int off, int len) throws IOException {
-				updateTextArea(new String(b, off, len));
+				appendToTextArea(new String(b, off, len));
 			}
 
 			@Override
@@ -569,10 +587,15 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, Prop
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if ("applicationStatus".equals(evt.getPropertyName())) {
-			onImportDone(
-					((ApplicationStatus) evt.getNewValue()).getImportStatus(),
-					resourceToImport.getSource_file_id());
+		if ("applicationStatus.currentJob".equals(evt.getPropertyName())) {
+			if(resourceToImport != null){
+				onImportDone(
+						((ApplicationStatus) evt.getNewValue()).getImportStatus(), resourceToImport.getSource_file_id());
+			}
+			else{
+				onImportDone(
+						((ApplicationStatus) evt.getNewValue()).getImportStatus(), null);
+			}
 		}
 	}
 }

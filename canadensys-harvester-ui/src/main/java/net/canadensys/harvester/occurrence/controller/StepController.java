@@ -8,10 +8,6 @@ import java.util.List;
 
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.config.harvester.HarvesterConfigIF;
-import net.canadensys.harvester.jms.control.JMSControlConsumer;
-import net.canadensys.harvester.jms.control.JMSControlConsumerMessageHandlerIF;
-import net.canadensys.harvester.message.ControlMessageIF;
-import net.canadensys.harvester.message.control.NodeErrorControlMessage;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
@@ -43,7 +39,7 @@ import com.sun.syndication.io.XmlReader;
  *
  */
 @Component("stepController")
-public class StepController implements StepControllerIF, JMSControlConsumerMessageHandlerIF{
+public class StepController implements StepControllerIF {
 
 	@Autowired
 	private HarvesterConfigIF harvesterConfig;
@@ -64,24 +60,29 @@ public class StepController implements StepControllerIF, JMSControlConsumerMessa
 	@Autowired
 	private HarvesterViewModel harvesterViewModel;
 
-	//TODO abstract JMS or move to ImportDwcaJob
 	@Autowired
-	private JMSControlConsumer errorReceiver;
+	private NodeStatusController nodeStatusController;
+
+	public StepController(){}
 
 	@Override
 	public void registerProgressListener(ItemProgressListenerIF progressListener){
 		importDwcaJob.setItemProgressListener(progressListener);
 	}
 
-	/**
-	 * Starts the import process.
-	 * @param resourceId
-	 * @param progressListener
-	 */
 	@Override
 	public void importDwcA(Integer resourceId){
-		errorReceiver.registerHandler(this);
+		//enable node status controller
+		nodeStatusController.start();
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceId);
+		importDwcaJob.doJob(this);
+	}
+
+	@Override
+	public void importDwcAFromLocalFile(String dwcaFilePath){
+		//enable node status controller
+		nodeStatusController.start();
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, dwcaFilePath);
 		importDwcaJob.doJob(this);
 	}
 
@@ -174,13 +175,8 @@ public class StepController implements StepControllerIF, JMSControlConsumerMessa
 	}
 
 	@Override
-	public Class<?> getMessageClass() {
-		return NodeErrorControlMessage.class;
-	}
-
-	@Override
-	public boolean handleMessage(ControlMessageIF message) {
-		System.out.println(((NodeErrorControlMessage)message).getErrorMessage());
-		return true;
+	public void onNodeError(){
+		//stop the current job with cancel()
+		harvesterViewModel.setImportStatus(JobStatusEnum.CANCEL_NODE_ERROR);
 	}
 }
