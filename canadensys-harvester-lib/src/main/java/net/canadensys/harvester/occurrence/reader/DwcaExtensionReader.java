@@ -117,4 +117,9 @@ public class DwcaExtensionReader<T> extends AbstractDwcaReaderSupport implements
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	public void abort() {
+		// TODO implement
+	}
 }

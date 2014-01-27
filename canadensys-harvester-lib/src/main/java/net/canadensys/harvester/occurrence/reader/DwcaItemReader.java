@@ -91,4 +91,9 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 			}
 		}
 	}
+
+	@Override
+	public void abort() {
+		// TODO implement
+	}
 }

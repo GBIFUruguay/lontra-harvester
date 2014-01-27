@@ -14,8 +14,9 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
 public interface ItemReaderIF<T> {
 	
 	public void openReader(Map<SharedParameterEnum,Object> sharedParameters);
-	
 	public void closeReader();
+	
+	public void abort();
 	
 	public T read();
 }

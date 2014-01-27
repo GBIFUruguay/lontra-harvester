@@ -57,4 +57,10 @@ public class DwcaEmlReader implements ItemReaderIF<Eml>{
 	public void closeReader(){
 		System.out.println("### CLOSE - DwcaEmlReader ###");
 	}
+	
+
+	@Override
+	public void abort() {
+		// TODO implement
+	}
 }
