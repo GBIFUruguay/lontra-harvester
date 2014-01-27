@@ -15,6 +15,7 @@ import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.model.ApplicationStatus.JobStatusEnum;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.ImportLogModel;
+import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.model.ResourceModel;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 
@@ -75,7 +76,9 @@ public class StepController implements StepControllerIF {
 		//enable node status controller
 		nodeStatusController.start();
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceId);
-		importDwcaJob.doJob(this);
+
+		JobStatusModel jobStatusModel = new JobStatusModel();
+		importDwcaJob.doJob(jobStatusModel,this);
 	}
 
 	@Override
@@ -83,7 +86,9 @@ public class StepController implements StepControllerIF {
 		//enable node status controller
 		nodeStatusController.start();
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, dwcaFilePath);
-		importDwcaJob.doJob(this);
+
+		JobStatusModel jobStatusModel = new JobStatusModel();
+		importDwcaJob.doJob(jobStatusModel,this);
 	}
 
 	@Override

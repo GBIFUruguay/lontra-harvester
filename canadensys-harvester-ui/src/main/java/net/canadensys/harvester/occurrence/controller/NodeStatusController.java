@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Controller that will received notifications from nodes in case of error.
+ * Controller that will receive notifications from node(s) in case of error.
  * @author canadensys
  *
  */

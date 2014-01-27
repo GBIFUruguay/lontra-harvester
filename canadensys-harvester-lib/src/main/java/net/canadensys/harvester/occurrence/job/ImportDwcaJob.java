@@ -7,6 +7,7 @@ import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
+import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.task.CheckProcessingCompletenessTask;
 import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
 import net.canadensys.harvester.occurrence.task.GetResourceInfoTask;
@@ -51,9 +52,9 @@ public class ImportDwcaJob extends AbstractProcessingJob{
 	}
 		
 	/**
-	 * Run the actual job
+	 * Run the actual job.
 	 */
-	public void doJob(FutureCallback<Void> jobCallback){
+	public void doJob(JobStatusModel jobStatusModel, FutureCallback<Void> jobCallback){
 		//optional task, could also import a DwcA from a local path but, at your own risk.
 		if(getResourceInfoTask != null && sharedParameters.containsKey(SharedParameterEnum.RESOURCE_ID)){
 			getResourceInfoTask.execute(sharedParameters);

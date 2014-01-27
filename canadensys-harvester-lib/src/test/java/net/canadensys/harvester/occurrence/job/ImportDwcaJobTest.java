@@ -15,6 +15,7 @@ import net.canadensys.harvester.jms.control.JMSControlConsumerMessageHandlerIF;
 import net.canadensys.harvester.message.ControlMessageIF;
 import net.canadensys.harvester.message.control.NodeErrorControlMessage;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
+import net.canadensys.harvester.occurrence.model.JobStatusModel;
 
 import org.hibernate.SessionFactory;
 import org.junit.After;
@@ -126,7 +127,8 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, "qmor-specimens");
 		
-		importDwcaJob.doJob(this);
+		JobStatusModel jobStatusModel = new JobStatusModel();
+		importDwcaJob.doJob(jobStatusModel,this);
 		synchronized (jobComplete) {
 			try {
 				jobComplete.wait(MAX_WAIT);
@@ -170,7 +172,8 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens-broken");
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, "qmor-specimens");
 		
-		importDwcaJob.doJob(this);
+		JobStatusModel jobStatusModel = new JobStatusModel();
+		importDwcaJob.doJob(jobStatusModel,this);
 		synchronized (controlMessageReceived) {
 			try {
 				controlMessageReceived.wait(MAX_WAIT);
