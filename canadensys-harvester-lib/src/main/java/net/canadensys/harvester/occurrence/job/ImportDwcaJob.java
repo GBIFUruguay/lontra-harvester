@@ -5,17 +5,17 @@ import java.util.HashMap;
 import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.ItemTaskIF;
+import net.canadensys.harvester.LongRunningTaskIF;
 import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
+import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 import net.canadensys.harvester.occurrence.task.CheckProcessingCompletenessTask;
 import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
 import net.canadensys.harvester.occurrence.task.GetResourceInfoTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.google.common.util.concurrent.FutureCallback;
 
 /**
  * This job allows to give a resource ID, stream the content into JMS messages and waiting for completion.
@@ -26,7 +26,7 @@ import com.google.common.util.concurrent.FutureCallback;
  * @author canadensys
  *
  */
-public class ImportDwcaJob extends AbstractProcessingJob{
+public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgressListenerIF{
 	
 	//Task and step
 	@Autowired
@@ -45,7 +45,9 @@ public class ImportDwcaJob extends AbstractProcessingJob{
 	private ProcessingStepIF streamDwcContentStep;
 	
 	@Autowired
-	private ItemTaskIF checkProcessingCompletenessTask;
+	private LongRunningTaskIF checkProcessingCompletenessTask;
+	
+	private JobStatusModel jobStatusModel;
 	
 	public ImportDwcaJob(){
 		sharedParameters = new HashMap<SharedParameterEnum, Object>();
@@ -54,19 +56,28 @@ public class ImportDwcaJob extends AbstractProcessingJob{
 	/**
 	 * Run the actual job.
 	 */
-	public void doJob(JobStatusModel jobStatusModel, FutureCallback<Void> jobCallback){
+	public void doJob(JobStatusModel jobStatusModel){
+		this.jobStatusModel = jobStatusModel;
+		jobStatusModel.setCurrentStatus(JobStatus.RUNNING);
 		//optional task, could also import a DwcA from a local path but, at your own risk.
 		if(getResourceInfoTask != null && sharedParameters.containsKey(SharedParameterEnum.RESOURCE_ID)){
 			getResourceInfoTask.execute(sharedParameters);
 		}
 		
+		jobStatusModel.setCurrentStatusExplanation("Preparing DwcA");
 		prepareDwcaTask.execute(sharedParameters);
+		
+		jobStatusModel.setCurrentStatusExplanation("Cleaning buffer table");
 		cleanBufferTableTask.execute(sharedParameters);
 		
+		jobStatusModel.setCurrentStatusExplanation("Streaming EML");
 		executeStepSequentially(streamEmlContentStep, sharedParameters);
+		
+		jobStatusModel.setCurrentStatusExplanation("String DwcA content");
 		executeStepSequentially(streamDwcContentStep, sharedParameters);
 		
-		sharedParameters.put(SharedParameterEnum.CALLBACK,jobCallback);
+		jobStatusModel.setCurrentStatusExplanation("Waiting for completion");
+		((CheckProcessingCompletenessTask)checkProcessingCompletenessTask).addItemProgressListenerIF(this);
 		checkProcessingCompletenessTask.execute(sharedParameters);
 	}
 	
@@ -93,6 +104,28 @@ public class ImportDwcaJob extends AbstractProcessingJob{
 	
 	@Override
 	public void cancel(){
+		checkProcessingCompletenessTask.cancel();
+	}
+
+	@Override
+	public void onProgress(String context, int current, int total) {
+		jobStatusModel.setCurrentJobProgress(current+"/"+total);
+	}
+
+	@Override
+	public void onSuccess() {
+		jobStatusModel.setCurrentStatus(JobStatus.DONE);
+	}
+	
+	@Override
+	public void onCancel() {
+		jobStatusModel.setCurrentStatus(JobStatus.CANCEL);
+	}
+
+	@Override
+	public void onError(Throwable t) {
+		jobStatusModel.setCurrentStatus(JobStatus.ERROR);
+		jobStatusModel.setCurrentStatusExplanation(t.getMessage());
 	}
 
 }

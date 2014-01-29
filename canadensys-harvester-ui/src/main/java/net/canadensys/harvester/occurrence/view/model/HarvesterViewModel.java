@@ -3,7 +3,7 @@ package net.canadensys.harvester.occurrence.view.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-import net.canadensys.harvester.occurrence.model.ApplicationStatus;
+import net.canadensys.harvester.occurrence.model.JobStatusModel;
 
 /**
  * Harvester view model with PropertyChangeSupport.
@@ -13,12 +13,13 @@ import net.canadensys.harvester.occurrence.model.ApplicationStatus;
 public class HarvesterViewModel {
 
 	private final PropertyChangeSupport propertyChangeSupport;
-	private final ApplicationStatus currentStatus;
+	private JobStatusModel currentJobStatusModel;
+
 	private String databaseLocation;
 
 	public HarvesterViewModel(){
 		propertyChangeSupport = new PropertyChangeSupport(this);
-		currentStatus = new ApplicationStatus();
+		//currentStatus = new ApplicationStatus();
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){
@@ -33,17 +34,13 @@ public class HarvesterViewModel {
 		propertyChangeSupport.firePropertyChange("databaseLocation", null, databaseLocation);
 	}
 
-	public ApplicationStatus getCurrentStatus() {
-		return currentStatus;
-	}
-
-	public void setImportStatus(ApplicationStatus.JobStatusEnum newStatus){
-		currentStatus.setImportStatus(newStatus);
-		propertyChangeSupport.firePropertyChange("applicationStatus.currentJob", null, currentStatus);
-	}
-
-	public void setMoveStatus(ApplicationStatus.JobStatusEnum newStatus){
-		currentStatus.setMoveStatus(newStatus);
-		propertyChangeSupport.firePropertyChange("applicationStatus.currentJob", null, currentStatus);
+	/**
+	 * Encapsulate the JobStatusModel into this model.
+	 * All PropertyChangeListeners will also be registered to the JobStatusModel.
+	 * @param currentJobStatusModel
+	 */
+	public void encapsulateJobStatus(JobStatusModel currentJobStatusModel){
+		this.currentJobStatusModel = currentJobStatusModel;
+		currentJobStatusModel.addPropertyChangeListener(propertyChangeSupport.getPropertyChangeListeners()[0]);
 	}
 }

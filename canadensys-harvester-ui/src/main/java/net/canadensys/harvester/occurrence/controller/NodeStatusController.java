@@ -39,6 +39,7 @@ public class NodeStatusController implements JMSControlConsumerMessageHandlerIF{
 		NodeErrorControlMessage errorCtrlMsg = (NodeErrorControlMessage)message;
 		System.out.println("ERROR receive from node " + message.getNodeIdentifier() + ". See log for details");
 		LOGGER.fatal("Received from node "+errorCtrlMsg.getNodeIdentifier(), errorCtrlMsg.getEnclosedException());
+		parentCtrl.onNodeError();
 		return true;
 	}
 

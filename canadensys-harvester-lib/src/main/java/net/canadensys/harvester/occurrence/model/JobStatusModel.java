@@ -16,9 +16,9 @@ public class JobStatusModel {
 	
 	public enum JobStatus {RUNNING,DONE,ERROR,CANCEL};
 	
-	public String CURRENT_STATUS_PROPERTY = "currentStatus";
-	public String CURRENT_STATUS_EXPLANATION_PROPERTY = "currentStatusExplanation";
-	public String CURRENT_JOB_PROGRESS_PROPERTY = "currentJobProgress";
+	public static String CURRENT_STATUS_PROPERTY = "currentStatus";
+	public static String CURRENT_STATUS_EXPLANATION_PROPERTY = "currentStatusExplanation";
+	public static String CURRENT_JOB_PROGRESS_PROPERTY = "currentJobProgress";
 	
 	private AbstractProcessingJob currentJob;
 	private JobStatus currentStatus;

@@ -3,6 +3,8 @@ package net.canadensys.harvester.occurrence.job;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -16,6 +18,7 @@ import net.canadensys.harvester.message.ControlMessageIF;
 import net.canadensys.harvester.message.control.NodeErrorControlMessage;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
+import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 
 import org.hibernate.SessionFactory;
 import org.junit.After;
@@ -29,8 +32,6 @@ import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
-
-import com.google.common.util.concurrent.FutureCallback;
 
 /**
  * Test coverage : 
@@ -50,7 +51,7 @@ import com.google.common.util.concurrent.FutureCallback;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=ProcessingConfigTest.class, loader=AnnotationConfigContextLoader.class)
-public class ImportDwcaJobTest implements FutureCallback<Void>{
+public class ImportDwcaJobTest implements PropertyChangeListener{
 	
 	private static final String TEST_BROKER_URL = "vm://localhost?broker.persistent=false";
 	private static AtomicBoolean jobComplete = new AtomicBoolean(false);
@@ -128,7 +129,8 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, "qmor-specimens");
 		
 		JobStatusModel jobStatusModel = new JobStatusModel();
-		importDwcaJob.doJob(jobStatusModel,this);
+		jobStatusModel.addPropertyChangeListener(this);
+		importDwcaJob.doJob(jobStatusModel);
 		synchronized (jobComplete) {
 			try {
 				jobComplete.wait(MAX_WAIT);
@@ -173,7 +175,7 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, "qmor-specimens");
 		
 		JobStatusModel jobStatusModel = new JobStatusModel();
-		importDwcaJob.doJob(jobStatusModel,this);
+		importDwcaJob.doJob(jobStatusModel);
 		synchronized (controlMessageReceived) {
 			try {
 				controlMessageReceived.wait(MAX_WAIT);
@@ -186,29 +188,13 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 			}
 		}
 	}
-
-	
-	@Override
-	public void onSuccess(Void arg0) {
-		synchronized (jobComplete) {
-			jobComplete.set(true);
-			jobComplete.notifyAll();
-		}
-	}
-	@Override
-	public void onFailure(Throwable arg0) {
-		synchronized (jobComplete) {
-			jobComplete.set(false);
-			jobComplete.notifyAll();
-		}
-	}
 	
 	/**
 	 * JMSControlConsumerMessageHandlerIF implementation for unit testing.
 	 * @author canadensys
 	 *
 	 */
-	private class MockControlMessageHandler implements JMSControlConsumerMessageHandlerIF, FutureCallback<Void>{
+	private class MockControlMessageHandler implements JMSControlConsumerMessageHandlerIF{
 
 		@Override
 		public Class<?> getMessageClass() {
@@ -223,15 +209,32 @@ public class ImportDwcaJobTest implements FutureCallback<Void>{
 			}
 			return true;
 		}
+	}
 
-		@Override
-		public void onSuccess(Void result) {
-			//fail();
+	@Override
+	public void propertyChange(PropertyChangeEvent pcEvt) {
+		if(JobStatusModel.CURRENT_STATUS_PROPERTY.equals(pcEvt.getPropertyName())) {
+			JobStatus newStatus = (JobStatus)pcEvt.getNewValue();
+			if(JobStatus.DONE == newStatus){
+				onSuccess();
+			}
+			else if(JobStatus.ERROR == newStatus){
+				onError();
+			}
 		}
+	}
+	
+	public void onSuccess() {
+		synchronized (jobComplete) {
+			jobComplete.set(true);
+			jobComplete.notifyAll();
+		}
+	}
 
-		@Override
-		public void onFailure(Throwable t) {
-			//nothing, we handle that case through the ErrorControl Message.
+	public void onError() {
+		synchronized (jobComplete) {
+			jobComplete.set(false);
+			jobComplete.notifyAll();
 		}
 	}
 }

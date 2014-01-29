@@ -6,13 +6,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.config.harvester.HarvesterConfigIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
-import net.canadensys.harvester.occurrence.model.ApplicationStatus.JobStatusEnum;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
@@ -35,7 +35,8 @@ import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
 /**
- * main controller
+ * Main controller to initiate jobs.
+ * This controller is NOT thread safe.
  * @author canadensys
  *
  */
@@ -64,6 +65,8 @@ public class StepController implements StepControllerIF {
 	@Autowired
 	private NodeStatusController nodeStatusController;
 
+	private AbstractProcessingJob currentJob;
+
 	public StepController(){}
 
 	@Override
@@ -76,9 +79,11 @@ public class StepController implements StepControllerIF {
 		//enable node status controller
 		nodeStatusController.start();
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceId);
+		currentJob = importDwcaJob;
 
 		JobStatusModel jobStatusModel = new JobStatusModel();
-		importDwcaJob.doJob(jobStatusModel,this);
+		harvesterViewModel.encapsulateJobStatus(jobStatusModel);
+		importDwcaJob.doJob(jobStatusModel);
 	}
 
 	@Override
@@ -86,17 +91,21 @@ public class StepController implements StepControllerIF {
 		//enable node status controller
 		nodeStatusController.start();
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, dwcaFilePath);
+		currentJob = importDwcaJob;
 
 		JobStatusModel jobStatusModel = new JobStatusModel();
-		importDwcaJob.doJob(jobStatusModel,this);
+		harvesterViewModel.encapsulateJobStatus(jobStatusModel);
+		importDwcaJob.doJob(jobStatusModel);
 	}
 
 	@Override
 	public void moveToPublicSchema(String datasetShortName){
 		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, datasetShortName);
 		moveToPublicSchemaJob.doJob();
+		currentJob = moveToPublicSchemaJob;
 
 		computeUniqueValueJob.doJob();
+		currentJob = computeUniqueValueJob;
 	}
 
 
@@ -169,19 +178,8 @@ public class StepController implements StepControllerIF {
 	}
 
 	@Override
-	public void onFailure(Throwable err) {
-		System.out.println("Import failed " + err.getMessage());
-		harvesterViewModel.setImportStatus(JobStatusEnum.DONE_ERROR);
-	}
-
-	@Override
-	public void onSuccess(Void arg0) {
-		harvesterViewModel.setImportStatus(JobStatusEnum.DONE_SUCCESS);
-	}
-
-	@Override
 	public void onNodeError(){
-		//stop the current job with cancel()
-		harvesterViewModel.setImportStatus(JobStatusEnum.CANCEL_NODE_ERROR);
+		//stop the current job
+		currentJob.cancel();
 	}
 }

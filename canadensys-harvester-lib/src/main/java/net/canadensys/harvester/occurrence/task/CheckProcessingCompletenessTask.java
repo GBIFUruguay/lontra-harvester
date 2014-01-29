@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.canadensys.harvester.ItemProgressListenerIF;
-import net.canadensys.harvester.ItemTaskIF;
+import net.canadensys.harvester.LongRunningTaskIF;
 import net.canadensys.harvester.exception.TaskExecutionException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
@@ -18,15 +19,13 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import com.google.common.util.concurrent.FutureCallback;
-
 /**
  * Task to check and wait for processing completion.
- * Notification will be sent using the FutureCallback object.
+ * Notification will be sent using the ItemProgressListenerIF listener.
  * @author canadensys
  *
  */
-public class CheckProcessingCompletenessTask implements ItemTaskIF{
+public class CheckProcessingCompletenessTask implements LongRunningTaskIF{
 
 	private static final int MAX_WAITING_SECONDS = 10;
 	private static final Logger LOGGER = Logger.getLogger(CheckProcessingCompletenessTask.class);
@@ -37,6 +36,7 @@ public class CheckProcessingCompletenessTask implements ItemTaskIF{
 	
 	private List<ItemProgressListenerIF> itemListenerList;
 	private int secondsWaiting = 0;
+	private AtomicBoolean taskCanceled = new AtomicBoolean(false);
 	
 	/**
 	 * @param sharedParameters get BatchConstant.NUMBER_OF_RECORDS and BatchConstant.DWCA_IDENTIFIER_TAG
@@ -45,9 +45,8 @@ public class CheckProcessingCompletenessTask implements ItemTaskIF{
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
 		final Integer numberOfRecords = (Integer)sharedParameters.get(SharedParameterEnum.NUMBER_OF_RECORDS);
 		final String datasetShortname = (String)sharedParameters.get(SharedParameterEnum.DATASET_SHORTNAME);
-		final FutureCallback<Void> jobCallback = (FutureCallback<Void>)sharedParameters.get(SharedParameterEnum.CALLBACK);
-		if(numberOfRecords == null || datasetShortname == null || jobCallback == null){
-			LOGGER.fatal("Misconfigured task : needs numberOfRecords, datasetShortname and callback");
+		if(numberOfRecords == null || datasetShortname == null){
+			LOGGER.fatal("Misconfigured task : needs numberOfRecords, datasetShortname");
 			throw new TaskExecutionException("Misconfigured task");
 		}
 		
@@ -60,7 +59,7 @@ public class CheckProcessingCompletenessTask implements ItemTaskIF{
 				query.setString(0, datasetShortname);
 				try{
 					Number currNumberOfResult = (Number)query.uniqueResult();
-					while(currNumberOfResult.intValue() < numberOfRecords){
+					while(!taskCanceled.get() && (currNumberOfResult.intValue() < numberOfRecords)){
 						currNumberOfResult = (Number)query.uniqueResult();
 						//make sure we don't get stuck here is something goes wrong with the clients
 						if(previousCount == currNumberOfResult.intValue()){
@@ -83,15 +82,20 @@ public class CheckProcessingCompletenessTask implements ItemTaskIF{
 						}
 					}
 				}catch(HibernateException hEx){
-					jobCallback.onFailure(hEx);
+					notifyListenersOnFailure(hEx);
 				}
 				session.close();
 				
-				if(secondsWaiting < MAX_WAITING_SECONDS){
-					jobCallback.onSuccess(null);
+				if(taskCanceled.get()){
+					notifyListenersOnCancel();
 				}
 				else{
-					jobCallback.onFailure(new TimeoutException("No progress made in more than " + MAX_WAITING_SECONDS + " seconds."));
+					if(secondsWaiting < MAX_WAITING_SECONDS){
+						notifyListenersOnSuccess();
+					}
+					else{
+						notifyListenersOnFailure(new TimeoutException("No progress made in more than " + MAX_WAITING_SECONDS + " seconds."));
+					}
 				}
 			}
 		});
@@ -109,11 +113,37 @@ public class CheckProcessingCompletenessTask implements ItemTaskIF{
 			}
 		}
 	}
+	private void notifyListenersOnSuccess(){
+		if(itemListenerList != null){
+			for(ItemProgressListenerIF currListener : itemListenerList){
+				currListener.onSuccess();
+			}
+		}
+	}
+	private void notifyListenersOnCancel(){
+		if(itemListenerList != null){
+			for(ItemProgressListenerIF currListener : itemListenerList){
+				currListener.onCancel();
+			}
+		}
+	}
+	private void notifyListenersOnFailure(Throwable t){
+		if(itemListenerList != null){
+			for(ItemProgressListenerIF currListener : itemListenerList){
+				currListener.onError(t);
+			}
+		}
+	}
 	
 	public void addItemProgressListenerIF(ItemProgressListenerIF listener){
 		if(itemListenerList == null){
 			itemListenerList = new ArrayList<ItemProgressListenerIF>();
 		}
 		itemListenerList.add(listener);
+	}
+
+	@Override
+	public void cancel() {
+		taskCanceled.set(true);
 	}
 }

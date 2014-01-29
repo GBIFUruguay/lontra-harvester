@@ -17,4 +17,5 @@ public interface ItemTaskIF {
 	 * @exception if something goes wrong
 	 */
 	public void execute(Map<SharedParameterEnum,Object> sharedParameters) throws TaskExecutionException;
+
 }

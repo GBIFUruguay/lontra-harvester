@@ -11,6 +11,7 @@ import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.ItemWriterIF;
+import net.canadensys.harvester.LongRunningTaskIF;
 import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.jms.JMSWriter;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
@@ -200,7 +201,7 @@ public class ProcessingConfigTest {
 	}
 	
 	@Bean
-	public ItemTaskIF checkProcessingCompletenessTask(){
+	public LongRunningTaskIF checkProcessingCompletenessTask(){
 		return new CheckProcessingCompletenessTask();
 	}
 	

@@ -30,12 +30,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
-import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
-import net.canadensys.harvester.occurrence.model.ApplicationStatus;
 import net.canadensys.harvester.occurrence.model.ApplicationStatus.JobStatusEnum;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.ImportLogModel;
+import net.canadensys.harvester.occurrence.model.JobStatusModel;
+import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 import net.canadensys.harvester.occurrence.model.ResourceModel;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 
@@ -52,8 +52,9 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, PropertyChangeListener {
+public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
+	private String END_LINE = System.getProperty("line.separator");
 	private JFrame harvesterFrame = null;
 
 	private JPanel mainPanel = null;
@@ -97,7 +98,7 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, Prop
 		openFileBtn = new JButton(Messages.getString("view.button.openFile"));
 		openResourceBtn = new JButton(
 				Messages.getString("view.button.openResource"));
-		openFileBtn.setEnabled(false);
+		//openFileBtn.setEnabled(false);
 		openFileBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -210,9 +211,8 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, Prop
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = lineIdx;
-		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 0.8;
-		c.weighty = 0.8;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1.0;
 		mainPanel.add(bufferSchemaTxt, c);
 
 		// UI line break
@@ -267,7 +267,7 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, Prop
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = lineIdx;
-		c.gridwidth = 2;
+		c.gridwidth = 3;
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
@@ -320,7 +320,8 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, Prop
 		harvesterFrame.setVisible(true);
 
 		redirectSystemStreams();
-		stepController.registerProgressListener(this);
+
+		//register to received all updates to the model
 		harvesterViewModel.addPropertyChangeListener(this);
 	}
 
@@ -392,13 +393,14 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, Prop
 						stepController.importDwcAFromLocalFile(pathToImportTxt.getText());
 					}
 				}
-				// async call, onImportDone(...) will be called once done
+				// async call, propertyChange(...) will be called once done
 				return null;
 			}
 
 			@Override
 			protected void done() {
 			}
+			
 		};
 		swingWorker.execute();
 	}
@@ -466,59 +468,39 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, Prop
 		dlg.setLocationRelativeTo(null);
 		dlg.setVisible(true);
 	}
-
-	//TODO write better code :)
-	private void onImportDone(JobStatusEnum status, String datasetShortName) {
-		loadingLbl.setIcon(null);
-		try {
-			if (JobStatusEnum.DONE_SUCCESS.equals(status)) {
-				bufferSchemaTxt.setText(datasetShortName);
+	
+	private void onJobStatusChanged(JobStatus newStatus){
+		switch (newStatus) {
+			case DONE: 
+				loadingLbl.setIcon(null);
+				bufferSchemaTxt.setText(resourceToImport.getSource_file_id());
 				moveToPublicBtn.setEnabled(true);
-
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						loadingLbl.setText(Messages
-								.getString("view.info.status.importDone"));
-					}
-				});
-			} else if (JobStatusEnum.DONE_ERROR.equals(status)) {
-				//Avoid flooding the user
+				updateStatusLabel(Messages.getString("view.info.status.importDone"));
+				break;
+			case ERROR:
+				loadingLbl.setIcon(null);
+				updateStatusLabel(Messages.getString("view.info.status.error.importError"));
 				JOptionPane.showMessageDialog(
 						harvesterFrame,
 						Messages.getString("view.info.status.error.details"),
 						Messages.getString("view.info.status.error"), JOptionPane.ERROR_MESSAGE);
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						loadingLbl.setText(Messages
-								.getString("view.info.status.error.importError"));
-					}
-				});
-			}
-			else{
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						loadingLbl.setText(Messages
-								.getString("view.info.status.error.importError"));
-					}
-				});
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(harvesterFrame,
-					Messages.getString("view.info.status.error.details"),
-					Messages.getString("view.info.status.error"),
-					JOptionPane.ERROR_MESSAGE);
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					loadingLbl.setText(Messages
-							.getString("view.info.status.error.importError"));
-				}
-			});
+				break;
+			case CANCEL:
+				loadingLbl.setIcon(null);
+				updateStatusLabel(Messages.getString("view.info.status.canceled"));
+				break;
+			default:
+				break;
 		}
+	}
+	
+	private void updateStatusLabel(final String status){
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				loadingLbl.setText(status);
+			}
+		});
 	}
 
 	private void onMoveDone(JobStatusEnum status) {
@@ -575,27 +557,26 @@ public class OccurrenceHarvesterMainView implements ItemProgressListenerIF, Prop
 		System.setErr(new PrintStream(out, true));
 	}
 
-	@Override
-	public void onProgress(String context,final int current, final int total) {
+	public void updateProgressText(final String text) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				loadingLbl.setText(current + "/" + total);
+				loadingLbl.setText(text);
 			}
 		});
 	}
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if ("applicationStatus.currentJob".equals(evt.getPropertyName())) {
-			if(resourceToImport != null){
-				onImportDone(
-						((ApplicationStatus) evt.getNewValue()).getImportStatus(), resourceToImport.getSource_file_id());
-			}
-			else{
-				onImportDone(
-						((ApplicationStatus) evt.getNewValue()).getImportStatus(), null);
-			}
+		if(JobStatusModel.CURRENT_STATUS_EXPLANATION_PROPERTY.equals(evt.getPropertyName())) {
+			appendToTextArea((String)evt.getNewValue() + END_LINE);
+		}
+		else if(JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt.getPropertyName())) {
+			appendToTextArea("STATUS:"+evt.getNewValue() + END_LINE);
+			onJobStatusChanged((JobStatus)evt.getNewValue());
+		}
+		else if(JobStatusModel.CURRENT_JOB_PROGRESS_PROPERTY.equals(evt.getPropertyName())) {
+			updateProgressText((String)evt.getNewValue());
 		}
 	}
 }
