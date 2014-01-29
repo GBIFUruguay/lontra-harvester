@@ -31,7 +31,6 @@ import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
-import net.canadensys.harvester.occurrence.model.ApplicationStatus.JobStatusEnum;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
@@ -98,7 +97,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		openFileBtn = new JButton(Messages.getString("view.button.openFile"));
 		openResourceBtn = new JButton(
 				Messages.getString("view.button.openResource"));
-		//openFileBtn.setEnabled(false);
+		openFileBtn.setEnabled(false);
 		openFileBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -424,14 +423,14 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 			protected void done() {
 				try {
 					if (get()) {
-						onMoveDone(JobStatusEnum.DONE_SUCCESS);
+						onMoveDone(JobStatus.DONE);
 					} else {
-						onMoveDone(JobStatusEnum.DONE_ERROR);
+						onMoveDone(JobStatus.ERROR);
 					}
 				} catch (InterruptedException e) {
-					onMoveDone(JobStatusEnum.DONE_ERROR);
+					onMoveDone(JobStatus.ERROR);
 				} catch (ExecutionException e) {
-					onMoveDone(JobStatusEnum.DONE_ERROR);
+					onMoveDone(JobStatus.ERROR);
 				}
 			}
 		};
@@ -503,9 +502,9 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		});
 	}
 
-	private void onMoveDone(JobStatusEnum status) {
+	private void onMoveDone(JobStatus status) {
 		loadingLbl.setIcon(null);
-		if (JobStatusEnum.DONE_SUCCESS.equals(status)) {
+		if (JobStatus.DONE == status) {
 			JOptionPane.showMessageDialog(harvesterFrame,
 					Messages.getString("view.info.status.moveCompleted"),
 					Messages.getString("view.info.status.info"),
