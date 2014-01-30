@@ -1,6 +1,8 @@
 package net.canadensys.harvester.occurrence.reader;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,5 +52,22 @@ public class DwcaReaderTest {
 		//ensure that we read default values
 		assertEquals("1", rawModel.getCatalognumber());
 		assertEquals("Gomphus", rawModel.getGenus());
+	}
+	
+	@Test
+	public void testDwcaItemReaderAbort(){
+		Map<SharedParameterEnum,Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
+		sharedParameters.put(SharedParameterEnum.DWCA_PATH,"src/test/resources/dwca-qmor-specimens");
+		sharedParameters.put(SharedParameterEnum.DATASET_SHORTNAME,"qmor-specimens");
+		
+		ItemReaderIF<OccurrenceRawModel> dwcaItemReader = new DwcaItemReader();
+		dwcaItemReader.openReader(sharedParameters);
+		
+		OccurrenceRawModel rawModel = dwcaItemReader.read();
+		assertNotNull(rawModel);
+		//cancel the reader
+		dwcaItemReader.abort();
+		rawModel = dwcaItemReader.read();
+		assertNull(rawModel);
 	}
 }

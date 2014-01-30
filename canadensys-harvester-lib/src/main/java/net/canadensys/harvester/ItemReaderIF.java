@@ -18,5 +18,10 @@ public interface ItemReaderIF<T> {
 	
 	public void abort();
 	
+	/**
+	 * Return the next object from the reader or null if the end is reached.
+	 * null will also be returned if abort() is called.
+	 * @return
+	 */
 	public T read();
 }

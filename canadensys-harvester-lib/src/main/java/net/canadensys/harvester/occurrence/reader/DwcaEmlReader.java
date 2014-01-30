@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
+import org.apache.log4j.Logger;
 import org.gbif.dwc.text.Archive;
 import org.gbif.dwc.text.ArchiveFactory;
 import org.gbif.dwc.text.UnsupportedArchiveException;
@@ -22,11 +24,19 @@ import org.xml.sax.SAXException;
  */
 public class DwcaEmlReader implements ItemReaderIF<Eml>{
 
+	private static final Logger LOGGER = Logger.getLogger(DwcaEmlReader.class);
+	
+	private final AtomicBoolean canceled = new AtomicBoolean(false);
 	private String dwcaFilePath = null;
 	private Eml eml = null;
 	
 	@Override
 	public Eml read(){
+		
+		if(canceled.get()){
+			return null;
+		}
+		
 		Eml tmpEml = eml;
 		//the read method act like an iterator so we only return the eml once
 		if(eml != null){
@@ -45,20 +55,17 @@ public class DwcaEmlReader implements ItemReaderIF<Eml>{
 			Archive dwcArchive = ArchiveFactory.openArchive(dwcaFile);
 			eml = EmlFactory.build(new FileInputStream(dwcArchive.getMetadataLocationFile()));
 		} catch (UnsupportedArchiveException e) {
-			e.printStackTrace();	
+			LOGGER.fatal("Can't open DwcaEmlReader", e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.fatal("Can't open DwcaEmlReader", e);
 		} catch (SAXException e) {
-			e.printStackTrace();
+			LOGGER.fatal("Can't open DwcaEmlReader", e);
 		}
 	}
 	
 	@Override
-	public void closeReader(){
-		System.out.println("### CLOSE - DwcaEmlReader ###");
-	}
+	public void closeReader(){}
 	
-
 	@Override
 	public void abort() {
 		// TODO implement

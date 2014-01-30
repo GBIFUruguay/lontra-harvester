@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.harvester.ItemMapperIF;
@@ -27,12 +28,13 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 	//get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(DwcaItemReader.class);
 	
+	private final AtomicBoolean canceled = new AtomicBoolean(false);
 	private ItemMapperIF<OccurrenceRawModel> mapper = new OccurrenceMapper();
 
 	@Override
 	public OccurrenceRawModel read(){
 		
-		if(!rowsIt.hasNext()){
+		if(canceled.get() || !rowsIt.hasNext()){
 			return null;
 		}
 		
@@ -94,6 +96,6 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 
 	@Override
 	public void abort() {
-		// TODO implement
+		canceled.set(true);
 	}
 }

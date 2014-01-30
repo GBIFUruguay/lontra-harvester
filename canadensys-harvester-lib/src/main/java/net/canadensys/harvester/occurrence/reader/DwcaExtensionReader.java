@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.canadensys.harvester.ItemMapperIF;
 import net.canadensys.harvester.ItemReaderIF;
@@ -27,11 +28,10 @@ import org.gbif.dwc.text.UnsupportedArchiveException;
  */
 public class DwcaExtensionReader<T> extends AbstractDwcaReaderSupport implements ItemReaderIF<T>{
 
-	//get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(DwcaExtensionReader.class);
 	
+	private final AtomicBoolean canceled = new AtomicBoolean(false);
 	private String dwcaExtensionType = null;
-	
 	private ItemMapperIF<T> mapper;
 	
 	@Override
@@ -68,7 +68,7 @@ public class DwcaExtensionReader<T> extends AbstractDwcaReaderSupport implements
 
 	@Override
 	public T read() {
-		if(!rowsIt.hasNext()){
+		if(canceled.get() || !rowsIt.hasNext()){
 			return null;
 		}
 		
@@ -120,6 +120,6 @@ public class DwcaExtensionReader<T> extends AbstractDwcaReaderSupport implements
 
 	@Override
 	public void abort() {
-		// TODO implement
+		canceled.set(true);
 	}
 }
