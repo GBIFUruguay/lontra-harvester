@@ -32,7 +32,7 @@ import net.canadensys.harvester.occurrence.step.InsertResourceContactStep;
 import net.canadensys.harvester.occurrence.step.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.StreamDwcContentStep;
 import net.canadensys.harvester.occurrence.step.StreamEmlContentStep;
-import net.canadensys.harvester.occurrence.task.CheckProcessingCompletenessTask;
+import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
 import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
@@ -114,7 +114,7 @@ public class TestConfig {
 
 	@Bean
 	public ItemTaskIF checkProcessingCompletenessTask() {
-		return new CheckProcessingCompletenessTask();
+		return new CheckHarvestingCompletenessTask();
 	}
 
 	@Bean

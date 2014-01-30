@@ -10,7 +10,7 @@ import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
-import net.canadensys.harvester.occurrence.task.CheckProcessingCompletenessTask;
+import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
 import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
 import net.canadensys.harvester.occurrence.task.GetResourceInfoTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
@@ -77,12 +77,12 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 		executeStepSequentially(streamDwcContentStep, sharedParameters);
 		
 		jobStatusModel.setCurrentStatusExplanation("Waiting for completion");
-		((CheckProcessingCompletenessTask)checkProcessingCompletenessTask).addItemProgressListenerIF(this);
+		((CheckHarvestingCompletenessTask)checkProcessingCompletenessTask).addItemProgressListenerIF(this);
 		checkProcessingCompletenessTask.execute(sharedParameters);
 	}
 	
 	public void setItemProgressListener(ItemProgressListenerIF listener){
-		((CheckProcessingCompletenessTask)checkProcessingCompletenessTask).addItemProgressListenerIF(listener);
+		((CheckHarvestingCompletenessTask)checkProcessingCompletenessTask).addItemProgressListenerIF(listener);
 	}
 	
 	public void setGetResourceInfoTask(GetResourceInfoTask getResourceInfoTask){
@@ -98,7 +98,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 	}
 
 	public void setCheckProcessingCompletenessTask(
-			CheckProcessingCompletenessTask checkProcessingCompletenessTask) {
+			CheckHarvestingCompletenessTask checkProcessingCompletenessTask) {
 		this.checkProcessingCompletenessTask = checkProcessingCompletenessTask;
 	}
 	

@@ -34,7 +34,7 @@ import net.canadensys.harvester.occurrence.step.InsertResourceContactStep;
 import net.canadensys.harvester.occurrence.step.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.StreamDwcContentStep;
 import net.canadensys.harvester.occurrence.step.StreamEmlContentStep;
-import net.canadensys.harvester.occurrence.task.CheckProcessingCompletenessTask;
+import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
 import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
 import net.canadensys.harvester.occurrence.task.ComputeGISDataTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
@@ -243,7 +243,7 @@ public class ProcessingConfig {
 
 	@Bean
 	public LongRunningTaskIF checkProcessingCompletenessTask(){
-		return new CheckProcessingCompletenessTask();
+		return new CheckHarvestingCompletenessTask();
 	}
 
 	@Bean

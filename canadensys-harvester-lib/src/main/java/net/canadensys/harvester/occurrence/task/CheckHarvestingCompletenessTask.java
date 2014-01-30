@@ -25,10 +25,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author canadensys
  *
  */
-public class CheckProcessingCompletenessTask implements LongRunningTaskIF{
+public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 
 	private static final int MAX_WAITING_SECONDS = 10;
-	private static final Logger LOGGER = Logger.getLogger(CheckProcessingCompletenessTask.class);
+	private static final Logger LOGGER = Logger.getLogger(CheckHarvestingCompletenessTask.class);
 	
 	@Autowired
 	@Qualifier(value="bufferSessionFactory")
