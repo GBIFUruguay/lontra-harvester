@@ -151,7 +151,7 @@ public class ImportDwcaJobTest implements PropertyChangeListener{
 					String source = jdbcTemplate.queryForObject("SELECT sourcefileid FROM buffer.occurrence where dwcaid='1'", String.class);
 					assertTrue("qmor-specimens".equals(source));
 					
-					String resource_contact = jdbcTemplate.queryForObject("SELECT name FROM buffer.resource_contact where dataset_shortname='qmor-specimens'", String.class);
+					String resource_contact = jdbcTemplate.queryForObject("SELECT name FROM buffer.resource_contact where sourcefileid='qmor-specimens'", String.class);
 					assertTrue("Louise Cloutier".equals(resource_contact));
 
 					assertTrue(new Integer(EXPECTED_NUMBER_OF_RESULTS).equals(count));

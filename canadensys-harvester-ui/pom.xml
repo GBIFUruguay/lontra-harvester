@@ -17,7 +17,7 @@
 	<properties>
 		<appClass>net.canadensys.Main</appClass>
 		<jackson.version>2.2.3</jackson.version>
-		<spring.version>3.2.4.RELEASE</spring.version>
+		<spring.version>3.2.6.RELEASE</spring.version>
 		<hibernate.version>4.1.12.Final</hibernate.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
