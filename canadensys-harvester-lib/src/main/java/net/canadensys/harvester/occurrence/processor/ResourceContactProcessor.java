@@ -31,16 +31,16 @@ public class ResourceContactProcessor implements ItemProcessorIF<Eml, ResourceCo
 	@Override
 	public ResourceContactModel process(Eml eml, Map<SharedParameterEnum, Object> sharedParameters)
 			throws ProcessException {
-		String datasetShortname = (String)sharedParameters.get(SharedParameterEnum.DATASET_SHORTNAME);
+		String sourceFileId = (String)sharedParameters.get(SharedParameterEnum.DATASET_SHORTNAME);
         
-        if(datasetShortname == null){
+        if(sourceFileId == null){
 			LOGGER.fatal("Misconfigured processor : needs  sourceFileId");
 			throw new TaskExecutionException("Misconfigured processor");
 		}
         Agent agent = eml.getContact();
         ResourceContactModel resourceContactModel = new ResourceContactModel();
-        resourceContactModel.setDataset_shortname(datasetShortname);
-        resourceContactModel.setDataset_title(eml.getTitle());
+        resourceContactModel.setSourcefileid(sourceFileId);
+        resourceContactModel.setResource_name(eml.getTitle());
         resourceContactModel.setName(agent.getFullName());
         resourceContactModel.setPosition_name(agent.getPosition());
         resourceContactModel.setOrganization_name(agent.getOrganisation());

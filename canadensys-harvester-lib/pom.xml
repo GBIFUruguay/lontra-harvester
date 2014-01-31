@@ -19,6 +19,7 @@
 		<spring.version>3.2.4.RELEASE</spring.version>
 		<hibernate.version>4.1.12.Final</hibernate.version>
 		<narwhal.version>1.5.1</narwhal.version>
+		<data-access.version>2.3.0-SNAPSHOT</data-access.version>
 			
 		<gbif-api.version>0.10</gbif-api.version>
 		<dwca-reader.version>1.14</dwca-reader.version>
@@ -72,7 +73,7 @@
 		<dependency>
 			<groupId>net.canadensys</groupId>
 			<artifactId>canadensys-data-access</artifactId>
-			<version>2.2.2</version>
+			<version>${data-access.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
