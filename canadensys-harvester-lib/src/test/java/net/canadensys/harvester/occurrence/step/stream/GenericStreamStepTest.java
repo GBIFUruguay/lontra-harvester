@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
+import net.canadensys.harvester.mapper.DefaultBeanMapper;
 import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.message.DefaultMessage;
 import net.canadensys.harvester.occurrence.mock.MockHabitObject;
-import net.canadensys.harvester.occurrence.mock.mapper.MockHabitMapper;
 import net.canadensys.harvester.occurrence.mock.writer.MockObjectWriter;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
 import net.canadensys.harvester.occurrence.step.async.GenericAsyncStep;
@@ -37,7 +37,7 @@ public class GenericStreamStepTest {
 		
 		//setup reader
 		DwcaExtensionReader<MockHabitObject> extReader = new DwcaExtensionReader<MockHabitObject>();
-		extReader.setMapper(new MockHabitMapper());
+		extReader.setMapper(new DefaultBeanMapper<MockHabitObject>(MockHabitObject.class));
 		
 		streamHabitStep.setReader(extReader);
 		streamHabitStep.setWriter(writer);

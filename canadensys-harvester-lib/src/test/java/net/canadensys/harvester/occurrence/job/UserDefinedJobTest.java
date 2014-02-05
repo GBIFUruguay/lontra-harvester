@@ -15,10 +15,10 @@ import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.jms.JMSConsumer;
 import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 import net.canadensys.harvester.jms.JMSWriter;
+import net.canadensys.harvester.mapper.DefaultBeanMapper;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.mock.MockHabitObject;
 import net.canadensys.harvester.occurrence.mock.MockProcessedHabitObject;
-import net.canadensys.harvester.occurrence.mock.mapper.MockHabitMapper;
 import net.canadensys.harvester.occurrence.mock.processor.MockHabitProcessor;
 import net.canadensys.harvester.occurrence.mock.writer.MockObjectWriter;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
@@ -74,7 +74,7 @@ public class UserDefinedJobTest{
 		itemReader = new DwcaExtensionReader<MockHabitObject>();
 		
 		//Build a mapper to control how DarwinCore properties are mapped to user defined object
-		ItemMapperIF<MockHabitObject> itemMapper = new MockHabitMapper();
+		ItemMapperIF<MockHabitObject> itemMapper = new DefaultBeanMapper<MockHabitObject>(MockHabitObject.class);
 		
 		//Link the reader with our mapper
 		itemReader.setMapper(itemMapper);

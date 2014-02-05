@@ -64,6 +64,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 			getResourceInfoTask.execute(sharedParameters);
 		}
 		
+		//TODO move strings to properties file
 		jobStatusModel.setCurrentStatusExplanation("Preparing DwcA");
 		prepareDwcaTask.execute(sharedParameters);
 		
@@ -73,7 +74,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 		jobStatusModel.setCurrentStatusExplanation("Streaming EML");
 		executeStepSequentially(streamEmlContentStep, sharedParameters);
 		
-		jobStatusModel.setCurrentStatusExplanation("String DwcA content");
+		jobStatusModel.setCurrentStatusExplanation("Streaming DwcA content");
 		executeStepSequentially(streamDwcContentStep, sharedParameters);
 		
 		jobStatusModel.setCurrentStatusExplanation("Waiting for completion");

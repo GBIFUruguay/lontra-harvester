@@ -5,9 +5,9 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.canadensys.harvester.mapper.DefaultBeanMapper;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.mock.MockHabitObject;
-import net.canadensys.harvester.occurrence.mock.mapper.MockHabitMapper;
 
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ public class DwcaExtensionReaderTest {
 		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE,"description");
 		
 		DwcaExtensionReader<MockHabitObject> extReader = new DwcaExtensionReader<MockHabitObject>();
-		extReader.setMapper(new MockHabitMapper());
+		extReader.setMapper(new DefaultBeanMapper<MockHabitObject>(MockHabitObject.class));
 		
 		extReader.openReader(sharedParameters);
 		MockHabitObject obj = extReader.read();
