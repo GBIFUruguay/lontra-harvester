@@ -568,7 +568,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		if(JobStatusModel.CURRENT_STATUS_EXPLANATION_PROPERTY.equals(evt.getPropertyName())) {
-			appendToTextArea((String)evt.getNewValue() + END_LINE);
+			appendToTextArea(">"+(String)evt.getNewValue() + END_LINE);
 		}
 		else if(JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt.getPropertyName())) {
 			appendToTextArea("STATUS:"+evt.getNewValue() + END_LINE);

@@ -13,9 +13,10 @@ import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Generic item writer for Hibernate.
+ * Generic item writer for Hibernate using buffer schema.
  * @author canadensys
  *
  * @param <T>
@@ -61,13 +62,12 @@ public class GenericHibernateWriter<T> implements ItemWriterIF<T> {
 		}
 	}
 
+	@Transactional("bufferTransactionManager")
 	@Override
 	public void write(T model) throws WriterException {
 		try {
 			Session currSession = sessionFactory.getCurrentSession();
-			currSession.beginTransaction();
 			currSession.save(model);
-			currSession.getTransaction().commit();
 		} catch (HibernateException hEx) {
 			LOGGER.fatal("Failed to write model", hEx);
 			if (session.getTransaction() != null) {
@@ -76,5 +76,4 @@ public class GenericHibernateWriter<T> implements ItemWriterIF<T> {
 			throw new WriterException(hEx.getMessage(), hEx);
 		}
 	}
-
 }
