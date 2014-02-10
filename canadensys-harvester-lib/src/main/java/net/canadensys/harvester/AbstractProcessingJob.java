@@ -14,6 +14,10 @@ public abstract class AbstractProcessingJob {
 	//Data structure used to share parameters among steps
 	protected Map<SharedParameterEnum,Object> sharedParameters;
 	
+	//this could be needed to allow steps insertion
+	//protected List<ProcessingStepIF> stepSequence;
+	//insertStep(StepDefinitionID insertionPoint, ProcessingStepIF step)
+	
 	/**
 	 * This function assumes that sharedParameters was previously created by the child class.
 	 * NullPointerException will be thrown if sharedParameters wasn't created.
