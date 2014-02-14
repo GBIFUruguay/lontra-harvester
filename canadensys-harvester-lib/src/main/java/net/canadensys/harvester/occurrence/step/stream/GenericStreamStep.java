@@ -90,14 +90,14 @@ public class GenericStreamStep<T> implements ProcessingStepIF{
 			objList.add(currObject);
 			numberOfRecords++;
 			if(numberOfRecords % flushInterval == 0){
-				writeObject(objList);
+				writeObjects(objList);
 				objList.clear();
 			}
 			currObject = reader.read();
 		}
 		//flush remaining content
 		if(objList.size() > 0){
-			writeObject(objList);
+			writeObjects(objList);
 		}
 		System.out.println("Streaming the file took :" + (System.currentTimeMillis()-t) + " ms");
 		sharedParameters.put(SharedParameterEnum.NUMBER_OF_RECORDS,numberOfRecords);
@@ -107,14 +107,15 @@ public class GenericStreamStep<T> implements ProcessingStepIF{
 	 * Create one message per defined message class
 	 * @param obj
 	 */
-	private void writeObject(Object obj){
+	private void writeObjects(List<T> objList){
 		try{
 			for(Class<?> currClass : targetedMsgHandlerList){
 				DefaultMessage dmsg = new DefaultMessage();
 				dmsg.setTimestamp(Calendar.getInstance().getTime().toString());
 				dmsg.setMsgHandlerClass(currClass);
-				dmsg.setContent(obj);
-				dmsg.setContentClass(obj.getClass());
+				dmsg.setContent(objList);
+				dmsg.setContentClass(objList.getClass());
+				dmsg.setContentClassGeneric(objList.get(0).getClass());
 				writer.write(dmsg);
 			}
 		}
