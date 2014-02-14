@@ -12,6 +12,7 @@ public interface JobAction {
 	 */
 	public String getTitle();
 	
-	public void accept(JobActionVisitor visitor);
+	//not ready yet
+	//public void accept(JobActionVisitor visitor);
 
 }

@@ -25,6 +25,8 @@ public class GenericAsyncProcessingStep<T,S> implements ProcessingStepIF,JMSCons
 	private ItemWriterIF<S> writer;
 	private Class<T> messageContentClass;
 	
+	private String stepTitle = "Processing and Writing data using GenericAsyncProcessingStep";
+	
 	/**
 	 * 
 	 * @param classOfT class object of T to allow explicit cast
@@ -89,5 +91,13 @@ public class GenericAsyncProcessingStep<T,S> implements ProcessingStepIF,JMSCons
 	}
 	public void setWriter(ItemWriterIF<S> writer) {
 		this.writer = writer;
-	};
+	}
+	
+	public void setTitle(String stepTitle) {
+		this.stepTitle=stepTitle;
+	}
+	@Override
+	public String getTitle() {
+		return stepTitle;
+	}
 }
