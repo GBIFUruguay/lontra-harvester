@@ -29,7 +29,8 @@ public class OccurrenceProcessorTest {
 		OccurrenceRawModel rawModel = new OccurrenceRawModel();
 		rawModel.setAssociatedmedia("http://www.google.com | http://yahoo.ca");
 		rawModel.setCountry("bra");
-		rawModel.setScientificname("Carex Linnaeus");
+		//the tab char in the scientific name should removed
+		rawModel.setScientificname("Carex \tLinnaeus");
 		
 		rawModel.setDecimallatitude("10.2");
 		rawModel.setDecimallongitude("27.3");

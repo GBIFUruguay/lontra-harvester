@@ -33,6 +33,8 @@ import org.gbif.api.vocabulary.NameType;
 import org.gbif.nameparser.NameParser;
 import org.gbif.nameparser.UnparsableException;
 
+import com.google.common.base.CharMatcher;
+
 /**
  * Processing each OccurrenceRawModel into OccurrenceModel.
  * @author canadensys
@@ -43,6 +45,8 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 	//get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(OccurrenceProcessor.class);
 	
+	//CharMatcher matching all whitespace except space char
+	protected static CharMatcher CHAR_MATCHER_WHITESPACE = CharMatcher.WHITESPACE.and(CharMatcher.isNot(' '));
 	private static final Integer MIN_DATE = 1700;
 	private static final Integer MAX_DATE = Calendar.getInstance().get(Calendar.YEAR);
 	private static final int DATE_INTERVAL_THRESHOLD = 16; //minimum date length = 8 (2002-1-1)
@@ -181,13 +185,18 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 	 * @param occModel
 	 */
 	private void processScientificName(OccurrenceRawModel rawModel, OccurrenceModel occModel){
-		occModel.setRawscientificname(rawModel.getScientificname());
+		String rawScientificName = rawModel.getScientificname();
+		occModel.setRawscientificname(rawScientificName);
+		//remove all whitespace except space char
+		if(StringUtils.isNotBlank(rawScientificName)){
+			rawScientificName = CHAR_MATCHER_WHITESPACE.removeFrom(rawScientificName);
+		}
 		//set it to raw scientificname in case the parsing could not be done
-		occModel.setScientificname(rawModel.getScientificname());
+		occModel.setScientificname(rawScientificName);
 		
 		ParsedName parsedName = null;
 		try{
-			parsedName = GBIF_NAME_PARSER.parse(rawModel.getScientificname());
+			parsedName = GBIF_NAME_PARSER.parse(rawScientificName);
 			if (NameType.WELLFORMED.equals(parsedName.getType())
 					|| NameType.SCINAME.equals(parsedName.getType())) {
 				occModel.setScientificname(parsedName.canonicalNameWithMarker());
@@ -391,5 +400,5 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 	
 	@Override
 	public void destroy() {};
-
+	
 }
