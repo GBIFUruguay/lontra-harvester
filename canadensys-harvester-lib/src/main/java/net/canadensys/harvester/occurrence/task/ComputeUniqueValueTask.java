@@ -33,6 +33,9 @@ public class ComputeUniqueValueTask implements ItemTaskIF {
 	//get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(ComputeUniqueValueTask.class);
 	
+	//for performance reason we use varchar(255) (and not text)
+	private static final int MAX_VALUE_LENGTH = 255;
+	
 	private static final int FETCH_SIZE = 1000;
 	private static String ABSTRACT_INSERT = "INSERT INTO unique_values (key,occurrence_count,value,unaccented_value) VALUES (:key,:occ_count,:value,:unaccented_value)";
 	private static String ABSTRACT_SELECT = "SELECT COUNT(%field) occurrence_count,%field FROM occurrence WHERE %field IS NOT NULL AND %field <> '' GROUP BY %field";
@@ -83,14 +86,17 @@ public class ComputeUniqueValueTask implements ItemTaskIF {
 						.setFetchSize(FETCH_SIZE).scroll();
 				while (cursor.next()) {
 					currentValue = cursor.get();
-					session.createSQLQuery(ABSTRACT_INSERT)
-							.setParameter("key", currCol)
-							.setParameter("occ_count", currentValue[0])
-							.setParameter("value", currentValue[1])
-							.setParameter(
-									"unaccented_value",
-									StringUtils.unaccent(((String) currentValue[1])
-											.toLowerCase())).executeUpdate();
+					if(((String)currentValue[1]).length() < MAX_VALUE_LENGTH){
+						System.out.println("lenth = " + ((String)currentValue[1]).length());
+						session.createSQLQuery(ABSTRACT_INSERT)
+								.setParameter("key", currCol)
+								.setParameter("occ_count", currentValue[0])
+								.setParameter("value", currentValue[1])
+								.setParameter(
+										"unaccented_value",
+										StringUtils.unaccent(((String) currentValue[1])
+												.toLowerCase())).executeUpdate();
+					}
 				}
 			}
 		}

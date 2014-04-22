@@ -2,6 +2,7 @@ package net.canadensys.harvester.occurrence.job;
 
 import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemTaskIF;
+import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,8 @@ public class ComputeUniqueValueJob extends AbstractProcessingJob{
 	@Autowired
 	private ItemTaskIF computeUniqueValueTask;
 	
-	public void doJob(){
+	public void doJob(JobStatusModel jobStatusModel){
+		jobStatusModel.setCurrentStatusExplanation("Compute unique values");
 		computeUniqueValueTask.execute(null);
 	}
 	

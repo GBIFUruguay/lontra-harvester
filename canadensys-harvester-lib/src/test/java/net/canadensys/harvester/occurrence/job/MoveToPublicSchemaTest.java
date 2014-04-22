@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
+import net.canadensys.harvester.occurrence.model.JobStatusModel;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,9 +55,11 @@ public class MoveToPublicSchemaTest {
 	
 	@Test
 	public void testMoveToPublicSchema(){
+		JobStatusModel jobStatusModel = new JobStatusModel();
+		
 		moveJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, "qmor-specimens");
 		
-		moveJob.doJob();
+		moveJob.doJob(jobStatusModel);
 
 		String state = jdbcTemplate.queryForObject("SELECT stateprovince FROM occurrence where dwcaid='3'", String.class);
 		assertTrue("Florida".equals(state));

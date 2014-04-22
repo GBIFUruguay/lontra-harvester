@@ -5,6 +5,7 @@ import java.util.HashMap;
 import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
+import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.task.ComputeGISDataTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
@@ -31,12 +32,15 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob{
 		sharedParameters = new HashMap<SharedParameterEnum, Object>();
 	}
 	
-	public void doJob(){
-		
+	public void doJob(JobStatusModel jobStatusModel){
+		jobStatusModel.setCurrentStatusExplanation("Compute GIS data");
 		computeGISDataTask.execute(sharedParameters);
+		
+		jobStatusModel.setCurrentStatusExplanation("Replace previous records");
 		replaceOldOccurrenceTask.execute(sharedParameters);
 		
 		//log the import event
+		jobStatusModel.setCurrentStatusExplanation("Log import event");
 		recordImportTask.execute(sharedParameters);
 	}
 
