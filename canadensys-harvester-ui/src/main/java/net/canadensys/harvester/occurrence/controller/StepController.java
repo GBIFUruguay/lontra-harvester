@@ -101,10 +101,13 @@ public class StepController implements StepControllerIF {
 	@Override
 	public void moveToPublicSchema(String datasetShortName){
 		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, datasetShortName);
-		moveToPublicSchemaJob.doJob();
+		JobStatusModel jobStatusModel = new JobStatusModel();
+		harvesterViewModel.encapsulateJobStatus(jobStatusModel);
+		
+		//moveToPublicSchemaJob.doJob(jobStatusModel);
 		currentJob = moveToPublicSchemaJob;
 
-		computeUniqueValueJob.doJob();
+		computeUniqueValueJob.doJob(jobStatusModel);
 		currentJob = computeUniqueValueJob;
 	}
 

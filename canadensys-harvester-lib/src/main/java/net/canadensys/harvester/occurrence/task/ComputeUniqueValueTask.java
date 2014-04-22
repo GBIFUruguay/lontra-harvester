@@ -87,7 +87,6 @@ public class ComputeUniqueValueTask implements ItemTaskIF {
 				while (cursor.next()) {
 					currentValue = cursor.get();
 					if(((String)currentValue[1]).length() < MAX_VALUE_LENGTH){
-						System.out.println("lenth = " + ((String)currentValue[1]).length());
 						session.createSQLQuery(ABSTRACT_INSERT)
 								.setParameter("key", currCol)
 								.setParameter("occ_count", currentValue[0])

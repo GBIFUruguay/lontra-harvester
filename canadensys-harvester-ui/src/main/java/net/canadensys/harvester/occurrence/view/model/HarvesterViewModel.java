@@ -40,6 +40,7 @@ public class HarvesterViewModel {
 	 * @param currentJobStatusModel
 	 */
 	public void encapsulateJobStatus(JobStatusModel currentJobStatusModel){
+		//TODO we should probably unregister from previous currentJobStatusModel
 		this.currentJobStatusModel = currentJobStatusModel;
 		currentJobStatusModel.addPropertyChangeListener(propertyChangeSupport.getPropertyChangeListeners()[0]);
 	}
