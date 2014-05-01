@@ -104,7 +104,7 @@ public class StepController implements StepControllerIF {
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		harvesterViewModel.encapsulateJobStatus(jobStatusModel);
 		
-		//moveToPublicSchemaJob.doJob(jobStatusModel);
+		moveToPublicSchemaJob.doJob(jobStatusModel);
 		currentJob = moveToPublicSchemaJob;
 
 		computeUniqueValueJob.doJob(jobStatusModel);
