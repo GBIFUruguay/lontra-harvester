@@ -138,6 +138,9 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 		processedModel.setEventdate(rawModel.getEventdate());
 		processedModel.setHasmedia(!StringUtils.isBlank(rawModel.getAssociatedmedia()));
 		
+		processedModel.setTypestatus(rawModel.getTypestatus());
+		processedModel.setHastypestaus(StringUtils.isNotBlank(rawModel.getTypestatus()));
+		
 		processScientificName(rawModel, processedModel);
 		
 		//Process date(s)
