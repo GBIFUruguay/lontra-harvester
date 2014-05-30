@@ -190,9 +190,13 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 	private void processScientificName(OccurrenceRawModel rawModel, OccurrenceModel occModel){
 		String rawScientificName = rawModel.getScientificname();
 		occModel.setRawscientificname(rawScientificName);
-		//remove all whitespace except space char
+		
 		if(StringUtils.isNotBlank(rawScientificName)){
+			//remove all whitespace except space char
 			rawScientificName = CHAR_MATCHER_WHITESPACE.removeFrom(rawScientificName);
+			//ensure it's not 'quoted'
+			rawScientificName = StringUtils.removeStart(rawScientificName, "\"");
+			rawScientificName = StringUtils.removeEnd(rawScientificName, "\"");
 		}
 		//set it to raw scientificname in case the parsing could not be done
 		occModel.setScientificname(rawScientificName);
