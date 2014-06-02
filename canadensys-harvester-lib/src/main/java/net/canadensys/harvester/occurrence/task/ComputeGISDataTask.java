@@ -52,11 +52,11 @@ public class ComputeGISDataTask implements ItemTaskIF{
 		//update the_geom_webmercator
 		query = session.createSQLQuery("UPDATE buffer.occurrence SET the_geom_webmercator = st_transform_null(the_geom,3857) WHERE sourcefileid=? AND the_geom IS NOT NULL");
 		query.setString(0, datasetShortname);
+		query.executeUpdate();
 		
 		//update the_shifted_geom
 		query = session.createSQLQuery("UPDATE buffer.occurrence SET the_shifted_geom = ST_Shift_Longitude(the_geom) WHERE sourcefileid=? AND the_geom IS NOT NULL");
 		query.setString(0, datasetShortname);
-		
 		query.executeUpdate();
 	}
 	
