@@ -19,8 +19,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author canadensys
  * 
  */
-public class ResourceContactHibernateWriter implements
-		ItemWriterIF<ResourceContactModel> {
+public class ResourceContactHibernateWriter implements ItemWriterIF<ResourceContactModel> {
 
 	private static final Logger LOGGER = Logger
 			.getLogger(ResourceContactHibernateWriter.class);
@@ -47,9 +46,11 @@ public class ResourceContactHibernateWriter implements
 
 	@Override
 	public void write(List<? extends ResourceContactModel> elementList) throws WriterException{
+		String lastId = "";
 		try {
 			session.beginTransaction();
 			for (ResourceContactModel resourceContactModel : elementList) {
+				lastId = resourceContactModel.getId() != null ? resourceContactModel.getId().toString() : "?";
 				session.save(resourceContactModel);
 			}
 			session.getTransaction().commit();
@@ -58,7 +59,7 @@ public class ResourceContactHibernateWriter implements
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
-			throw new WriterException(hEx.getMessage());
+			throw new WriterException(lastId,hEx.getMessage());
 		}
 	}
 
@@ -73,7 +74,8 @@ public class ResourceContactHibernateWriter implements
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
-			throw new WriterException(hEx.getMessage());
+			String id = resourceContactModel.getId() != null ? resourceContactModel.getId().toString() : "?";
+			throw new WriterException(id,hEx.getMessage());
 		}
 	}
 }

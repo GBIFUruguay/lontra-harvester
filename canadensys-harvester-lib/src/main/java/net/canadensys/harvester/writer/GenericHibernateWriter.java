@@ -47,9 +47,12 @@ public class GenericHibernateWriter<T> implements ItemWriterIF<T> {
 
 	@Override
 	public void write(List<? extends T> elementList) throws WriterException{
+		Transaction tx = null;
+		T lastElement = null;
 		try {
-			Transaction tx = session.beginTransaction();
+			tx = session.beginTransaction();
 			for (T currOccurrence : elementList) {
+				lastElement = currOccurrence;
 				session.insert(currOccurrence);
 			}
 			tx.commit();
@@ -58,7 +61,11 @@ public class GenericHibernateWriter<T> implements ItemWriterIF<T> {
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
-			throw new WriterException(hEx.getMessage(), hEx);
+			if( tx != null){
+				tx.rollback();
+			}
+			String id = (lastElement != null) ? lastElement.toString() : "?";
+			throw new WriterException(id ,hEx.getMessage(), hEx);
 		}
 	}
 
@@ -73,7 +80,7 @@ public class GenericHibernateWriter<T> implements ItemWriterIF<T> {
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
-			throw new WriterException(hEx.getMessage(), hEx);
+			throw new WriterException(model.toString(),hEx.getMessage(), hEx);
 		}
 	}
 }

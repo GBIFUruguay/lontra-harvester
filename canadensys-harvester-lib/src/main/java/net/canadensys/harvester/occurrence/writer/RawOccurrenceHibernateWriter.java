@@ -21,8 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author canadensys
  * 
  */
-public class RawOccurrenceHibernateWriter implements
-		ItemWriterIF<OccurrenceRawModel> {
+public class RawOccurrenceHibernateWriter implements ItemWriterIF<OccurrenceRawModel> {
 
 	private static final Logger LOGGER = Logger
 			.getLogger(RawOccurrenceHibernateWriter.class);
@@ -49,34 +48,38 @@ public class RawOccurrenceHibernateWriter implements
 
 	@Override
 	public void write(List<? extends OccurrenceRawModel> elementList) throws WriterException {
+		Transaction tx = null;
+		String lastDwcaId = "";
 		try {
-			Transaction tx = session.beginTransaction();
+			tx = session.beginTransaction();
 			for (OccurrenceRawModel currRawOccurrence : elementList) {
+				lastDwcaId = currRawOccurrence.getDwcaid();
 				session.insert(currRawOccurrence);
 			}
 			tx.commit();
 		} catch (HibernateException hEx) {
 			LOGGER.fatal("Failed to write OccurrenceRawModel", hEx);
-			if (session.getTransaction() != null) {
-				session.getTransaction().rollback();
+			if (tx != null) {
+				tx.rollback();
 			}
-			throw new WriterException(hEx.getMessage());
+			throw new WriterException(lastDwcaId,hEx.getMessage());
 		}
 	}
 
 	@Override
 	public void write(OccurrenceRawModel rawModel) throws WriterException {
+		Transaction tx = null;
 		try {
 			Session currSession = sessionFactory.getCurrentSession();
-			currSession.beginTransaction();
+			tx = currSession.beginTransaction();
 			currSession.save(rawModel);
-			currSession.getTransaction().commit();
+			tx.commit();
 		} catch (HibernateException hEx) {
-			LOGGER.fatal("Failed to write OccurrenceRawModel", hEx);
-			if (session.getTransaction() != null) {
-				session.getTransaction().rollback();
+			LOGGER.fatal("Failed to write OccurrenceRawModel " +rawModel.getDwcaid(), hEx);
+			if (tx != null) {
+				tx.rollback();
 			}
-			throw new WriterException(hEx.getMessage());
+			throw new WriterException(rawModel.getDwcaid(),hEx.getMessage());
 		}
 	}
 
