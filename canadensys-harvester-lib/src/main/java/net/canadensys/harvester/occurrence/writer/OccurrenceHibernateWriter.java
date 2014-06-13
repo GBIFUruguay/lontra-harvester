@@ -57,7 +57,7 @@ public class OccurrenceHibernateWriter implements ItemWriterIF<OccurrenceModel> 
 			}
 			tx.commit();
 		} catch (HibernateException hEx) {
-			LOGGER.fatal("Failed to write OccurrenceModel "+lastDwcaId, hEx);
+			LOGGER.fatal("Failed to write OccurrenceModel ["+lastDwcaId+"]", hEx);
 			if(tx != null){
 				tx.rollback();
 			}
@@ -74,7 +74,7 @@ public class OccurrenceHibernateWriter implements ItemWriterIF<OccurrenceModel> 
 			currSession.save(occModel);
 			tx.commit();
 		} catch (HibernateException hEx) {
-			LOGGER.fatal("Failed to write OccurrenceModel "+occModel.getDwcaid(), hEx);
+			LOGGER.fatal("Failed to write OccurrenceModel ["+occModel.getDwcaid()+"]", hEx);
 			if(tx != null){
 				tx.rollback();
 			}
