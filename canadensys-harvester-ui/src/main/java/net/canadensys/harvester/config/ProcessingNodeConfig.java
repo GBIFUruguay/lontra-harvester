@@ -5,6 +5,8 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
+import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
@@ -19,11 +21,13 @@ import net.canadensys.harvester.jms.JMSConsumer;
 import net.canadensys.harvester.jms.JMSWriter;
 import net.canadensys.harvester.jms.control.JMSControlConsumer;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
+import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
+import net.canadensys.harvester.occurrence.dao.ResourceDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
-import net.canadensys.harvester.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.occurrence.model.ResourceModel;
+import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceContactProcessor;
@@ -278,6 +282,24 @@ public class ProcessingNodeConfig {
 	@Bean
 	public HarvesterConfigIF harvesterConfig(){
 		//currently not used by the nodes
+		return null;
+	}
+	
+	//---DAO---
+	@Bean
+	public IPTFeedDAO iptFeedDAO(){
+		return null;
+	}
+	@Bean
+	public ResourceDAO resourceDAO(){
+		return null;
+	}
+	@Bean
+	public ImportLogDAO importLogDAO(){
+		return null;
+	}
+	@Bean
+	public ResourceStatusNotifierIF resourceStatusNotifierIF(){
 		return null;
 	}
 

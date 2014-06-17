@@ -1,22 +1,22 @@
 package net.canadensys.harvester.occurrence.controller;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
+import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.config.harvester.HarvesterConfigIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
+import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
-import net.canadensys.harvester.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.model.ResourceModel;
+import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 
 import org.hibernate.Criteria;
@@ -27,12 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
 
 /**
  * Main controller to initiate jobs.
@@ -49,6 +43,12 @@ public class StepController implements StepControllerIF {
 	@Autowired
 	@Qualifier(value="publicSessionFactory")
 	private SessionFactory sessionFactory;
+	
+	@Autowired
+	private IPTFeedDAO iptFeedDAO;
+	
+	@Autowired
+	private ResourceStatusNotifierIF notifier;
 
 	@Autowired
 	private ImportDwcaJob importDwcaJob;
@@ -148,41 +148,28 @@ public class StepController implements StepControllerIF {
 		return criteria.list();
 	}
 
-	/**
-	 * Get the list of IPTFeedModel from an IPT installation RSS feed.
-	 * @param feedURL
-	 * @return
-	 */
-	@Override
-	public List<IPTFeedModel> getIPTFeed() {
-		List<IPTFeedModel> feedList = new ArrayList<IPTFeedModel>();
-		SyndFeedInput input = new SyndFeedInput();
-		try {
-			SyndFeed feed = input.build(new XmlReader(new URL(harvesterConfig.getIptRssAddress())));
-			List<SyndEntry> feedEntries = feed.getEntries();
-			for (SyndEntry currEntry : feedEntries) {
-				IPTFeedModel feedModel = new IPTFeedModel();
-				feedModel.setTitle(currEntry.getTitle());
-				feedModel.setUri(currEntry.getUri());
-				feedModel.setLink(currEntry.getLink());
-				feedModel.setPublishedDate(currEntry.getPublishedDate());
-				feedList.add(feedModel);
-			}
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (FeedException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return feedList;
-	}
-
 	@Override
 	public void onNodeError(){
 		//stop the current job
 		currentJob.cancel();
+	}
+	
+	@Override
+	@Transactional("publicTransactionManager")
+	public List<IPTFeedModel> getIPTFeed() {
+		
+		URL mainIPTUrl = null;
+		try {
+			mainIPTUrl = new URL(harvesterConfig.getIptRssAddress());
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return iptFeedDAO.getIPTFeed(mainIPTUrl);
+	}
+	
+	@Override
+	public List<ResourceModel> getResourceToHarvest() {
+		return notifier.getHarvestRequiredList();
 	}
 }

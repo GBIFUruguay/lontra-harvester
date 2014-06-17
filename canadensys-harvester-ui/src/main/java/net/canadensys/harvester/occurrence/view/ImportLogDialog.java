@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.util.List;
 import java.util.Vector;
 
-import net.canadensys.harvester.occurrence.model.ImportLogModel;
+import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 
 /**
  * Dialog displaying the previous import log in a table.

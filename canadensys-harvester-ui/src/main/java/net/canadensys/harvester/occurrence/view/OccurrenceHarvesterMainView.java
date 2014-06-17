@@ -30,9 +30,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
+import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
-import net.canadensys.harvester.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 import net.canadensys.harvester.occurrence.model.ResourceModel;
@@ -322,6 +322,18 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 		//register to received all updates to the model
 		harvesterViewModel.addPropertyChangeListener(this);
+		
+		checkForOutdatedResources();
+	}
+	
+	/**
+	 * Display in text area resource that should be (re)harvested.
+	 */
+	private void checkForOutdatedResources(){
+		List<ResourceModel> outdatedResources = stepController.getResourceToHarvest();
+		for(ResourceModel currResourceModel : outdatedResources){
+			appendToTextArea(Messages.getString("view.info.harvestRequired") + currResourceModel.getSource_file_id()+"\n");
+		}
 	}
 
 	/**

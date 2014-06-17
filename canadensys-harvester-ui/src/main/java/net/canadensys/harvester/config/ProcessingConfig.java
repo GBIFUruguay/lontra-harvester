@@ -4,6 +4,9 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
+import net.canadensys.dataportal.occurrence.dao.impl.HibernateImportLogDAO;
+import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
@@ -19,11 +22,16 @@ import net.canadensys.harvester.jms.JMSConsumer;
 import net.canadensys.harvester.jms.JMSWriter;
 import net.canadensys.harvester.jms.control.JMSControlConsumer;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
+import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
+import net.canadensys.harvester.occurrence.dao.ResourceDAO;
+import net.canadensys.harvester.occurrence.dao.impl.HibernateIPTFeedDAO;
+import net.canadensys.harvester.occurrence.dao.impl.HibernateResourceDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
-import net.canadensys.harvester.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.occurrence.model.ResourceModel;
+import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
+import net.canadensys.harvester.occurrence.notification.impl.DefaultResourceStatusNotifier;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceContactProcessor;
@@ -139,7 +147,7 @@ public class ProcessingConfig {
 		return sb;
 	}
 
-	@Bean(name="publicSessionFactory")
+	@Bean(name={"publicSessionFactory","sessionFactory"})
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
@@ -317,6 +325,25 @@ public class ProcessingConfig {
 		HarvesterConfig hc = new HarvesterConfig();
 		hc.setIptRssAddress(iptRssAddress);
 		return hc;
+	}
+	
+	//---DAO---
+	@Bean
+	public IPTFeedDAO iptFeedDAO(){
+		return new HibernateIPTFeedDAO();
+	}
+	@Bean
+	public ResourceDAO resourceDAO(){
+		return new HibernateResourceDAO();
+	}
+	@Bean
+	public ImportLogDAO importLogDAO(){
+		return new HibernateImportLogDAO();
+	}
+	
+	@Bean
+	public ResourceStatusNotifierIF resourceStatusNotifierIF(){
+		return new DefaultResourceStatusNotifier();
 	}
 
 	/**

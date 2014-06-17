@@ -3,10 +3,10 @@ package net.canadensys.harvester.occurrence.task;
 import java.util.Date;
 import java.util.Map;
 
+import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.exception.TaskExecutionException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
-import net.canadensys.harvester.occurrence.model.ImportLogModel;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
