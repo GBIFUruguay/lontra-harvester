@@ -15,8 +15,14 @@ import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 
 import org.junit.Test;
 
-
+/**
+ * Test OccurrenceProcessor behavior
+ * @author cgendreau
+ *
+ */
 public class OccurrenceProcessorTest {
+	
+	private static final char NULL_CHAR = '\0';
 	
 	/**
 	 * Test regular processing
@@ -29,8 +35,9 @@ public class OccurrenceProcessorTest {
 		OccurrenceRawModel rawModel = new OccurrenceRawModel();
 		rawModel.setAssociatedmedia("http://www.google.com | http://yahoo.ca");
 		rawModel.setCountry("bra");
-		//the tab char in the scientific name and the quotes should removed
-		rawModel.setScientificname("\"Carex \tLinnaeus\"");
+		//the tab char in the scientific name, the quotes should removed and the NUL should be removed.
+		//actually the NUL will be removed by the Mapper but the Processor should also do it
+		rawModel.setScientificname("\"Carex \tLinnaeus\""+NULL_CHAR);
 		
 		rawModel.setDecimallatitude("10.2");
 		rawModel.setDecimallongitude("27.3");
@@ -123,6 +130,56 @@ public class OccurrenceProcessorTest {
 			e.printStackTrace();
 			fail();
 		}
+	}
+	
+	/**
+	 * Make sure we can parse date interval when provided in Eventdate or Verbatimeventdate.
+	 */
+	@Test
+	public void testDateProcessingBehaviorWhenYDMIsProvided(){
+		OccurrenceProcessor occProcessor = new OccurrenceProcessor();
+		OccurrenceRawModel rawModel = new OccurrenceRawModel();
+		rawModel.setDay("1");
+		rawModel.setMonth("10");
+		rawModel.setYear("1990");
+		
+		OccurrenceModel processedModel = occProcessor.process(rawModel, null);
+		assertEquals(1990,processedModel.getSyear().intValue());
+		assertEquals(10,processedModel.getSmonth().intValue());
+		assertEquals(1,processedModel.getSday().intValue());
+		
+		//partial date
+		rawModel = new OccurrenceRawModel();
+		rawModel.setMonth("10");
+		rawModel.setYear("1990");
+		
+		processedModel = occProcessor.process(rawModel, null);
+		assertEquals(1990,processedModel.getSyear().intValue());
+		assertEquals(10,processedModel.getSmonth().intValue());
+		assertNull(processedModel.getSday());
+		
+		//wrong date, we still keep the year
+		rawModel = new OccurrenceRawModel();
+		rawModel.setDay("1");
+		rawModel.setMonth("13");
+		rawModel.setYear("1990");
+		
+		processedModel = occProcessor.process(rawModel, null);
+		assertEquals(1990,processedModel.getSyear().intValue());
+		assertNull(processedModel.getSmonth());
+		assertNull(processedModel.getSday());
+		
+		//test day,month, year fields precedence
+		rawModel = new OccurrenceRawModel();
+		rawModel.setDay("1");
+		rawModel.setMonth("10");
+		rawModel.setYear("1990");
+		rawModel.setEventdate("1991-11-2");
+		
+		processedModel = occProcessor.process(rawModel, null);
+		assertEquals(1990,processedModel.getSyear().intValue());
+		assertEquals(10,processedModel.getSmonth().intValue());
+		assertEquals(1,processedModel.getSday().intValue());
 	}
 	
 	/**

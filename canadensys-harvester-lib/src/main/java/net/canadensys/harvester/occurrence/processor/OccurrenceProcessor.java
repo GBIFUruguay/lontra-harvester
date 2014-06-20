@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.time.MonthOfYear;
+
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.harvester.ItemProcessorIF;
@@ -25,6 +27,7 @@ import net.canadensys.vocabulary.stateprovince.BEProvince;
 import net.canadensys.vocabulary.stateprovince.CAProvince;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.math.util.MathUtils;
 import org.apache.log4j.Logger;
 import org.gbif.api.model.checklistbank.ParsedName;
@@ -45,8 +48,9 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 	//get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(OccurrenceProcessor.class);
 	
-	//CharMatcher matching all whitespace except space char
-	protected static CharMatcher CHAR_MATCHER_WHITESPACE = CharMatcher.WHITESPACE.and(CharMatcher.isNot(' '));
+	//CharMatcher matching all invisible characters except space char
+	protected static CharMatcher CHAR_MATCHER_WHITESPACE = CharMatcher.INVISIBLE.and(CharMatcher.isNot(' '));
+	
 	private static final Integer MIN_DATE = 1700;
 	private static final Integer MAX_DATE = Calendar.getInstance().get(Calendar.YEAR);
 	private static final int DATE_INTERVAL_THRESHOLD = 16; //minimum date length = 8 (2002-1-1)
@@ -226,36 +230,46 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 	private void processDate(OccurrenceRawModel rawModel, OccurrenceModel occModel){
 		ProcessingResult pr = new ProcessingResult();
 		
-		dateProcessor.processBean(rawModel, occModel, null, pr);
-		
-		if(occModel.getSday() == null && occModel.getSmonth() == null && occModel.getSyear() == null){
+		//if something is available in one of those 3 fields, try to use it
+		if(StringUtils.isNotBlank(rawModel.getDay()) || StringUtils.isNotBlank(rawModel.getMonth()) ||
+				StringUtils.isNotBlank(rawModel.getDay())){
+			occModel.setSyear(NumberUtils.toInt(rawModel.getYear(), -1));
+			occModel.setSmonth(NumberUtils.toInt(rawModel.getMonth(), -1));
+			occModel.setSday(NumberUtils.toInt(rawModel.getDay(), -1));
+			validateStartDate(occModel);
+		}
+		else{
+			dateProcessor.processBean(rawModel, occModel, null, pr);
 			
-			String rawEventDate = rawModel.getEventdate();
-			String rawVerbatimEventDate = rawModel.getVerbatimeventdate();
-			
-			String usedDate = StringUtils.isNotBlank(rawEventDate)?rawEventDate:rawVerbatimEventDate;
-			usedDate = StringUtils.defaultString(usedDate, "");
-
-			//check if we should try to parse it as date interval
-			if(usedDate.length() > DATE_INTERVAL_THRESHOLD){
-				//we try the date interval, clear the previous error
-				pr.clear();
-				processDateInterval(usedDate,occModel,pr);
-			}
-			else{
-				//try verbatim date only if eventDate is blank
-				if(StringUtils.isNotBlank(rawVerbatimEventDate) && StringUtils.isBlank(rawEventDate)){
-					//we try the verbatim, clear the previous error
+			if(occModel.getSday() == null && occModel.getSmonth() == null && occModel.getSyear() == null){
+				
+				String rawEventDate = rawModel.getEventdate();
+				String rawVerbatimEventDate = rawModel.getVerbatimeventdate();
+				
+				String usedDate = StringUtils.isNotBlank(rawEventDate)?rawEventDate:rawVerbatimEventDate;
+				usedDate = StringUtils.defaultString(usedDate, "");
+	
+				//check if we should try to parse it as date interval
+				if(usedDate.length() > DATE_INTERVAL_THRESHOLD){
+					//we try the date interval, clear the previous error
 					pr.clear();
-					Integer[] pDate = dateProcessor.process(rawVerbatimEventDate, pr);
-					occModel.setSyear(pDate[DateProcessor.YEAR_IDX]);
-					occModel.setSmonth(pDate[DateProcessor.MONTH_IDX]);
-					occModel.setSday(pDate[DateProcessor.DAY_IDX]);
+					processDateInterval(usedDate,occModel,pr);
 				}
-			}
-			
-			if(pr.getErrorList().size() > 0){
-				System.out.println("DwcA ID:"+rawModel.getDwcaid() +"->"+pr.getErrorString());
+				else{
+					//try verbatim date only if eventDate is blank
+					if(StringUtils.isNotBlank(rawVerbatimEventDate) && StringUtils.isBlank(rawEventDate)){
+						//we try the verbatim, clear the previous error
+						pr.clear();
+						Integer[] pDate = dateProcessor.process(rawVerbatimEventDate, pr);
+						occModel.setSyear(pDate[DateProcessor.YEAR_IDX]);
+						occModel.setSmonth(pDate[DateProcessor.MONTH_IDX]);
+						occModel.setSday(pDate[DateProcessor.DAY_IDX]);
+					}
+				}
+				
+				if(pr.getErrorList().size() > 0){
+					System.out.println("DwcA ID:"+rawModel.getDwcaid() +"->"+pr.getErrorString());
+				}
 			}
 		}
 		
@@ -358,6 +372,43 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 	}
 	
 	/**
+	 * Validate start date value and make sure they are valid. If not, remove them from occModel.
+	 * TODO should  be replaced by dwca-validator library 
+	 * @param occModel
+	 */
+	private void validateStartDate(OccurrenceModel occModel){
+		//make sure the year is valid
+		if(occModel.getSyear() !=null && (occModel.getSyear() < MIN_DATE || occModel.getSyear() > MAX_DATE)){
+			occModel.setSyear(null);
+		}
+		//make sure month is valid
+		if(occModel.getSmonth() !=null && (occModel.getSmonth() < MonthOfYear.JANUARY.getValue() || occModel.getSmonth() > MonthOfYear.DECEMBER.getValue())){
+			occModel.setSmonth(null);
+		}
+		
+		//to validate a day, we need the month and the ideally, the year
+		if(occModel.getSday() != null){
+			//validate that we do not provide negative value since calendar will accept them.
+			if(occModel.getSyear() == null || occModel.getSmonth() == null || occModel.getSday() <= 0){
+				occModel.setSday(null);
+			}
+			else{
+				Calendar cal = Calendar.getInstance();
+				cal.setLenient(false);
+				//Calendar month id 0-based
+				try{
+					cal.set(occModel.getSyear(), occModel.getSmonth()-1, occModel.getSday());
+				}
+				catch (IllegalArgumentException iaEx){
+					occModel.setSday(null);
+					occModel.setSmonth(null);
+					//we keep the year
+				}
+			}
+		}	
+	}
+	
+	/**
 	 * Make sure the date is within accepted range and set the decade.
 	 * @param occModel
 	 */
@@ -382,10 +433,14 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 		//if we have a date interval
 		if(ArrayUtils.containsOnlyNotNull(occModel.getEyear(),occModel.getEmonth(),occModel.getEday())){
 			Calendar startCal = Calendar.getInstance();
-			startCal.set(occModel.getSyear(), occModel.getSmonth(), occModel.getSday());
+			startCal.setLenient(false);
+			//Calendar month id 0-based
+			startCal.set(occModel.getSyear(), occModel.getSmonth()-1, occModel.getSday());
 			
 			Calendar endCal = Calendar.getInstance();
-			endCal.set(occModel.getEyear(), occModel.getEmonth(), occModel.getEday());
+			endCal.setLenient(false);
+			//Calendar month id 0-based
+			endCal.set(occModel.getEyear(), occModel.getEmonth()-1, occModel.getEday());
 			
 			//if start is not before end, clear both dates
 			if(!startCal.before(endCal)){
