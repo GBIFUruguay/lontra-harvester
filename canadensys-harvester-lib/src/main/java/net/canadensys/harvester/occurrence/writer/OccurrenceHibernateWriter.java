@@ -7,6 +7,7 @@ import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.exception.WriterException;
 
 import org.apache.log4j.Logger;
+import org.hibernate.CacheMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -70,6 +71,7 @@ public class OccurrenceHibernateWriter implements ItemWriterIF<OccurrenceModel> 
 		Transaction tx = null;
 		try {
 			Session currSession = sessionFactory.getCurrentSession();
+			currSession.setCacheMode(CacheMode.IGNORE);
 			tx = currSession.beginTransaction();
 			currSession.save(occModel);
 			tx.commit();

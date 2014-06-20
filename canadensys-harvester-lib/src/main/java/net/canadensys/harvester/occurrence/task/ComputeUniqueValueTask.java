@@ -10,6 +10,7 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.utils.StringUtils;
 
 import org.apache.log4j.Logger;
+import org.hibernate.CacheMode;
 import org.hibernate.HibernateException;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
@@ -83,6 +84,8 @@ public class ComputeUniqueValueTask implements ItemTaskIF {
 								ABSTRACT_SELECT.replaceAll("%field", currCol))
 						.addScalar("occurrence_count", StandardBasicTypes.INTEGER)
 						.addScalar(currCol, StandardBasicTypes.STRING)
+						.setCacheable(false)
+						.setCacheMode(CacheMode.IGNORE)
 						.setFetchSize(FETCH_SIZE).scroll();
 				while (cursor.next()) {
 					currentValue = cursor.get();
@@ -97,6 +100,7 @@ public class ComputeUniqueValueTask implements ItemTaskIF {
 												.toLowerCase())).executeUpdate();
 					}
 				}
+				cursor.close();
 			}
 		}
 		catch(HibernateException hEx){
