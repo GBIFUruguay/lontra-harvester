@@ -3,7 +3,7 @@ before_install:
  - cd ..
  - git clone https://github.com/Canadensys/canadensys-data-access.git
  - cd canadensys-data-access
- - git checkouk tags/2.3.0
+ - git checkout tags/2.3.0
  - mvn install
  - cd ..
  - git clone https://github.com/Canadensys/narwhal-processor.git
