@@ -29,7 +29,8 @@ public class JMSProducer {
 
 	private static final Logger LOGGER = Logger.getLogger(JMSProducer.class);
 
-	private final String brokerURL;
+	private String brokerURL;
+	private boolean isOpen = false;
 
 	// Name of the queue we will sent messages into
 	public static String QUEUE_NAME = "Harvester.Queue";
@@ -44,11 +45,19 @@ public class JMSProducer {
 	public JMSProducer(String brokerURL) {
 		this.brokerURL = brokerURL;
 	}
+	
+	public void setBrokerURL(String brokerURL){
+		if(isOpen){
+			throw new IllegalStateException("Can not set broker URL if the connection is started.");
+		}
+		this.brokerURL = brokerURL;
+	}
 
 	public void close() {
 		try {
 			connection.stop();
 			connection.close();
+			isOpen = false;
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
@@ -61,7 +70,7 @@ public class JMSProducer {
 		
 		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(
 				brokerURL);
-
+		
 		try {
 			// Getting JMS connection from the server and starting it
 			connection = factory.createConnection();
@@ -69,6 +78,7 @@ public class JMSProducer {
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
 			Destination destination = session.createQueue(QUEUE_NAME);
+			isOpen = true;
 			producer = session.createProducer(destination);
 		} catch (JMSException jEx) {
 			LOGGER.fatal("Can not initialize JMSProducer", jEx);

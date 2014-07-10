@@ -1,5 +1,7 @@
 Version History
 ===============
+Version 0.3 2014-??-??
+* Added new module (component) for the node
 
 Version 0.2 2014-01-14
 * Split project into 2 components (Issue #6)

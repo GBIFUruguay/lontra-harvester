@@ -1,7 +1,6 @@
 package net.canadensys;
 
 import net.canadensys.harvester.main.JobInitiatorMain;
-import net.canadensys.harvester.main.ProcessingNodeMain;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -17,9 +16,7 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		Options cmdLineOptions = new Options();
-		cmdLineOptions.addOption("node", false, "Start as processing node");
-		cmdLineOptions.addOption("initiator", false, "Start haverster initiator");
-		cmdLineOptions.addOption("brokerip", true, "ActiveMQ broker service");
+		cmdLineOptions.addOption("brokerip", true, "Override ActiveMQ broker URL");
 		
 		CommandLineParser parser = new PosixParser();
 		CommandLine cmdLine = null;
@@ -30,16 +27,8 @@ public class Main {
 		}
 		
 		if(cmdLine != null){
-			String ipAddress = cmdLine.getOptionValue("brokerip");
-			if(cmdLine.hasOption("initiator")){
-				JobInitiatorMain.main();
-			}
-			else if(cmdLine.hasOption("node")){
-				ProcessingNodeMain.main(ipAddress);
-			}
-			else{
-				JobInitiatorMain.main();
-			}
+			String brokerIpAddress = cmdLine.getOptionValue("brokerip");
+			JobInitiatorMain.main(brokerIpAddress);
 		}
 	}
 }

@@ -96,6 +96,8 @@ public class JMSConsumer{
 			
 			// Get the queue
 			Queue queue = session.createQueue(JMSProducer.QUEUE_NAME);
+			
+			isOpen = true;
 	
 			// MessageConsumer is used for receiving (consuming) messages
 			consumer = session.createConsumer(queue);
@@ -109,6 +111,7 @@ public class JMSConsumer{
 	public void close() {
 		try {
 			connection.close();
+			isOpen = false;
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}

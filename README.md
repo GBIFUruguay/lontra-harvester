@@ -7,6 +7,7 @@ Modules
 -------
 * [canadensys-harvester-lib](https://github.com/Canadensys/canadensys-harvester/tree/master/canadensys-harvester-lib)
 * [canadensys-harvester-ui](https://github.com/Canadensys/canadensys-harvester/tree/master/canadensys-harvester-ui)
+* [canadensys-harvester-node](https://github.com/Canadensys/canadensys-harvester/tree/master/canadensys-harvester-node)
 
 Code Status
 -----------
