@@ -12,6 +12,7 @@
 	<modules>
 		<module>canadensys-harvester-lib</module>
 		<module>canadensys-harvester-ui</module>
+    <module>canadensys-harvester-node</module>
 	</modules>
 
 	<properties>
