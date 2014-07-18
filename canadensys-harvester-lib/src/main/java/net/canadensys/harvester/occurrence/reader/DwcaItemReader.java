@@ -2,7 +2,10 @@ package net.canadensys.harvester.occurrence.reader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -78,6 +81,15 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 		
 		//make sure those headers can be imported correctly
 		validateDwcaHeaders();
+		
+		List<String> usedDwcTerms = new ArrayList<String>();
+		usedDwcTerms.addAll(Arrays.asList(headers));
+		if(defaultValues != null){
+			usedDwcTerms.addAll(defaultValues.keySet());
+		}
+		
+		//set the used dwc terms used by this archive
+		sharedParameters.put(SharedParameterEnum.DWCA_USED_TERMS, usedDwcTerms);
 	}
 	
 	@Override
