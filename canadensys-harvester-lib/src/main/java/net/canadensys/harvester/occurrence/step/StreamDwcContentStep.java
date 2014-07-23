@@ -1,6 +1,8 @@
 package net.canadensys.harvester.occurrence.step;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
@@ -12,7 +14,6 @@ import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.message.ProcessOccurrenceMessage;
-import net.canadensys.harvester.occurrence.message.SaveRawOccurrenceMessage;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 public class StreamDwcContentStep implements ProcessingStepIF{
 	
 	private static final Logger LOGGER = Logger.getLogger(StreamDwcContentStep.class);
-	private static final int DEFAULT_FLUSH_INTERVAL = 100;
+	private static final int DEFAULT_FLUSH_INTERVAL = 250;
+	
+	//Fields from OccurrenceRawModel that are not DarwinCore fields but should be included in messages.
+	private static List<String> NON_DWC_FIELD_USED = new ArrayList<String>();
+	static{
+		NON_DWC_FIELD_USED.add("auto_id");
+		NON_DWC_FIELD_USED.add("dwcaid");
+		NON_DWC_FIELD_USED.add("sourcefileid");
+	}
 	
 	@Autowired
 	@Qualifier("dwcItemReader")
@@ -47,6 +56,9 @@ public class StreamDwcContentStep implements ProcessingStepIF{
 	//Flush interval, number of OccurrenceRawModel until we flush it (into a JMS message)
 	private int flushInterval = DEFAULT_FLUSH_INTERVAL;
 	
+	private List<String> usedFields;
+	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void preStep(Map<SharedParameterEnum,Object> sharedParameters) throws IllegalStateException {
 		if(writer == null){
@@ -59,7 +71,16 @@ public class StreamDwcContentStep implements ProcessingStepIF{
 			throw new IllegalStateException("No reader defined");
 		}
 		this.sharedParameters = sharedParameters;
+		
+		//the reader should fill DWCA_USED_TERMS
 		reader.openReader(sharedParameters);
+		if(sharedParameters.get(SharedParameterEnum.DWCA_USED_TERMS) == null){
+			throw new IllegalStateException("sharedParameters doesn't contained DwcA used terms");
+		}
+		//copy the list because we want to add elements to it
+		usedFields = new ArrayList<String>((List<String>)sharedParameters.get(SharedParameterEnum.DWCA_USED_TERMS));
+		usedFields.addAll(NON_DWC_FIELD_USED);
+		
 		writer.openWriter();
 		lineProcessor.init();
 	}
@@ -74,8 +95,7 @@ public class StreamDwcContentStep implements ProcessingStepIF{
 	@Override
 	public void doStep() {
 		try{
-			SaveRawOccurrenceMessage rom = new SaveRawOccurrenceMessage();
-			ProcessOccurrenceMessage com = new ProcessOccurrenceMessage();
+			ProcessOccurrenceMessage occMsg = new ProcessOccurrenceMessage(usedFields);
 			
 			long t= System.currentTimeMillis();
 			OccurrenceRawModel currRawModel = reader.read();
@@ -83,31 +103,25 @@ public class StreamDwcContentStep implements ProcessingStepIF{
 				currRawModel = lineProcessor.process(currRawModel, sharedParameters);
 	
 				//should be done by ChunkSplitter
-				rom.addRawModel(currRawModel);
-				rom.setWhen(Calendar.getInstance().getTime().toString());
-				com.addRawModel(currRawModel);
-				com.setWhen(Calendar.getInstance().getTime().toString());
+				occMsg.addRawModel(currRawModel);
+				occMsg.setWhen(Calendar.getInstance().getTime().toString());
 				
 				currRawModel = reader.read();
 				numberOfRecords++;
 				
 				if(numberOfRecords % flushInterval == 0){
-					writer.write(rom);
-					writer.write(com);
-					rom = new SaveRawOccurrenceMessage();
-					rom.setWhen(Calendar.getInstance().getTime().toString());
-					com = new ProcessOccurrenceMessage();
-					com.setWhen(Calendar.getInstance().getTime().toString());
+					writer.write(occMsg);
+					
+					occMsg = new ProcessOccurrenceMessage(usedFields);
+					occMsg.setWhen(Calendar.getInstance().getTime().toString());
 				}
 			}
 			//flush remaining content
-			if(rom.getRawModelList().size() > 0){
-				writer.write(rom);
-				writer.write(com);
+			if(occMsg.getBulkRawModel().getData().size() > 0){
+				writer.write(occMsg);
 			}
 			
 			System.out.println("Streaming the file took :" + (System.currentTimeMillis()-t) + " ms");
-			
 			sharedParameters.put(SharedParameterEnum.NUMBER_OF_RECORDS,numberOfRecords);
 		}
 		catch(WriterException e){
@@ -141,8 +155,4 @@ public class StreamDwcContentStep implements ProcessingStepIF{
 		return "Streaming DwcA content";
 	}
 	
-//	@Override
-//	public void accept(JobActionVisitor visitor) {
-//		visitor.visit(this);
-//	}
 }

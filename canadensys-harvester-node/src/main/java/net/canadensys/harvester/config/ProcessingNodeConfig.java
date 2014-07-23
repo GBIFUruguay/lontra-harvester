@@ -31,7 +31,6 @@ import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceContactProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
-import net.canadensys.harvester.occurrence.step.InsertRawOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.InsertResourceContactStep;
 import net.canadensys.harvester.occurrence.step.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
@@ -66,6 +65,9 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 public class ProcessingNodeConfig {
 	
 	private static String propertiesFileLocation = "config/harvester-config.properties";
+	
+	@Value( "${harvester.library.version:?}" )
+	private String currentVersion;
 
 	@Value("${database.url}")
 	private String dbUrl;
@@ -198,11 +200,6 @@ public class ProcessingNodeConfig {
 		return null;
 	}
 
-	@Bean(name = "insertRawOccurrenceStep")
-	public ProcessingStepIF insertRawOccurrenceStep() {
-		return new InsertRawOccurrenceStep();
-	}
-
 	@Bean(name = "insertResourceContactStep")
 	public ProcessingStepIF insertResourceContactStep() {
 		return new InsertResourceContactStep();
@@ -217,6 +214,11 @@ public class ProcessingNodeConfig {
 	@Bean(name = "jmsConsumer")
 	public JMSConsumer jmsConsumer() {
 		return new JMSConsumer(jmsBrokerUrl);
+	}
+	
+	@Bean(destroyMethod="close")
+	public JMSControlConsumer controlMessageReceiver(){
+		return new JMSControlConsumer(jmsBrokerUrl);
 	}
 
 	/**
@@ -327,5 +329,10 @@ public class ProcessingNodeConfig {
 	@Bean(name = "updateResourceContactStep")
 	public ProcessingStepIF updateResourceContactStep() {
 		return null;
+	}
+
+	@Bean(name="currentVersion")
+	public String getCurrentVersion() {
+		return currentVersion;
 	}
 }

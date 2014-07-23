@@ -14,6 +14,7 @@ import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.message.control.NodeErrorControlMessage;
+import net.canadensys.harvester.model.BulkDataObject;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.message.ProcessOccurrenceMessage;
 
@@ -22,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
- * Step taking a ProcessOccurrenceMessage from JMS message, process a Occurrence Raw object list, writing the result.
+ * Step taking a ProcessOccurrenceMessage from JMS message, process a Occurrence Raw object list, writing the result as well as the origin data (OccurrenceRaw).
  * NOT thread safe
  * @author canadensys
  *
@@ -39,11 +40,15 @@ public class ProcessInsertOccurrenceStep implements ProcessingStepIF,JMSConsumer
 	private ItemWriterIF<OccurrenceModel> writer;
 	
 	@Autowired
+	@Qualifier("rawOccurrenceWriter")
+	private ItemWriterIF<OccurrenceRawModel> rawWriter;
+	
+	@Autowired
 	private JMSControlProducer errorReporter;
 	
 	@Override
 	public void preStep(Map<SharedParameterEnum,Object> sharedParameters) throws IllegalStateException {
-		if(writer == null){
+		if(writer == null || rawWriter == null){
 			throw new IllegalStateException("No writer defined");
 		}
 		if(processor == null){
@@ -53,12 +58,14 @@ public class ProcessInsertOccurrenceStep implements ProcessingStepIF,JMSConsumer
 			throw new IllegalStateException("No errorReporter defined");
 		}
 		writer.openWriter();
+		rawWriter.openWriter();
 		errorReporter.open();
 	}
 
 	@Override
 	public void postStep() {
 		writer.closeWriter();
+		rawWriter.closeWriter();
 		errorReporter.close();
 	}
 	
@@ -75,13 +82,19 @@ public class ProcessInsertOccurrenceStep implements ProcessingStepIF,JMSConsumer
 
 	@Override
 	public boolean handleMessage(ProcessingMessageIF message) {
-		List<OccurrenceRawModel> occRawList = ((ProcessOccurrenceMessage)message).getRawModelList();
-		List<OccurrenceModel> occList = new ArrayList<OccurrenceModel>();
-		
-		for(OccurrenceRawModel currRawModel : occRawList){
-			occList.add(processor.process(currRawModel, null));
+		BulkDataObject<OccurrenceRawModel> bulkDataObject = ((ProcessOccurrenceMessage)message).getBulkRawModel();
+		int numberOfData = bulkDataObject.getData().size();
+				
+		List<OccurrenceModel> occList = new ArrayList<OccurrenceModel>(numberOfData);
+		List<OccurrenceRawModel> occRawList = new ArrayList<OccurrenceRawModel>(numberOfData);
+		OccurrenceRawModel extractedRawModel = null;
+		for(int idx=0;idx<numberOfData;idx++){
+			extractedRawModel = bulkDataObject.retrieveObject(idx, new OccurrenceRawModel());
+			occRawList.add(extractedRawModel);
+			occList.add(processor.process(extractedRawModel, null));
 		}
 		try {
+			rawWriter.write(occRawList);
 			writer.write(occList);
 		} catch (WriterException e) {
 			errorReporter.publish(new NodeErrorControlMessage(e));

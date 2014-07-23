@@ -58,6 +58,9 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 		return mapper.mapElement(properties);
 	}
 
+	/**
+	 * Responsible to set DWCA_USED_TERMS
+	 */
 	@Override
 	public void openReader(Map<SharedParameterEnum,Object> sharedParameters){
 		dwcaFilePath = (String)sharedParameters.get(SharedParameterEnum.DWCA_PATH);

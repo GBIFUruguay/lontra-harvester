@@ -8,6 +8,8 @@ import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.config.harvester.HarvesterConfigIF;
+import net.canadensys.harvester.jms.control.JMSControlProducer;
+import net.canadensys.harvester.message.control.VersionControlMessage;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
@@ -39,6 +41,10 @@ public class StepController implements StepControllerIF {
 
 	@Autowired
 	private HarvesterConfigIF harvesterConfig;
+	
+	@Qualifier("currentVersion")
+	@Autowired
+	private String currentVersion;
 
 	@Autowired
 	@Qualifier(value="publicSessionFactory")
@@ -61,6 +67,9 @@ public class StepController implements StepControllerIF {
 
 	@Autowired
 	private HarvesterViewModel harvesterViewModel;
+	
+	@Autowired
+	private JMSControlProducer controlMessageProducer;
 
 	@Autowired
 	private NodeStatusController nodeStatusController;
@@ -76,6 +85,11 @@ public class StepController implements StepControllerIF {
 
 	@Override
 	public void importDwcA(Integer resourceId){
+		controlMessageProducer.open();
+		//send the app verion
+		controlMessageProducer.publish(new VersionControlMessage(currentVersion));
+		controlMessageProducer.close();
+		
 		//enable node status controller
 		nodeStatusController.start();
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceId);

@@ -1,10 +1,10 @@
 package net.canadensys.harvester.occurrence.message;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.harvester.message.ProcessingMessageIF;
+import net.canadensys.harvester.model.BulkDataObject;
 
 /**
  * Message asking to process raw occurrence data.
@@ -14,10 +14,12 @@ import net.canadensys.harvester.message.ProcessingMessageIF;
 public class ProcessOccurrenceMessage implements ProcessingMessageIF{
 	private String when;
 	
-	private List<OccurrenceRawModel> rawModelList;
+	private BulkDataObject<OccurrenceRawModel> bulkRawModel;
+		
+	public ProcessOccurrenceMessage(){}
 	
-	public ProcessOccurrenceMessage(){
-		rawModelList = new ArrayList<OccurrenceRawModel>();
+	public ProcessOccurrenceMessage(List<String> occurrenceRawModelProperties){
+		bulkRawModel = new BulkDataObject<OccurrenceRawModel>(occurrenceRawModelProperties);
 	}
 	
 	public String getWhen() {
@@ -26,14 +28,16 @@ public class ProcessOccurrenceMessage implements ProcessingMessageIF{
 	public void setWhen(String when) {
 		this.when = when;
 	}
-	
-	public List<OccurrenceRawModel> getRawModelList() {
-		return rawModelList;
-	}
-	public void setRawModelList(List<OccurrenceRawModel> rawModelList) {
-		this.rawModelList = rawModelList;
-	}
+
 	public void addRawModel(OccurrenceRawModel rawModel) {
-		rawModelList.add(rawModel);
+		bulkRawModel.addObject(rawModel);
+	}
+
+	public BulkDataObject<OccurrenceRawModel> getBulkRawModel() {
+		return bulkRawModel;
+	}
+
+	public void setBulkRawModel(BulkDataObject<OccurrenceRawModel> bulkRawModel) {
+		this.bulkRawModel = bulkRawModel;
 	}
 }

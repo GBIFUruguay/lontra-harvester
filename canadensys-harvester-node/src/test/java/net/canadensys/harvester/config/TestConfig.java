@@ -29,7 +29,6 @@ import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceContactProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaEmlReader;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
-import net.canadensys.harvester.occurrence.step.InsertRawOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.InsertResourceContactStep;
 import net.canadensys.harvester.occurrence.step.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.StreamDwcContentStep;
@@ -185,11 +184,6 @@ public class TestConfig {
 	@Bean
 	public ImportLogDAO importLogDAO() {
 		return null;
-	}
-
-	@Bean(name = "insertRawOccurrenceStep")
-	public ProcessingStepIF insertRawOccurrenceStep() {
-		return new InsertRawOccurrenceStep();
 	}
 
 	// ---TASK wiring---

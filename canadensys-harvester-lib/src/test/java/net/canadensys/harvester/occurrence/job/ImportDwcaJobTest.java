@@ -74,11 +74,7 @@ public class ImportDwcaJobTest implements PropertyChangeListener{
 	
 	@Autowired
 	private ImportDwcaJob importDwcaJob;
-	
-	@Autowired
-	@Qualifier("insertRawOccurrenceStep")
-	private JMSConsumerMessageHandlerIF insertRawOccurrenceStep;
-	
+		
 	@Autowired
 	@Qualifier("processInsertOccurrenceStep")
 	private JMSConsumerMessageHandlerIF processInsertOccurrenceStep;
@@ -94,12 +90,10 @@ public class ImportDwcaJobTest implements PropertyChangeListener{
 	@Before
 	public void setup(){
 		reader = new JMSConsumer(TEST_BROKER_URL);
-		reader.registerHandler(insertRawOccurrenceStep);
 		reader.registerHandler(processInsertOccurrenceStep);
 		reader.registerHandler(insertResourceContactStep);
 		
 		try {
-			((ProcessingStepIF)insertRawOccurrenceStep).preStep(null);
 			((ProcessingStepIF)processInsertOccurrenceStep).preStep(null);
 			((ProcessingStepIF)insertResourceContactStep).preStep(null);
 		} catch (IllegalStateException e) {
@@ -116,7 +110,6 @@ public class ImportDwcaJobTest implements PropertyChangeListener{
 	public void destroy(){
 		reader.close();
 		controlConsumer.close();
-		((ProcessingStepIF)insertRawOccurrenceStep).postStep();
 		((ProcessingStepIF)processInsertOccurrenceStep).postStep();
 		((ProcessingStepIF)insertResourceContactStep).postStep();
 	}

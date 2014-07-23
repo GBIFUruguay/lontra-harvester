@@ -5,12 +5,12 @@ import java.util.List;
 
 import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.config.ProcessingNodeConfig;
+import net.canadensys.harvester.controller.VersionController;
 import net.canadensys.harvester.jms.JMSConsumer;
 import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -29,12 +29,11 @@ public class ProcessingNodeMain {
 	private JMSConsumer jmsConsumer;
 	
 	@Autowired
-	private ProcessingNodeConfig nodeConfig;
-
+	private VersionController versionController;
+	
 	@Autowired
-	@Qualifier("insertRawOccurrenceStep")
-	private ProcessingStepIF insertRawOccurrenceStep;
-
+	private ProcessingNodeConfig nodeConfig;
+	
 	@Autowired
 	private ProcessingStepIF processInsertOccurrenceStep;
 
@@ -69,10 +68,6 @@ public class ProcessingNodeMain {
 
 		// Declare step handlers (maybe this should be configurable?)
 		registeredMsgHandlers
-				.add((JMSConsumerMessageHandlerIF) insertRawOccurrenceStep);
-		registeredSteps.add(insertRawOccurrenceStep);
-
-		registeredMsgHandlers
 				.add((JMSConsumerMessageHandlerIF) processInsertOccurrenceStep);
 		registeredSteps.add(processInsertOccurrenceStep);
 
@@ -100,6 +95,7 @@ public class ProcessingNodeMain {
 		// TODO register postStep calls
 
 		jmsConsumer.open();
+		versionController.start();
 	}
 
 	/**

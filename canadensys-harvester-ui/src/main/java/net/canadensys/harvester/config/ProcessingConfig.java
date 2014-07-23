@@ -37,7 +37,6 @@ import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceContactProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaEmlReader;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
-import net.canadensys.harvester.occurrence.step.InsertRawOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.InsertResourceContactStep;
 import net.canadensys.harvester.occurrence.step.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.StreamDwcContentStep;
@@ -78,8 +77,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @Configuration
 @ComponentScan(basePackages ="net.canadensys.harvester",
-excludeFilters = { @Filter(type = FilterType.CUSTOM, value = { ExcludeTestClassesTypeFilter.class }),
-		@Filter(type = FilterType.ASSIGNABLE_TYPE, value = { ProcessingNodeConfig.class })})
+excludeFilters = { @Filter(type = FilterType.CUSTOM, value = { ExcludeTestClassesTypeFilter.class })})
 @EnableTransactionManagement
 public class ProcessingConfig {
 
@@ -89,6 +87,9 @@ public class ProcessingConfig {
 		ppc.setLocation( new FileSystemResource("config/harvester-config.properties") );
 		return ppc;
 	}
+	
+	@Value( "${harvester.library.version:?}" )
+	private String currentVersion;
 
 	@Value("${database.url}")
 	private String dbUrl;
@@ -209,11 +210,6 @@ public class ProcessingConfig {
 	@Bean(name="streamDwcContentStep")
 	public ProcessingStepIF StreamDwcContentStep(){
 		return new StreamDwcContentStep();
-	}
-
-	@Bean(name="insertRawOccurrenceStep")
-	public ProcessingStepIF insertRawOccurrenceStep(){
-		return new InsertRawOccurrenceStep();
 	}
 
 	@Bean(name="processInsertOccurrenceStep")
@@ -360,13 +356,19 @@ public class ProcessingConfig {
 	public JMSConsumer jmsConsumer(){
 		return null;
 	}
-	@Bean
-	public JMSControlProducer errorReporter(){
-		return null;
+	
+	@Bean(destroyMethod="close")
+	public JMSControlProducer controlMessageProducer(){
+		return new JMSControlProducer(jmsBrokerUrl);
 	}
 
 	@Bean(destroyMethod="close")
 	public JMSControlConsumer errorReceiver(){
 		return new JMSControlConsumer(jmsBrokerUrl);
+	}
+
+	@Bean(name="currentVersion")
+	public String currentVersion() {
+		return currentVersion;
 	}
 }

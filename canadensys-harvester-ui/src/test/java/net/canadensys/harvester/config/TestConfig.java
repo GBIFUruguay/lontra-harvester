@@ -31,7 +31,6 @@ import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceContactProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaEmlReader;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
-import net.canadensys.harvester.occurrence.step.InsertRawOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.InsertResourceContactStep;
 import net.canadensys.harvester.occurrence.step.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.StreamDwcContentStep;
@@ -61,7 +60,7 @@ import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@Configuration
+@Configuration("processingConfig")
 @ComponentScan(basePackages = "net.canadensys.harvester.occurrence")
 @EnableTransactionManagement
 public class TestConfig {
@@ -217,11 +216,6 @@ public class TestConfig {
 
 	// ---TASK wiring---
 
-	@Bean(name = "insertRawOccurrenceStep")
-	public ProcessingStepIF insertRawOccurrenceStep() {
-		return new InsertRawOccurrenceStep();
-	}
-
 	@Bean(name = "insertResourceContactStep")
 	public ProcessingStepIF insertResourceContactStep() {
 		return new InsertResourceContactStep();
@@ -340,5 +334,10 @@ public class TestConfig {
 	@Bean
 	public JMSControlProducer errorReporter(){
 		return null;
+	}
+	
+	@Bean(name="currentVersion")
+	public String currentVersion() {
+		return "test-version";
 	}
 }

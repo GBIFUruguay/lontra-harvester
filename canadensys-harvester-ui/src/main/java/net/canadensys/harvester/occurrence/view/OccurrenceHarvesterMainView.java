@@ -396,13 +396,20 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		final SwingWorker<Void, Object> swingWorker = new SwingWorker<Void, Object>() {
 			@Override
 			public Void doInBackground() {
-				if(resourceToImport != null){
-					stepController.importDwcA(resourceToImport.getResource_id());
-				}
-				else{
-					if(StringUtils.isNotBlank(pathToImportTxt.getText())){
-						stepController.importDwcAFromLocalFile(pathToImportTxt.getText());
+				try{
+					if(resourceToImport != null){
+						stepController.importDwcA(resourceToImport.getResource_id());
 					}
+					else{
+						if(StringUtils.isNotBlank(pathToImportTxt.getText())){
+							stepController.importDwcAFromLocalFile(pathToImportTxt.getText());
+						}
+					}
+				}
+				catch (Exception e) {
+					// should not get there but just in case
+					e.printStackTrace();
+					
 				}
 				// async call, propertyChange(...) will be called once done
 				return null;
