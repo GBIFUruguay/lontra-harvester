@@ -14,8 +14,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.canadensys.dataportal.occurrence.model.ResourceModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
-import net.canadensys.harvester.occurrence.model.ResourceModel;
 
 /**
  * Dialog used to select a resource.
@@ -53,7 +53,7 @@ public class ResourceChooser extends JDialog {
 		Vector<String> knowResourceVector = new Vector<String>();
 		for (ResourceModel resourceModel : knownResource) {
 			knowResourceVector.add(resourceModel.getName() + "-"
-					+ resourceModel.getSource_file_id());
+					+ resourceModel.getSourcefileid());
 		}
 		// add an empty record
 		knowResourceVector.add(0, null);
@@ -155,7 +155,7 @@ public class ResourceChooser extends JDialog {
 		knownCbx.addItem(null);
 		for (ResourceModel resourceModel : knownResource) {
 			knownCbx.addItem(resourceModel.getName() + "-"
-					+ resourceModel.getSource_file_id());
+					+ resourceModel.getSourcefileid());
 		}
 	}
 

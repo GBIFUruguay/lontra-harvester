@@ -5,11 +5,14 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
+import net.canadensys.dataportal.occurrence.dao.ResourceDAO;
 import net.canadensys.dataportal.occurrence.dao.impl.HibernateImportLogDAO;
+import net.canadensys.dataportal.occurrence.dao.impl.HibernateResourceDAO;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
+import net.canadensys.dataportal.occurrence.model.ResourceModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
@@ -23,13 +26,10 @@ import net.canadensys.harvester.jms.JMSWriter;
 import net.canadensys.harvester.jms.control.JMSControlConsumer;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
-import net.canadensys.harvester.occurrence.dao.ResourceDAO;
 import net.canadensys.harvester.occurrence.dao.impl.HibernateIPTFeedDAO;
-import net.canadensys.harvester.occurrence.dao.impl.HibernateResourceDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
-import net.canadensys.harvester.occurrence.model.ResourceModel;
 import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
 import net.canadensys.harvester.occurrence.notification.impl.DefaultResourceStatusNotifier;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
@@ -154,7 +154,7 @@ public class ProcessingConfig {
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[]{
 				OccurrenceRawModel.class,OccurrenceModel.class,
-				ImportLogModel.class, ResourceModel.class, });
+				ImportLogModel.class, ResourceModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);

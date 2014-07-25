@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
+import net.canadensys.dataportal.occurrence.dao.ResourceDAO;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
+import net.canadensys.dataportal.occurrence.model.ResourceModel;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
-import net.canadensys.harvester.occurrence.dao.ResourceDAO;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
-import net.canadensys.harvester.occurrence.model.ResourceModel;
 import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
 
 import org.apache.commons.lang3.StringUtils;
@@ -77,7 +77,7 @@ public class DefaultResourceStatusNotifier implements ResourceStatusNotifierIF {
 					resourceKey = StringUtils.substringBeforeLast(currFeed.getUri(),"/");
 					
 					if(currResource.getKey().equals(resourceKey)){
-						lastImportLog = importLogDAO.loadLastFrom(currResource.getSource_file_id());
+						lastImportLog = importLogDAO.loadLastFrom(currResource.getSourcefileid());
 						if(lastImportLog != null){
 							//compare date
 							if(currFeed.getPublishedDate().after(lastImportLog.getEvent_end_date_time())){
@@ -92,7 +92,7 @@ public class DefaultResourceStatusNotifier implements ResourceStatusNotifierIF {
 				}
 			}
 			else{
-				LOGGER.warn("Resource ["+currResource.getSource_file_id()+"] doesn't have a key. Can't validate status.");
+				LOGGER.warn("Resource ["+currResource.getSourcefileid()+"] doesn't have a key. Can't validate status.");
 			}
 		}
 		return resourceToHarvest;

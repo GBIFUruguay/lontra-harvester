@@ -3,9 +3,9 @@ package net.canadensys.harvester.occurrence.controller;
 import java.util.List;
 
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
+import net.canadensys.dataportal.occurrence.model.ResourceModel;
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
-import net.canadensys.harvester.occurrence.model.ResourceModel;
 
 public interface StepControllerIF {
 

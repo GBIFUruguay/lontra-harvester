@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import net.canadensys.harvester.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.ResourceModel;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -133,15 +133,15 @@ public class ResourceView extends AbstractDialog {
 		this.resourceModel = resourceModel;
 
 		if (resourceModel != null) {
-			if (resourceModel.getResource_id() != null) {
-				idValueLbl.setText(resourceModel.getResource_id().toString());
+			if (resourceModel.getId() != null) {
+				idValueLbl.setText(resourceModel.getId().toString());
 				idLbl.setVisible(true);
 				idValueLbl.setVisible(true);
 			}
 
 			nameTxt.setText(resourceModel.getName());
 			urlTxt.setText(resourceModel.getArchive_url());
-			sfIdTxt.setText(resourceModel.getSource_file_id());
+			sfIdTxt.setText(resourceModel.getSourcefileid());
 			// TODO test that URL is reachable
 
 			// modal dialog, blocking function until dispose() is called
@@ -161,7 +161,7 @@ public class ResourceView extends AbstractDialog {
 				&& StringUtils.isNotBlank(sourceFileIdValue)) {
 			resourceModel.setName(nameValue);
 			resourceModel.setArchive_url(urlValue);
-			resourceModel.setSource_file_id(sourceFileIdValue);
+			resourceModel.setSourcefileid(sourceFileIdValue);
 			exitValue = JOptionPane.OK_OPTION;
 			dispose();
 		} else {

@@ -4,7 +4,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import net.canadensys.dataportal.occurrence.dao.ResourceDAO;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
+import net.canadensys.dataportal.occurrence.model.ResourceModel;
 import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.config.harvester.HarvesterConfigIF;
@@ -17,12 +19,10 @@ import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
-import net.canadensys.harvester.occurrence.model.ResourceModel;
 import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +52,9 @@ public class StepController implements StepControllerIF {
 	
 	@Autowired
 	private IPTFeedDAO iptFeedDAO;
+	
+	@Autowired
+	private ResourceDAO resourceDAO;
 	
 	@Autowired
 	private ResourceStatusNotifierIF notifier;
@@ -127,24 +130,15 @@ public class StepController implements StepControllerIF {
 
 
 	@Override
-	@SuppressWarnings("unchecked")
 	@Transactional("publicTransactionManager")
 	public List<ResourceModel> getResourceModelList(){
-		Criteria searchCriteria = sessionFactory.getCurrentSession().createCriteria(ResourceModel.class);
-		return searchCriteria.list();
+		return resourceDAO.loadResources();
 	}
 
 	@Transactional("publicTransactionManager")
 	@Override
 	public boolean updateResourceModel(ResourceModel resourceModel) {
-		try{
-			sessionFactory.getCurrentSession().saveOrUpdate(resourceModel);
-		}
-		catch(HibernateException hEx){
-			hEx.printStackTrace();
-			return false;
-		}
-		return true;
+		return resourceDAO.save(resourceModel);
 	}
 
 	/**

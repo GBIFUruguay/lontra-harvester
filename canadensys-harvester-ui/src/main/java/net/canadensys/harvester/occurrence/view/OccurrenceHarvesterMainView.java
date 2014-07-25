@@ -31,11 +31,11 @@ import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
+import net.canadensys.dataportal.occurrence.model.ResourceModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
-import net.canadensys.harvester.occurrence.model.ResourceModel;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 
 import org.apache.commons.io.FilenameUtils;
@@ -332,7 +332,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 	private void checkForOutdatedResources(){
 		List<ResourceModel> outdatedResources = stepController.getResourceToHarvest();
 		for(ResourceModel currResourceModel : outdatedResources){
-			appendToTextArea(Messages.getString("view.info.harvestRequired") + currResourceModel.getSource_file_id()+"\n");
+			appendToTextArea(Messages.getString("view.info.harvestRequired") + currResourceModel.getSourcefileid()+"\n");
 		}
 	}
 
@@ -398,7 +398,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 			public Void doInBackground() {
 				try{
 					if(resourceToImport != null){
-						stepController.importDwcA(resourceToImport.getResource_id());
+						stepController.importDwcA(resourceToImport.getId());
 					}
 					else{
 						if(StringUtils.isNotBlank(pathToImportTxt.getText())){
@@ -491,7 +491,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		switch (newStatus) {
 			case DONE: 
 				loadingLbl.setIcon(null);
-				bufferSchemaTxt.setText(resourceToImport.getSource_file_id());
+				bufferSchemaTxt.setText(resourceToImport.getSourcefileid());
 				moveToPublicBtn.setEnabled(true);
 				updateStatusLabel(Messages.getString("view.info.status.importDone"));
 				break;

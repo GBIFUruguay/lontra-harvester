@@ -21,11 +21,9 @@ import net.canadensys.harvester.jms.JMSWriter;
 import net.canadensys.harvester.jms.control.JMSControlConsumer;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
-import net.canadensys.harvester.occurrence.dao.ResourceDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
-import net.canadensys.harvester.occurrence.model.ResourceModel;
 import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
@@ -274,7 +272,7 @@ public class ProcessingNodeConfig {
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -298,12 +296,7 @@ public class ProcessingNodeConfig {
 	@Bean(name = "resourceContactProcessor")
 	public ItemProcessorIF<Eml, ResourceContactModel> resourceContactProcessor() {
 		return new ResourceContactProcessor();
-	}
-
-	@Bean
-	public ResourceDAO resourceDAO() {
-		return null;
-	}
+	} 
 
 	@Bean
 	public ResourceStatusNotifierIF resourceStatusNotifierIF() {

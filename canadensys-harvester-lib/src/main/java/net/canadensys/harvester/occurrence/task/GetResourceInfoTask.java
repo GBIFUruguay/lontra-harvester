@@ -2,10 +2,10 @@ package net.canadensys.harvester.occurrence.task;
 
 import java.util.Map;
 
+import net.canadensys.dataportal.occurrence.model.ResourceModel;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.exception.TaskExecutionException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
-import net.canadensys.harvester.occurrence.model.ResourceModel;
 
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
@@ -40,7 +40,7 @@ public class GetResourceInfoTask implements ItemTaskIF{
 			throw new TaskExecutionException("ResourceID " + resourceId + " not found");
 		}
 		sharedParameters.put(SharedParameterEnum.DWCA_URL, resourceModel.getArchive_url());
-		sharedParameters.put(SharedParameterEnum.DATASET_SHORTNAME, resourceModel.getSource_file_id());
+		sharedParameters.put(SharedParameterEnum.DATASET_SHORTNAME, resourceModel.getSourcefileid());
 	}
 	
 	public void setSessionFactory(SessionFactory sessionFactory) {
