@@ -31,5 +31,5 @@ Dependencies
 * [Apache CLI](http://commons.apache.org/proper/commons-cli/)
 
 ### Projects
-* [Canadensys Data Access 2.2.1](https://github.com/Canadensys/canadensys-data-access)
-* [narwhal-processor 1.4](https://github.com/Canadensys/narwhal-processor)
+* [Canadensys Data Access 2.9.0](https://github.com/Canadensys/canadensys-data-access)
+* [narwhal-processor 1.5.1](https://github.com/Canadensys/narwhal-processor)

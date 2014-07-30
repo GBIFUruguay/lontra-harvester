@@ -6,6 +6,7 @@ import javax.sql.DataSource;
 
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.dao.ResourceDAO;
+import net.canadensys.dataportal.occurrence.dao.impl.HibernateResourceDAO;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
@@ -145,10 +146,8 @@ public class TestConfig {
 		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
 				// those 2 scripts are loaded from canadensys-data-access
 				.addScript("/script/occurrence/create_occurrence_tables.sql")
-				.addScript(
-						"/script/occurrence/create_occurrence_tables_buffer_schema.sql")
-
-						.addScript("classpath:create_management_tables.sql").build();
+				.addScript("/script/occurrence/create_occurrence_tables_buffer_schema.sql")
+				.build();
 	}
 
 	@Bean
@@ -182,7 +181,7 @@ public class TestConfig {
 	}
 	@Bean
 	public ResourceDAO resourceDAO(){
-		return null;
+		return new HibernateResourceDAO();
 	}
 	@Bean
 	public ImportLogDAO importLogDAO(){
@@ -273,7 +272,7 @@ public class TestConfig {
 		return htmgr;
 	}
 
-	@Bean(name = "publicSessionFactory")
+	@Bean(name = {"publicSessionFactory","sessionFactory"})
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());

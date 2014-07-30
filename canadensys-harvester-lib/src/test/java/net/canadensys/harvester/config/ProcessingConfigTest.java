@@ -92,8 +92,6 @@ public class ProcessingConfigTest {
 			//those 2 scripts are loaded from canadensys-data-access
 		    .addScript("/script/occurrence/create_occurrence_tables.sql")
 		    .addScript("/script/occurrence/create_occurrence_tables_buffer_schema.sql")
-		    
-		    .addScript("classpath:create_management_tables.sql")
 		    .build();
     }
     

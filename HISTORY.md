@@ -1,6 +1,6 @@
 Version History
 ===============
-Version 0.3 2014-??-??
+Version 0.3 2014-07-20
 * Added new module (component) for the node
 * Changes made to the resource_management table:
 ```
