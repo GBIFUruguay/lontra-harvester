@@ -89,6 +89,7 @@ public class ProcessingConfigTest {
     public DataSource dataSource() {
     	return new EmbeddedDatabaseBuilder()
 			.setType(EmbeddedDatabaseType.H2)
+			.addScript("classpath:h2/h2setup.sql")
 			//those 2 scripts are loaded from canadensys-data-access
 		    .addScript("/script/occurrence/create_occurrence_tables.sql")
 		    .addScript("/script/occurrence/create_occurrence_tables_buffer_schema.sql")

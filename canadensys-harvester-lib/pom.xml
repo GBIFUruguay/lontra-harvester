@@ -38,17 +38,6 @@
 		</repository>
 	</repositories>
 
-	<build>
-		<testResources>
-			<testResource>
-				<directory>${project.basedir}/src/test/resources</directory>
-			</testResource>
-			<testResource>
-				<directory>${project.basedir}/../script</directory>
-			</testResource>
-		</testResources>
-	</build>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>

@@ -143,7 +143,10 @@ public class TestConfig {
 
 	@Bean(name = "datasource")
 	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
+		return new EmbeddedDatabaseBuilder()
+				.setType(EmbeddedDatabaseType.H2)
+				// comes from lib project
+				.addScript("classpath:h2/h2setup.sql")
 				// those 2 scripts are loaded from canadensys-data-access
 				.addScript("/script/occurrence/create_occurrence_tables.sql")
 				.addScript("/script/occurrence/create_occurrence_tables_buffer_schema.sql")
