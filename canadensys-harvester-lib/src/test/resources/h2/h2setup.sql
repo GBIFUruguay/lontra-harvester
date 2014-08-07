@@ -1,2 +1,2 @@
 -- support hstore as type
-CREATE DOMAIN hstore AS OTHER;
+CREATE DOMAIN IF NOT EXISTS hstore AS OTHER;

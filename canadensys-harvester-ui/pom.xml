@@ -11,7 +11,7 @@
 	<groupId>net.canadensys</groupId>
 	<artifactId>canadensys-harvester-ui</artifactId>
 	<packaging>jar</packaging>
-	<version>0.3</version>
+	<version>0.4-SNAPSHOT</version>
 	<name>canadensys-harvester-ui</name>
 
 	<properties>
@@ -95,7 +95,7 @@
 		<dependency>
 			<groupId>net.canadensys</groupId>
 			<artifactId>canadensys-harvester-lib</artifactId>
-			<version>0.3</version>
+			<version>0.4-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>

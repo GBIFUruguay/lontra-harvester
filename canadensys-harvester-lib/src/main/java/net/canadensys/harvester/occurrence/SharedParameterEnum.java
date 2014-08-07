@@ -15,4 +15,5 @@ public enum SharedParameterEnum {
 	NUMBER_OF_RECORDS,
 	RESOURCE_ID,
 	CALLBACK,
+	JOB_STATUS_MODEL
 }

@@ -1,0 +1,16 @@
+database.driver=org.postgresql.Driver
+database.username=postgres
+database.password=MYPASSWORD
+database.url=jdbc:postgresql://127.0.0.1/dataportal
+
+hibernate.buffer_schema=buffer
+hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+hibernate.show_sql=false
+hibernate.jdbc.fetch_size=1000
+
+jms.broker_url=tcp://127.0.0.1:61616
+
+# SQL query to get 100 ID from the occurrence_raw table
+occurrence.idGenerationSQL=SELECT nextval('buffer.occurrence_raw_auto_id_seq') FROM generate_series(1,100)
+
+ipt.rss=http://data.canadensys.net/ipt/rss.do

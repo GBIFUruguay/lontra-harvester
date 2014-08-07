@@ -9,10 +9,10 @@
 	</parent>
 	
 	<groupId>net.canadensys</groupId>
-	<artifactId>canadensys-harvester-node</artifactId>
+	<artifactId>canadensys-harvester-cli</artifactId>
 	<packaging>jar</packaging>
 	<version>0.4-SNAPSHOT</version>
-	<name>canadensys-harvester-node</name>
+	<name>canadensys-harvester-cli</name>
 
 	<properties>
 		<appClass>net.canadensys.Main</appClass>

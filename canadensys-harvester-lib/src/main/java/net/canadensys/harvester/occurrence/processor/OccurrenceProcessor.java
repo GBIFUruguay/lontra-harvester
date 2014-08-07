@@ -146,7 +146,7 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 		processedModel.setHasmedia(!StringUtils.isBlank(rawModel.getAssociatedmedia()));
 		
 		processedModel.setTypestatus(rawModel.getTypestatus());
-		processedModel.setHastypestaus(StringUtils.isNotBlank(rawModel.getTypestatus()));
+		processedModel.setHastypestatus(StringUtils.isNotBlank(rawModel.getTypestatus()));
 		
 		processScientificName(rawModel, processedModel);
 		

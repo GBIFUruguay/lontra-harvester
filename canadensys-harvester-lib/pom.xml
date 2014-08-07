@@ -11,15 +11,17 @@
 	<groupId>net.canadensys</groupId>
 	<artifactId>canadensys-harvester-lib</artifactId>
 	<packaging>jar</packaging>
-	<version>0.3</version>
+	<version>0.4-SNAPSHOT</version>
 	<name>canadensys-harvester-lib</name>
 
 	<properties>
 		<jackson.version>2.2.3</jackson.version>
 		<spring.version>4.0.2.RELEASE</spring.version>
 		<hibernate.version>4.3.2.Final</hibernate.version>
+		<jsch.version>0.1.51</jsch.version>
+		<activemq.version>5.10.0</activemq.version>
 		<narwhal.version>1.5.1</narwhal.version>
-		<data-access.version>2.9.0</data-access.version>
+		<data-access.version>2.10.1-SNAPSHOT</data-access.version>
 			
 		<gbif-api.version>0.10</gbif-api.version>
 		<dwca-reader.version>1.14</dwca-reader.version>
@@ -56,8 +58,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-core</artifactId>
-			<version>5.7.0</version>
+			<artifactId>activemq-client</artifactId>
+			<version>${activemq.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>${jsch.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.canadensys</groupId>
@@ -150,6 +157,12 @@
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
 			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-broker</artifactId>
+			<version>${activemq.version}</version>
 		</dependency>
 
 		<!-- Spring test -->
