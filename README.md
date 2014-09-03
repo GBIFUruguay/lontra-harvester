@@ -1,4 +1,4 @@
-canadensys-harvester
+harvester
 ====================
 
 Lightweight harvester used to feed the [canadensys-explorer](https://github.com/Canadensys/canadensys-explorer) from occurrence Darwin Core Archive. The ingested data are processed using the [narwhal-processor](https://github.com/Canadensys/narwhal-processor).
@@ -9,13 +9,9 @@ Modules
 * [canadensys-harvester-ui](https://github.com/Canadensys/canadensys-harvester/tree/master/canadensys-harvester-ui)
 * [canadensys-harvester-node](https://github.com/Canadensys/canadensys-harvester/tree/master/canadensys-harvester-node)
 
-Code Status
------------
-[![Build Status](https://travis-ci.org/Canadensys/canadensys-harvester.png)](https://travis-ci.org/Canadensys/canadensys-harvester)
-
 Documentation
 -------------
-Visit our [wiki](https://github.com/Canadensys/canadensys-harvester/wiki)
+Visit our [wiki](https://github.com/WingLongitude/harvester/wiki)
 
 
 Dependencies
@@ -31,5 +27,5 @@ Dependencies
 * [Apache CLI](http://commons.apache.org/proper/commons-cli/)
 
 ### Projects
-* [Canadensys Data Access 2.9.0](https://github.com/Canadensys/canadensys-data-access)
+* [Liger  Data Access 2.9.0](https://github.com/WingLongitude/liger-data-access)
 * [narwhal-processor 1.5.1](https://github.com/Canadensys/narwhal-processor)
