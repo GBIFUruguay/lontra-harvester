@@ -36,7 +36,7 @@ public class ComputeGISDataTask implements ItemTaskIF{
 	@Transactional("publicTransactionManager")
 	@Override
 	public void execute(Map<SharedParameterEnum,Object> sharedParameters){
-		String datasetShortname = (String)sharedParameters.get(SharedParameterEnum.DATASET_SHORTNAME);
+		String datasetShortname = (String)sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
 		Session session = sessionFactory.getCurrentSession();
 		
 		if(datasetShortname == null){

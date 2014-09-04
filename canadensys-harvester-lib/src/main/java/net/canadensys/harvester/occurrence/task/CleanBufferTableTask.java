@@ -37,7 +37,7 @@ public class CleanBufferTableTask implements ItemTaskIF {
 	@Transactional("bufferTransactionManager")
 	@Override
 	public void execute(Map<SharedParameterEnum,Object> sharedParameters){
-		datasetShortname = (String)sharedParameters.get(SharedParameterEnum.DATASET_SHORTNAME);
+		datasetShortname = (String)sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
 		
 		Session session = sessionFactory.getCurrentSession();
 		

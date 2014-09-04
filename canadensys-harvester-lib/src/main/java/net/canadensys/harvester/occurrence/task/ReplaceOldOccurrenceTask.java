@@ -36,7 +36,7 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF{
 	public void execute(Map<SharedParameterEnum,Object> sharedParameters){
 		Session session = sessionFactory.getCurrentSession();
 		
-		String datasetShortname = (String)sharedParameters.get(SharedParameterEnum.DATASET_SHORTNAME);
+		String datasetShortname = (String)sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
 
 		if(datasetShortname == null){
 			LOGGER.fatal("Misconfigured task : datasetShortname cannot be null");

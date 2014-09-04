@@ -44,7 +44,7 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
 		final Integer numberOfRecords = (Integer)sharedParameters.get(SharedParameterEnum.NUMBER_OF_RECORDS);
-		final String datasetShortname = (String)sharedParameters.get(SharedParameterEnum.DATASET_SHORTNAME);
+		final String datasetShortname = (String)sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
 		if(numberOfRecords == null || datasetShortname == null){
 			LOGGER.fatal("Misconfigured task : needs numberOfRecords, datasetShortname");
 			throw new TaskExecutionException("Misconfigured task");

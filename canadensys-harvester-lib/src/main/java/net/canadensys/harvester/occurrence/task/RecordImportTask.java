@@ -38,7 +38,7 @@ public class RecordImportTask implements ItemTaskIF{
 	public void execute(Map<SharedParameterEnum,Object> sharedParameters){
 		Session session = sessionFactory.getCurrentSession();
 		ImportLogModel importLogModel = new ImportLogModel();
-		String datasetShortname = (String)sharedParameters.get(SharedParameterEnum.DATASET_SHORTNAME);
+		String datasetShortname = (String)sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
 		Integer numberOfRecords = (Integer)sharedParameters.get(SharedParameterEnum.NUMBER_OF_RECORDS);
 		
 		if(datasetShortname == null || numberOfRecords == null){
