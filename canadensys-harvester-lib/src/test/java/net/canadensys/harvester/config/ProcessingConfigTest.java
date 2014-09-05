@@ -5,6 +5,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
+import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
@@ -20,6 +21,7 @@ import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.mock.MockComputeGISDataTask;
+import net.canadensys.harvester.occurrence.processor.DwcaExtensionLineProcessor;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceContactProcessor;
@@ -80,6 +82,9 @@ public class ProcessingConfigTest {
     
     @Value( "${occurrence.idGenerationSQL}" )
     private String idGenerationSQL;
+    
+    @Value( "${occurrence.extension.idGenerationSQL}" )
+    private String extIdGenerationSQL;
     
     @Value("${jms.broker_url}")
     private String jmsBrokerUrl;
@@ -221,6 +226,12 @@ public class ProcessingConfigTest {
 	public ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> lineProcessor(){
 		DwcaLineProcessor dwcaLineProcessor = new DwcaLineProcessor();
 		dwcaLineProcessor.setIdGenerationSQL(idGenerationSQL);
+		return dwcaLineProcessor;
+	}
+	@Bean(name="extLineProcessor")
+	public ItemProcessorIF<OccurrenceExtensionModel, OccurrenceExtensionModel> extLineProcessor(){
+		DwcaExtensionLineProcessor dwcaLineProcessor = new DwcaExtensionLineProcessor();
+		dwcaLineProcessor.setIdGenerationSQL(extIdGenerationSQL);
 		return dwcaLineProcessor;
 	}
 	
