@@ -48,7 +48,7 @@ public class DwcaExtensionReader<T> extends AbstractDwcaReaderSupport implements
 		Archive dwcArchive;
 		try {
 			dwcArchive = ArchiveFactory.openArchive(dwcaFile);
-			prepareReader(dwcArchive.getExtension(dwcaExtensionType,false));
+			prepareReader(dwcArchive.getExtension(dwcaExtensionType, true));
 		} catch (UnsupportedArchiveException e) {
 			LOGGER.fatal("Can't open DwcaExtensionReader", e);
 		} catch (IOException e) {
