@@ -13,8 +13,6 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.gbif.dwc.terms.ConceptTerm;
-import org.gbif.dwc.terms.TermFactory;
 import org.gbif.dwc.text.Archive;
 import org.gbif.dwc.text.ArchiveFactory;
 import org.gbif.dwc.text.UnsupportedArchiveException;
@@ -46,14 +44,11 @@ public class DwcaExtensionReader<T> extends AbstractDwcaReaderSupport implements
 			throw new IllegalStateException("sharedParameters missing: DWCA_PATH and DWCA_EXTENSION_TYPE are required.");
 		}
 		
-		TermFactory tf = new TermFactory();
-		ConceptTerm extType = tf.findTerm(dwcaExtensionType);
-		
 		File dwcaFile = new File(dwcaFilePath);
 		Archive dwcArchive;
 		try {
 			dwcArchive = ArchiveFactory.openArchive(dwcaFile);
-			prepareReader(dwcArchive.getExtension(extType));
+			prepareReader(dwcArchive.getExtension(dwcaExtensionType,false));
 		} catch (UnsupportedArchiveException e) {
 			LOGGER.fatal("Can't open DwcaExtensionReader", e);
 		} catch (IOException e) {
