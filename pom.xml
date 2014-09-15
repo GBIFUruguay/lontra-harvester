@@ -3,11 +3,11 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>net.canadensys</groupId>
-	<artifactId>canadensys-harvester-parent</artifactId>
+	<groupId>winglongitude</groupId>
+	<artifactId>winglongitude-lontra</artifactId>
 	<packaging>pom</packaging>
 	<version>1.0</version>
-	<name>Canadensys Harvester Parent Project</name>
+	<name>WingLongitude Lontra Harvester</name>
 
 	<modules>
 		<module>canadensys-harvester-lib</module>
