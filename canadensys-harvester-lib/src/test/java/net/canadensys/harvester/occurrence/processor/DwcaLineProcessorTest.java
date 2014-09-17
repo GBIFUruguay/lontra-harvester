@@ -35,7 +35,7 @@ public class DwcaLineProcessorTest {
 		OccurrenceRawModel rawModel = new OccurrenceRawModel();
 		OccurrenceRawModel occModel = ProcessorRunner.runItemProcessor(lineProcessor, rawModel, sharedParameters);
 		
-		assertEquals("MySourceFileId", occModel.getSourcefileid());
+		assertEquals("MySourceFileId", occModel.getSourceFileId());
 		assertTrue(occModel.getAuto_id() > 0);
 	}
 }

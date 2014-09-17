@@ -21,78 +21,89 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Default implementation of ResourceStatusNotifierIF that is using the IPT RSS feed to get the last publication date.
- * The date is then used to compare with the last import event of each resources.
+ * Default implementation of ResourceStatusNotifierIF that is using the IPT RSS
+ * feed to get the last publication date. The date is then used to compare with
+ * the last import event of each resources.
+ * 
  * @author cgendreau
- *
+ * 
  */
 public class DefaultResourceStatusNotifier implements ResourceStatusNotifierIF {
-	private static final Logger LOGGER = Logger.getLogger(DefaultResourceStatusNotifier.class);
+	private static final Logger LOGGER = Logger
+			.getLogger(DefaultResourceStatusNotifier.class);
 	private static final String IPT_RSS_SUFFIX = "/rss.do";
-	
-	//very simple cache to avoid parsing the RSS feed on each resources
-	private Map<String,List<IPTFeedModel>> feedModelByIPTAddress;
-	
+
+	// very simple cache to avoid parsing the RSS feed on each resources
+	private Map<String, List<IPTFeedModel>> feedModelByIPTAddress;
+
 	@Autowired
 	private ResourceDAO resourceDAO;
-	
+
 	@Autowired
 	private IPTFeedDAO iptFeedDAO;
-	
+
 	@Autowired
 	private ImportLogDAO importLogDAO;
-	
-	public DefaultResourceStatusNotifier(){
+
+	public DefaultResourceStatusNotifier() {
 		feedModelByIPTAddress = new HashMap<String, List<IPTFeedModel>>();
 	}
-	
+
 	@Override
 	@Transactional("publicTransactionManager")
 	public List<ResourceModel> getHarvestRequiredList() {
-		
+
 		List<ResourceModel> resourceToHarvest = new ArrayList<ResourceModel>();
 		List<ResourceModel> resourcesList = resourceDAO.loadResources();
-		
+
 		String iptAddress;
 		URL iptURL;
-		for(ResourceModel currResource : resourcesList){
-			currResource.getKey();
-			//we deduce the RSS feed address from the archive URL. This may become a problem in the future.
-			iptAddress = StringUtils.substringBeforeLast(currResource.getArchive_url(), "/") + IPT_RSS_SUFFIX;
-			if(!feedModelByIPTAddress.containsKey(iptAddress)){
+		for (ResourceModel currResource : resourcesList) {
+			currResource.getResource_uuid();
+			// we deduce the RSS feed address from the archive URL. This may
+			// become a problem in the future.
+			iptAddress = StringUtils.substringBeforeLast(
+					currResource.getArchive_url(), "/")
+					+ IPT_RSS_SUFFIX;
+			if (!feedModelByIPTAddress.containsKey(iptAddress)) {
 				try {
 					iptURL = new URL(iptAddress);
-					feedModelByIPTAddress.put(iptAddress, iptFeedDAO.getIPTFeed(iptURL));
+					feedModelByIPTAddress.put(iptAddress,
+							iptFeedDAO.getIPTFeed(iptURL));
 				} catch (MalformedURLException e) {
 					LOGGER.error("Can't build IPT RSS feed address", e);
 				}
 			}
-			
-			List<IPTFeedModel> feedEntryList = feedModelByIPTAddress.get(iptAddress);
+
+			List<IPTFeedModel> feedEntryList = feedModelByIPTAddress
+					.get(iptAddress);
 			String resourceKey;
 			ImportLogModel lastImportLog;
-			if(StringUtils.isNotBlank(currResource.getKey())){
-				for(IPTFeedModel currFeed : feedEntryList){
-					//strip the version from the URI 
-					resourceKey = StringUtils.substringBeforeLast(currFeed.getUri(),"/");
-					
-					if(currResource.getKey().equals(resourceKey)){
-						lastImportLog = importLogDAO.loadLastFrom(currResource.getSourcefileid());
-						if(lastImportLog != null){
-							//compare date
-							if(currFeed.getPublishedDate().after(lastImportLog.getEvent_end_date_time())){
+			if (StringUtils.isNotBlank(currResource.getResource_uuid())) {
+				for (IPTFeedModel currFeed : feedEntryList) {
+					// strip the version from the URI
+					resourceKey = StringUtils.substringBeforeLast(
+							currFeed.getUri(), "/");
+
+					if (currResource.getResource_uuid().equals(resourceKey)) {
+						lastImportLog = importLogDAO.loadLastFrom(currResource
+								.getSourcefileid());
+						if (lastImportLog != null) {
+							// compare date
+							if (currFeed.getPublishedDate().after(
+									lastImportLog.getEvent_end_date_time())) {
 								resourceToHarvest.add(currResource);
 							}
 						}
-						//if it was never imported, add it to the list
-						else{
+						// if it was never imported, add it to the list
+						else {
 							resourceToHarvest.add(currResource);
 						}
 					}
 				}
-			}
-			else{
-				LOGGER.warn("Resource ["+currResource.getSourcefileid()+"] doesn't have a key. Can't validate status.");
+			} else {
+				LOGGER.warn("Resource [" + currResource.getSourcefileid()
+						+ "] doesn't have a key. Can't validate status.");
 			}
 		}
 		return resourceToHarvest;

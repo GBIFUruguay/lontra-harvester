@@ -21,7 +21,7 @@
 		<jsch.version>0.1.51</jsch.version>
 		<activemq.version>5.10.0</activemq.version>
 		<narwhal.version>1.5.1</narwhal.version>
-		<data-access.version>2.10.1-SNAPSHOT</data-access.version>
+		<data-access.version>2.11.0-SNAPSHOT</data-access.version>
 			
 		<gbif-api.version>0.10</gbif-api.version>
 		<dwca-reader.version>1.14</dwca-reader.version>
@@ -67,8 +67,8 @@
 			<version>${jsch.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.canadensys</groupId>
-			<artifactId>canadensys-data-access</artifactId>
+			<groupId>wingLongitude</groupId>
+			<artifactId>liger-data-access</artifactId>
 			<version>${data-access.version}</version>
 		</dependency>
 		<dependency>
@@ -171,6 +171,11 @@
 			<artifactId>spring-test</artifactId>
 			<version>${spring.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>2.10.4</version>
 		</dependency>
 	</dependencies>
 </project>

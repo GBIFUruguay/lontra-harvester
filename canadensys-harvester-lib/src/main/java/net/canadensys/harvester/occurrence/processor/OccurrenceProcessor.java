@@ -161,7 +161,7 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 		processedModel.setHabitat(rawModel.getHabitat());
 		
 		processedModel.setDwcaid(rawModel.getDwcaid());
-		processedModel.setSourcefileid(rawModel.getSourcefileid());
+		processedModel.setSourcefileid(rawModel.getSourceFileId());
 		return processedModel;
 	}
 	

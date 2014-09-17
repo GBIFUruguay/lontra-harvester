@@ -12,6 +12,7 @@ import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
+import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
 import net.canadensys.dataportal.occurrence.model.ResourceModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
@@ -29,7 +30,7 @@ import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
-import net.canadensys.harvester.occurrence.processor.ResourceContactProcessor;
+import net.canadensys.harvester.occurrence.processor.ResourceInformationProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaEmlReader;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessEmlContentStep;
@@ -44,7 +45,7 @@ import net.canadensys.harvester.occurrence.task.RecordImportTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
-import net.canadensys.harvester.occurrence.writer.ResourceContactHibernateWriter;
+import net.canadensys.harvester.occurrence.writer.ResourceInformationHibernateWriter;
 
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
@@ -254,9 +255,9 @@ public class CLIProcessingConfig {
 		return new OccurrenceProcessor();
 	}
 
-	@Bean(name="resourceContactProcessor")
-	public ItemProcessorIF<Eml, ResourceContactModel> resourceContactProcessor(){
-		return new ResourceContactProcessor();
+	@Bean(name="resourceInformationProcessor")
+	public ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor(){
+		return new ResourceInformationProcessor();
 	}
 
 	//---READER wiring---
@@ -281,9 +282,9 @@ public class CLIProcessingConfig {
 		return new OccurrenceHibernateWriter();
 	}
 
-	@Bean(name="resourceContactWriter")
-	public ItemWriterIF<ResourceContactModel> resourceContactHibernateWriter(){
-		return new ResourceContactHibernateWriter();
+	@Bean(name="resourceInformationWriter")
+	public ItemWriterIF<ResourceInformationModel> resourceInformationHibernateWriter(){
+		return new ResourceInformationHibernateWriter();
 	}
 	
 	//---DAO---

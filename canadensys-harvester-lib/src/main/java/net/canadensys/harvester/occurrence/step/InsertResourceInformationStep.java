@@ -2,7 +2,7 @@ package net.canadensys.harvester.occurrence.step;
 
 import java.util.Map;
 
-import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
+import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.exception.WriterException;
@@ -11,22 +11,22 @@ import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.message.control.NodeErrorControlMessage;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
-import net.canadensys.harvester.occurrence.message.SaveResourceContactMessage;
+import net.canadensys.harvester.occurrence.message.SaveResourceInformationMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
- * Step taking a SaveResourceContactMessage from JMS and writing a ResourceContactModel to a writer
+ * Step taking a SaveResourceInformationMessage from JMS and writing a ResourceInformationModel to a writer
  * NOT thread safe
  * @author canadensys
  *
  */
-public class InsertResourceContactStep implements ProcessingStepIF,JMSConsumerMessageHandlerIF{
+public class InsertResourceInformationStep implements ProcessingStepIF,JMSConsumerMessageHandlerIF{
 
 	@Autowired
-	@Qualifier("resourceContactWriter")
-	private ItemWriterIF<ResourceContactModel> writer;
+	@Qualifier("resourceInformationWriter")
+	private ItemWriterIF<ResourceInformationModel> writer;
 	
 	@Autowired
 	private JMSControlProducer errorReporter;
@@ -51,20 +51,20 @@ public class InsertResourceContactStep implements ProcessingStepIF,JMSConsumerMe
 	
 	@Override
 	public Class<?> getMessageClass() {
-		return SaveResourceContactMessage.class;
+		return SaveResourceInformationMessage.class;
 	}
 
 	@Override
 	public boolean handleMessage(ProcessingMessageIF message) {
 		long t = System.currentTimeMillis();
-		ResourceContactModel rcm = ((SaveResourceContactMessage)message).getResourceContactModel();
+		ResourceInformationModel rcm = ((SaveResourceInformationMessage)message).getResourceInformationModel();
 		try {
 			writer.write(rcm);
 		} catch (WriterException e) {
 			errorReporter.publish(new NodeErrorControlMessage(e));
 			return false;
 		}
-		System.out.println("Reading msg + Writing Resource Contact :" + ( System.currentTimeMillis()-t) + "ms");
+		System.out.println("Reading msg + Writing Resource Information :" + ( System.currentTimeMillis()-t) + "ms");
 		return true;
 	}
 	
@@ -74,12 +74,12 @@ public class InsertResourceContactStep implements ProcessingStepIF,JMSConsumerMe
 	@Override
 	public void doStep() {};
 	
-	public void setWriter(ItemWriterIF<ResourceContactModel> writer){
+	public void setWriter(ItemWriterIF<ResourceInformationModel> writer){
 		this.writer = writer;
 	}
 	
 	@Override
 	public String getTitle() {
-		return "Inserting resource contact data";
+		return "Inserting resource Information data";
 	}
 }

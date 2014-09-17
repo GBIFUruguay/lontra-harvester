@@ -49,7 +49,6 @@ public class MoveToPublicSchemaTest {
     			"DELETE FROM resource_contact",
     			"INSERT INTO buffer.occurrence (auto_id,dwcaid,stateprovince,sourcefileid) VALUES (1,'1','Delaware','qmor-specimens')",
     			"INSERT INTO buffer.occurrence (auto_id,dwcaid,stateprovince,sourcefileid) VALUES (2,'3','Florida','qmor-specimens')",
-    			"INSERT INTO buffer.resource_contact (name,sourcefileid) VALUES ('Louise Cloutier','qmor-specimens')"
     	});
     }
 	
@@ -69,9 +68,6 @@ public class MoveToPublicSchemaTest {
 		
 		int count = jdbcTemplate.queryForObject("SELECT count(*) FROM occurrence",BigDecimal.class).intValue();
 		assertTrue(new Integer(2).equals(count));
-		
-		String resource_contact = jdbcTemplate.queryForObject("SELECT name FROM resource_contact where sourcefileid='qmor-specimens'", String.class);
-		assertTrue("Louise Cloutier".equals(resource_contact));
 		
 		//validate import log
 		Integer record_quantity_log = jdbcTemplate.queryForObject("SELECT record_quantity FROM import_log where sourcefileid = 'qmor-specimens'", Integer.class);

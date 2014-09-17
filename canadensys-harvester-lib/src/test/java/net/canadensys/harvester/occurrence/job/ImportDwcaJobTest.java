@@ -80,8 +80,8 @@ public class ImportDwcaJobTest implements PropertyChangeListener{
 	private JMSConsumerMessageHandlerIF processInsertOccurrenceStep;
 	
 	@Autowired
-	@Qualifier("insertResourceContactStep")
-	private JMSConsumerMessageHandlerIF insertResourceContactStep;
+	@Qualifier("insertResourceInformationStep")
+	private JMSConsumerMessageHandlerIF insertResourceInformationStep;
 	
 	/**
 	 * Setup Test Consumer
@@ -91,11 +91,11 @@ public class ImportDwcaJobTest implements PropertyChangeListener{
 	public void setup(){
 		reader = new JMSConsumer(TEST_BROKER_URL);
 		reader.registerHandler(processInsertOccurrenceStep);
-		reader.registerHandler(insertResourceContactStep);
+		reader.registerHandler(insertResourceInformationStep);
 		
 		try {
 			((ProcessingStepIF)processInsertOccurrenceStep).preStep(null);
-			((ProcessingStepIF)insertResourceContactStep).preStep(null);
+			((ProcessingStepIF)insertResourceInformationStep).preStep(null);
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
 		}
@@ -111,7 +111,7 @@ public class ImportDwcaJobTest implements PropertyChangeListener{
 		reader.close();
 		controlConsumer.close();
 		((ProcessingStepIF)processInsertOccurrenceStep).postStep();
-		((ProcessingStepIF)insertResourceContactStep).postStep();
+		((ProcessingStepIF)insertResourceInformationStep).postStep();
 	}
 	
 	@Test
@@ -143,9 +143,6 @@ public class ImportDwcaJobTest implements PropertyChangeListener{
 					
 					String source = jdbcTemplate.queryForObject("SELECT sourcefileid FROM buffer.occurrence where dwcaid='1'", String.class);
 					assertTrue("qmor-specimens".equals(source));
-					
-					String resource_contact = jdbcTemplate.queryForObject("SELECT name FROM buffer.resource_contact where sourcefileid='qmor-specimens'", String.class);
-					assertTrue("Louise Cloutier".equals(resource_contact));
 
 					assertTrue(new Integer(EXPECTED_NUMBER_OF_RESULTS).equals(count));
 				}

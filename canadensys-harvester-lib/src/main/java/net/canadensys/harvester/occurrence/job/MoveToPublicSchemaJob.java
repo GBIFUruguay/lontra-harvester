@@ -13,33 +13,35 @@ import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * This job allows to move all the data from the buffer schema to the public one. We are creating the GIS related data inside that step.
+ * This job allows to move all the data from the buffer schema to the public
+ * one. We are creating the GIS related data inside that step.
+ * 
  * @author canadensys
- *
+ * 
  */
-public class MoveToPublicSchemaJob extends AbstractProcessingJob{
+public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 
 	@Autowired
 	private ItemTaskIF computeGISDataTask;
-	
+
 	@Autowired
 	private ItemTaskIF replaceOldOccurrenceTask;
-	
+
 	@Autowired
 	private ItemTaskIF recordImportTask;
-	
-	public MoveToPublicSchemaJob(){
+
+	public MoveToPublicSchemaJob() {
 		sharedParameters = new HashMap<SharedParameterEnum, Object>();
 	}
-	
-	public void doJob(JobStatusModel jobStatusModel){
+
+	public void doJob(JobStatusModel jobStatusModel) {
 		jobStatusModel.setCurrentStatusExplanation("Compute GIS data");
 		computeGISDataTask.execute(sharedParameters);
-		
+
 		jobStatusModel.setCurrentStatusExplanation("Replace previous records");
 		replaceOldOccurrenceTask.execute(sharedParameters);
-		
-		//log the import event
+
+		// log the import event
 		jobStatusModel.setCurrentStatusExplanation("Log import event");
 		recordImportTask.execute(sharedParameters);
 	}
@@ -56,9 +58,9 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob{
 	public void setRecordImportTask(RecordImportTask recordImportTask) {
 		this.recordImportTask = recordImportTask;
 	}
-	
+
 	@Override
-	public void cancel(){
+	public void cancel() {
 	}
 
 }

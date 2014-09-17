@@ -33,7 +33,7 @@ import net.canadensys.harvester.occurrence.step.InsertResourceContactStep;
 import net.canadensys.harvester.occurrence.step.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
-import net.canadensys.harvester.occurrence.writer.ResourceContactHibernateWriter;
+import net.canadensys.harvester.occurrence.writer.ResourceInformationHibernateWriter;
 
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
@@ -290,7 +290,7 @@ public class ProcessingNodeConfig {
 
 	@Bean(name = "resourceContactWriter")
 	public ItemWriterIF<ResourceContactModel> resourceContactHibernateWriter() {
-		return new ResourceContactHibernateWriter();
+		return new ResourceInformationHibernateWriter();
 	}
 
 	@Bean(name = "resourceContactProcessor")

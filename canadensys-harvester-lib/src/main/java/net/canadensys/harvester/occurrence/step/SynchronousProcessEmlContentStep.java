@@ -2,7 +2,7 @@ package net.canadensys.harvester.occurrence.step;
 
 import java.util.Map;
 
-import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
+import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemWriterIF;
@@ -27,12 +27,12 @@ public class SynchronousProcessEmlContentStep implements ProcessingStepIF{
 	private ItemReaderIF<Eml> reader;
 	
 	@Autowired
-	@Qualifier("resourceContactWriter")
-	private ItemWriterIF<ResourceContactModel> writer;
+	@Qualifier("resourceInformationWriter")
+	private ItemWriterIF<ResourceInformationModel> writer;
 	
 	@Autowired
-	@Qualifier("resourceContactProcessor")
-	private ItemProcessorIF<Eml, ResourceContactModel> resourceContactProcessor;
+	@Qualifier("resourceInformationProcessor")
+	private ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor;
 	
 	private Map<SharedParameterEnum,Object> sharedParameters;
 	
@@ -41,7 +41,7 @@ public class SynchronousProcessEmlContentStep implements ProcessingStepIF{
 		if(writer == null){
 			throw new IllegalStateException("No writer defined");
 		}
-		if(resourceContactProcessor == null){
+		if(resourceInformationProcessor == null){
 			throw new IllegalStateException("No processor defined");
 		}
 		if(reader == null){
@@ -50,23 +50,23 @@ public class SynchronousProcessEmlContentStep implements ProcessingStepIF{
 		this.sharedParameters = sharedParameters;
 		reader.openReader(sharedParameters);
 		writer.openWriter();
-		resourceContactProcessor.init();
+		resourceInformationProcessor.init();
 	}
 
 	@Override
 	public void postStep() {
 		writer.closeWriter();
-		resourceContactProcessor.destroy();
+		resourceInformationProcessor.destroy();
 		reader.closeReader();
 	}
 
 	@Override
 	public void doStep() {		
 		Eml emlModel = reader.read();
-		ResourceContactModel resourceContactModel = resourceContactProcessor.process(emlModel, sharedParameters);
+		ResourceInformationModel resourceInformationModel = resourceInformationProcessor.process(emlModel, sharedParameters);
 		
 		try {
-			writer.write(resourceContactModel);
+			writer.write(resourceInformationModel);
 		} catch (WriterException e) {
 			e.printStackTrace();
 		}

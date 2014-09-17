@@ -8,6 +8,7 @@ import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
+import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
@@ -22,10 +23,10 @@ import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.mock.MockComputeGISDataTask;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
-import net.canadensys.harvester.occurrence.processor.ResourceContactProcessor;
+import net.canadensys.harvester.occurrence.processor.ResourceInformationProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaEmlReader;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
-import net.canadensys.harvester.occurrence.step.InsertResourceContactStep;
+import net.canadensys.harvester.occurrence.step.InsertResourceInformationStep;
 import net.canadensys.harvester.occurrence.step.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.StreamDwcContentStep;
 import net.canadensys.harvester.occurrence.step.StreamEmlContentStep;
@@ -37,8 +38,7 @@ import net.canadensys.harvester.occurrence.task.RecordImportTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
-import net.canadensys.harvester.occurrence.writer.ResourceContactHibernateWriter;
-import net.canadensys.harvester.writer.GenericHibernateWriter;
+import net.canadensys.harvester.occurrence.writer.ResourceInformationHibernateWriter;
 
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
@@ -100,7 +100,7 @@ public class ProcessingConfigTest {
     	LocalSessionFactoryBean sb = new LocalSessionFactoryBean(); 
     	sb.setDataSource(dataSource()); 
     	sb.setAnnotatedClasses(new Class[]{OccurrenceRawModel.class,
-    			OccurrenceModel.class,ImportLogModel.class,ResourceContactModel.class});
+    			OccurrenceModel.class,ImportLogModel.class,ResourceContactModel.class, ResourceInformationModel.class});
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -170,9 +170,9 @@ public class ProcessingConfigTest {
 		return new ProcessInsertOccurrenceStep();
 	}
 	
-	@Bean(name="insertResourceContactStep")
-	public ProcessingStepIF insertResourceContactStep(){
-		return new InsertResourceContactStep();
+	@Bean(name="insertResourceInformationStep")
+	public ProcessingStepIF insertResourceInformationStep(){
+		return new InsertResourceInformationStep();
 	}
 	
 	//---TASK wiring---
@@ -229,9 +229,9 @@ public class ProcessingConfigTest {
 		return new OccurrenceProcessor();
 	}
 	
-	@Bean(name="resourceContactProcessor")
-	public ItemProcessorIF<Eml, ResourceContactModel> resourceContactProcessor(){
-		return new ResourceContactProcessor();
+	@Bean(name="resourceInformationProcessor")
+	public ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor(){
+		return new ResourceInformationProcessor();
 	}
 	
 	//---READER wiring---
@@ -256,14 +256,9 @@ public class ProcessingConfigTest {
 		return new OccurrenceHibernateWriter();
 	}
 	
-	@Bean(name="resourceContactWriter")
-	public ItemWriterIF<ResourceContactModel> resourceContactHibernateWriter(){
-		return new ResourceContactHibernateWriter();
-	}
-	
-	@Bean(name="genericResourceContactWriter")
-	public ItemWriterIF<ResourceContactModel> genericResourceContactWriter(){
-		return new GenericHibernateWriter<ResourceContactModel>();
+	@Bean(name="resourceInformationWriter")
+	public ItemWriterIF<ResourceInformationModel> resourceInformationHibernateWriter(){
+		return new ResourceInformationHibernateWriter();
 	}
 	
 	/**

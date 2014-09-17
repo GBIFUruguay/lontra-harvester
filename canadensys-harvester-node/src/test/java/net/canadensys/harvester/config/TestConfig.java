@@ -41,7 +41,7 @@ import net.canadensys.harvester.occurrence.task.RecordImportTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
-import net.canadensys.harvester.occurrence.writer.ResourceContactHibernateWriter;
+import net.canadensys.harvester.occurrence.writer.ResourceInformationHibernateWriter;
 
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
@@ -283,7 +283,7 @@ public class TestConfig {
 
 	@Bean(name = "resourceContactWriter")
 	public ItemWriterIF<ResourceContactModel> resourceContactHibernateWriter() {
-		return new ResourceContactHibernateWriter();
+		return new ResourceInformationHibernateWriter();
 	}
 
 	@Bean(name = "resourceContactProcessor")

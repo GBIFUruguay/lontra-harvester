@@ -71,7 +71,7 @@ public class DwcaLineProcessor implements ItemProcessorIF<OccurrenceRawModel, Oc
 			LOGGER.fatal("Misconfigured processor : needs  sourceFileId");
 			throw new TaskExecutionException("Misconfigured processor");
 		}
-		occModel.setSourcefileid(datasetShortname);
+		occModel.setSourceFileId(datasetShortname);
 
 		if(nextId == null || idPoll.isEmpty()){
 			try{

@@ -3,7 +3,7 @@ package net.canadensys.harvester.occurrence.step;
 import java.util.Calendar;
 import java.util.Map;
 
-import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
+import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemWriterIF;
@@ -11,7 +11,7 @@ import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
-import net.canadensys.harvester.occurrence.message.SaveResourceContactMessage;
+import net.canadensys.harvester.occurrence.message.SaveResourceInformationMessage;
 
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +34,8 @@ public class StreamEmlContentStep implements ProcessingStepIF{
 	private ItemWriterIF<ProcessingMessageIF> writer;
 	
 	@Autowired
-	@Qualifier("resourceContactProcessor")
-	private ItemProcessorIF<Eml, ResourceContactModel> resourceContactProcessor;
+	@Qualifier("resourceInformationProcessor")
+	private ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor;
 	
 	private Map<SharedParameterEnum,Object> sharedParameters;
 	
@@ -44,7 +44,7 @@ public class StreamEmlContentStep implements ProcessingStepIF{
 		if(writer == null){
 			throw new IllegalStateException("No writer defined");
 		}
-		if(resourceContactProcessor == null){
+		if(resourceInformationProcessor == null){
 			throw new IllegalStateException("No processor defined");
 		}
 		if(reader == null){
@@ -53,26 +53,26 @@ public class StreamEmlContentStep implements ProcessingStepIF{
 		this.sharedParameters = sharedParameters;
 		reader.openReader(sharedParameters);
 		writer.openWriter();
-		resourceContactProcessor.init();
+		resourceInformationProcessor.init();
 	}
 
 	@Override
 	public void postStep() {
 		writer.closeWriter();
-		resourceContactProcessor.destroy();
+		resourceInformationProcessor.destroy();
 		reader.closeReader();
 	}
 
 	@Override
 	public void doStep() {
-		//For now, we only read and stream the resource contact
-		SaveResourceContactMessage srcm = new SaveResourceContactMessage();
+		//For now, we only read and stream the resource information
+		SaveResourceInformationMessage srcm = new SaveResourceInformationMessage();
 		srcm.setWhen(Calendar.getInstance().getTime().toString());
 		
 		Eml emlModel = reader.read();
-		ResourceContactModel resourceContactModel = resourceContactProcessor.process(emlModel, sharedParameters);
+		ResourceInformationModel resourceInformationModel = resourceInformationProcessor.process(emlModel, sharedParameters);
 		
-		srcm.setResourceContactModel(resourceContactModel);
+		srcm.setResourceInformationModel(resourceInformationModel);
 
 		try {
 			writer.write(srcm);
