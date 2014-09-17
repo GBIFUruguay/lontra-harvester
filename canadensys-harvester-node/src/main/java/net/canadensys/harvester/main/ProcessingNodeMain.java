@@ -39,6 +39,9 @@ public class ProcessingNodeMain {
 
 	@Autowired
 	private ProcessingStepIF insertResourceContactStep;
+	
+	@Autowired
+	private ProcessingStepIF asyncManageOccurrenceExtensionStep;
 
 	private final List<ProcessingStepIF> registeredSteps;
 	private final List<JMSConsumerMessageHandlerIF> registeredMsgHandlers;
@@ -67,13 +70,15 @@ public class ProcessingNodeMain {
 		System.out.println("Database location : " + nodeConfig.getDbUrl());
 
 		// Declare step handlers (maybe this should be configurable?)
-		registeredMsgHandlers
-				.add((JMSConsumerMessageHandlerIF) processInsertOccurrenceStep);
+		registeredMsgHandlers.add((JMSConsumerMessageHandlerIF) processInsertOccurrenceStep);
 		registeredSteps.add(processInsertOccurrenceStep);
 
-		registeredMsgHandlers
-				.add((JMSConsumerMessageHandlerIF) insertResourceContactStep);
+		registeredMsgHandlers.add((JMSConsumerMessageHandlerIF) insertResourceContactStep);
 		registeredSteps.add(insertResourceContactStep);
+		
+		registeredMsgHandlers.add((JMSConsumerMessageHandlerIF) asyncManageOccurrenceExtensionStep);
+		registeredSteps.add(asyncManageOccurrenceExtensionStep);
+		
 
 		if (additionalMessageHandler != null) {
 			registeredMsgHandlers.addAll(additionalMessageHandler);

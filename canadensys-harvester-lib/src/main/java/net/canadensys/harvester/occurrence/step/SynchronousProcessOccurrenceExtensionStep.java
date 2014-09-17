@@ -74,6 +74,7 @@ public class SynchronousProcessOccurrenceExtensionStep implements ProcessingStep
 		List<OccurrenceExtensionModel> occExtList = new ArrayList<OccurrenceExtensionModel>(DEFAULT_FLUSH_INTERVAL);
 		String currExtension = dwcaInfoReader.read();
 		while(currExtension != null){
+			//TODO if there is more than one extension maybe trigger on thread per extension?
 			//create a reader
 			ItemReaderIF<OccurrenceExtensionModel> extReader = (ItemReaderIF<OccurrenceExtensionModel>)appContext.getBean("dwcaOccurrenceExtensionReader");
 			
@@ -116,6 +117,6 @@ public class SynchronousProcessOccurrenceExtensionStep implements ProcessingStep
 	
 	@Override
 	public String getTitle() {
-		return null;
+		return "SynchronousProcessOccurrenceExtensionStep";
 	}
 }

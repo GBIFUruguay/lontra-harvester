@@ -1,4 +1,4 @@
-package net.canadensys.harvester.occurrence.step;
+package net.canadensys.harvester.occurrence.step.stream;
 
 import java.util.ArrayList;
 import java.util.Calendar;

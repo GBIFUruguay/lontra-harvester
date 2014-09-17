@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
+import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
@@ -16,10 +17,12 @@ import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.LongRunningTaskIF;
 import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.controller.VersionController;
 import net.canadensys.harvester.jms.JMSConsumer;
 import net.canadensys.harvester.jms.JMSWriter;
 import net.canadensys.harvester.jms.control.JMSControlConsumer;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
+import net.canadensys.harvester.main.ProcessingNodeMain;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
@@ -30,19 +33,18 @@ import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceContactProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
 import net.canadensys.harvester.occurrence.step.InsertResourceContactStep;
-import net.canadensys.harvester.occurrence.step.ProcessInsertOccurrenceStep;
+import net.canadensys.harvester.occurrence.step.async.AsyncManageOccurrenceExtensionStep;
+import net.canadensys.harvester.occurrence.step.async.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.ResourceContactHibernateWriter;
+import net.canadensys.harvester.writer.GenericHibernateWriter;
 
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
@@ -58,7 +60,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
  * 
  */
 @Configuration
-@ComponentScan(basePackages = "net.canadensys.harvester", excludeFilters = { @Filter(type = FilterType.CUSTOM, value = { ExcludeTestClassesTypeFilter.class }) })
+//@ComponentScan(basePackages = "net.canadensys.harvester", excludeFilters = { @Filter(type = FilterType.CUSTOM, value = { ExcludeTestClassesTypeFilter.class }) })
 @EnableTransactionManagement
 public class ProcessingNodeConfig {
 	
@@ -107,6 +109,11 @@ public class ProcessingNodeConfig {
 		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
 		sb.setHibernateProperties(hibernateProperties);
 		return sb;
+	}
+	
+	@Bean
+	public ProcessingNodeMain processingNodeMain(){
+		return new ProcessingNodeMain();
 	}
 
 	@Bean
@@ -250,15 +257,14 @@ public class ProcessingNodeConfig {
 		return new OccurrenceHibernateWriter();
 	}
 
-	// ---Unused TASK in processing node---
-	@Bean
-	public ItemTaskIF prepareDwcaTask() {
-		return null;
-	}
-
 	@Bean(name = "processInsertOccurrenceStep")
 	public ProcessingStepIF processInsertOccurrenceStep() {
 		return new ProcessInsertOccurrenceStep();
+	}
+	
+	@Bean
+	public ProcessingStepIF asyncManageOccurrenceExtensionStep() {
+		return new AsyncManageOccurrenceExtensionStep();
 	}
 
 	@Bean(name = "publicTransactionManager")
@@ -296,7 +302,12 @@ public class ProcessingNodeConfig {
 	@Bean(name = "resourceContactProcessor")
 	public ItemProcessorIF<Eml, ResourceContactModel> resourceContactProcessor() {
 		return new ResourceContactProcessor();
-	} 
+	}
+	
+	@Bean(name="occurrenceExtensionWriter")
+	public ItemWriterIF<OccurrenceExtensionModel> occurrenceExtensionWriter(){
+		return new GenericHibernateWriter<OccurrenceExtensionModel>();
+	}
 
 	@Bean
 	public ResourceStatusNotifierIF resourceStatusNotifierIF() {
@@ -322,6 +333,11 @@ public class ProcessingNodeConfig {
 	@Bean(name = "updateResourceContactStep")
 	public ProcessingStepIF updateResourceContactStep() {
 		return null;
+	}
+	
+	@Bean
+	public VersionController versionController(){
+		return new VersionController();
 	}
 
 	@Bean(name="currentVersion")
