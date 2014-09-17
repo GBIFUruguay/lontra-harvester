@@ -3,12 +3,8 @@ package net.canadensys.harvester.occurrence.writer;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.sql.DataSource;
 
-import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
 import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;

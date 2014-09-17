@@ -2,6 +2,7 @@ package net.canadensys.harvester.occurrence.processor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,7 +10,6 @@ import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
 import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.exception.ProcessException;
-import net.canadensys.harvester.exception.TaskExecutionException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
 import org.apache.log4j.Logger;
@@ -40,29 +40,28 @@ public class ResourceInformationProcessor implements
 	public ResourceInformationModel process(Eml eml,
 			Map<SharedParameterEnum, Object> sharedParameters)
 			throws ProcessException {
-		String sourceFileId = (String) sharedParameters
-				.get(SharedParameterEnum.DATASET_SHORTNAME);
-
-		if (sourceFileId == null) {
-			LOGGER.fatal("Misconfigured processor : needs  sourceFileId");
-			throw new TaskExecutionException("Misconfigured processor");
-		}
 
 		ResourceInformationModel information = new ResourceInformationModel();
 		/* Set information data from EML file: */
 		information.set_abstract(eml.getAbstract());
 		// Fetch only first identifier available:
-		information.setAlternate_identifier(eml.getAlternateIdentifiers()
-				.get(0));
+		List<String> alternateIdentifiers = eml.getAlternateIdentifiers();
+		if (!alternateIdentifiers.equals(null)
+				&& !alternateIdentifiers.isEmpty()) {
+			information.setAlternate_identifier(alternateIdentifiers.get(0));
+		}
 		information.setCitation(eml.getCitationString());
 		information.setCollection_identifier(eml.getCollectionId());
 		information.setCollection_name(eml.getCollectionName());
 		information.setHierarchy_level(eml.getHierarchyLevel());
 		information.setIntellectual_rights(eml.getIntellectualRights());
 		// Fetch only the first keywords/thesaurus available:
-		KeywordSet keywordSet = eml.getKeywords().get(0);
-		information.setKeyword(keywordSet.getKeywordsString());
-		information.setKeyword_thesaurus(keywordSet.getKeywordThesaurus());
+		List<KeywordSet> keyList = eml.getKeywords();
+		if (!keyList.equals(null) && !keyList.isEmpty()) {
+			KeywordSet keywordSet = keyList.get(0);
+			information.setKeyword(keywordSet.getKeywordsString());
+			information.setKeyword_thesaurus(keywordSet.getKeywordThesaurus());
+		}
 		information.setLanguage(eml.getLanguage());
 		information
 				.setParent_collection_identifier(eml.getParentCollectionId());
@@ -80,13 +79,13 @@ public class ResourceInformationProcessor implements
 		agents.add(eml.getContact());
 		// Add resource metadata provider information:
 		agents.add(eml.getMetadataProvider());
-		// Add resource creator information: 
+		// Add resource creator information:
 		agents.add(eml.getResourceCreator());
 		// Add associatedParties information:
 		for (Agent a : eml.getAssociatedParties()) {
 			agents.add(a);
 		}
-		// Bring all agents data into ResourceContactModel: 
+		// Bring all agents data into ResourceContactModel:
 		for (Agent agent : agents) {
 			ResourceContactModel contact = new ResourceContactModel();
 			contact.setAddress(agent.getAddress().getAddress());
@@ -109,6 +108,5 @@ public class ResourceInformationProcessor implements
 
 	@Override
 	public void destroy() {
-
 	}
 }

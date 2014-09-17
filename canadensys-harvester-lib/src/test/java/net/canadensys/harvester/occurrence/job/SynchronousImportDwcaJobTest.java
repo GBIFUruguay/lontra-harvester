@@ -85,6 +85,9 @@ public class SynchronousImportDwcaJobTest {
 		String source = jdbcTemplate.queryForObject("SELECT sourcefileid FROM buffer.occurrence where dwcaid='1'", String.class);
 		assertTrue("qmor-specimens".equals(source));
 		
+		String alternateIdentifier = jdbcTemplate.queryForObject("SELECT alternate_identifier FROM buffer.resource_information where auto_id=1", String.class);
+		assertTrue("Collection entomologique Ouellet-Robert (QMOR)".equals(alternateIdentifier));
+		
 		assertTrue(new Integer(EXPECTED_NUMBER_OF_RESULTS).equals(count));
 	}
 	

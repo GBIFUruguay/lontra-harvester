@@ -12,6 +12,7 @@ import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
+import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
 import net.canadensys.dataportal.occurrence.model.ResourceModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
@@ -34,10 +35,10 @@ import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF
 import net.canadensys.harvester.occurrence.notification.impl.DefaultResourceStatusNotifier;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
-import net.canadensys.harvester.occurrence.processor.ResourceContactProcessor;
+import net.canadensys.harvester.occurrence.processor.ResourceInformationProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaEmlReader;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
-import net.canadensys.harvester.occurrence.step.InsertResourceContactStep;
+import net.canadensys.harvester.occurrence.step.InsertResourceInformationStep;
 import net.canadensys.harvester.occurrence.step.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.StreamDwcContentStep;
 import net.canadensys.harvester.occurrence.step.StreamEmlContentStep;
@@ -217,9 +218,9 @@ public class ProcessingConfig {
 		return new ProcessInsertOccurrenceStep();
 	}
 
-	@Bean(name="insertResourceContactStep")
-	public ProcessingStepIF insertResourceContactStep(){
-		return new InsertResourceContactStep();
+	@Bean(name="insertResourceInformationStep")
+	public ProcessingStepIF insertResourceInformationStep(){
+		return new InsertResourceInformationStep();
 	}
 
 	@Bean(name="processOccurrenceStatisticsStep")
@@ -283,9 +284,9 @@ public class ProcessingConfig {
 		return new OccurrenceProcessor();
 	}
 
-	@Bean(name="resourceContactProcessor")
-	public ItemProcessorIF<Eml, ResourceContactModel> resourceContactProcessor(){
-		return new ResourceContactProcessor();
+	@Bean(name="resourceInformationProcessor")
+	public ItemProcessorIF<Eml, ResourceInformationModel> resourceContactProcessor(){
+		return new ResourceInformationProcessor();
 	}
 
 	//---READER wiring---
@@ -310,8 +311,8 @@ public class ProcessingConfig {
 		return new OccurrenceHibernateWriter();
 	}
 
-	@Bean(name="resourceContactWriter")
-	public ItemWriterIF<ResourceContactModel> resourceContactHibernateWriter(){
+	@Bean(name="resourceInformationWriter")
+	public ItemWriterIF<ResourceInformationModel> resourceInformationHibernateWriter(){
 		return new ResourceInformationHibernateWriter();
 	}
 
