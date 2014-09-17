@@ -1,5 +1,6 @@
 package net.canadensys.harvester.occurrence.mock.writer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.canadensys.harvester.ItemWriterIF;
@@ -14,7 +15,8 @@ import net.canadensys.harvester.message.ProcessingMessageIF;
  */
 public class MockMessageWriter<T extends ProcessingMessageIF> implements ItemWriterIF<T>{
 
-	private List<T> content;
+	private List<T> content = new ArrayList<T>();
+	
 	@Override
 	public void openWriter() {
 		//no op
