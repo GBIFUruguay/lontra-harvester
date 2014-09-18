@@ -119,7 +119,7 @@ public class ImportDwcaJobTest implements PropertyChangeListener{
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(txManager.getDataSource());
 						
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, "qmor-specimens");
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
 		
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		jobStatusModel.addPropertyChangeListener(this);
@@ -165,7 +165,7 @@ public class ImportDwcaJobTest implements PropertyChangeListener{
 	@Test
 	public void testFailedImport(){						
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens-broken");
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, "qmor-specimens");
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
 		
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		importDwcaJob.doJob(jobStatusModel);

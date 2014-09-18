@@ -1,4 +1,4 @@
-package net.canadensys.harvester.occurrence.step;
+package net.canadensys.harvester.occurrence.step.async;
 
 import java.util.ArrayList;
 import java.util.List;
