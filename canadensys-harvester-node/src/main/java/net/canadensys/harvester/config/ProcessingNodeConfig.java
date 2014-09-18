@@ -32,21 +32,13 @@ import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceInformationProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
-<<<<<<< HEAD
 import net.canadensys.harvester.occurrence.step.InsertResourceInformationStep;
-import net.canadensys.harvester.occurrence.step.ProcessInsertOccurrenceStep;
-import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
-import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
-import net.canadensys.harvester.occurrence.writer.ResourceInformationHibernateWriter;
-=======
-import net.canadensys.harvester.occurrence.step.InsertResourceContactStep;
 import net.canadensys.harvester.occurrence.step.async.AsyncManageOccurrenceExtensionStep;
 import net.canadensys.harvester.occurrence.step.async.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
-import net.canadensys.harvester.occurrence.writer.ResourceContactHibernateWriter;
+import net.canadensys.harvester.occurrence.writer.ResourceInformationHibernateWriter;
 import net.canadensys.harvester.writer.GenericHibernateWriter;
->>>>>>> dev
 
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
@@ -307,22 +299,17 @@ public class ProcessingNodeConfig {
 		return new ResourceInformationHibernateWriter();
 	}
 
-<<<<<<< HEAD
 	@Bean(name = "resourceInformationProcessor")
 	public ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor() {
 		return new ResourceInformationProcessor();
 	} 
-=======
-	@Bean(name = "resourceContactProcessor")
-	public ItemProcessorIF<Eml, ResourceContactModel> resourceContactProcessor() {
-		return new ResourceContactProcessor();
-	}
+
 	
 	@Bean(name="occurrenceExtensionWriter")
 	public ItemWriterIF<OccurrenceExtensionModel> occurrenceExtensionWriter(){
 		return new GenericHibernateWriter<OccurrenceExtensionModel>();
 	}
->>>>>>> dev
+
 
 	@Bean
 	public ResourceStatusNotifierIF resourceStatusNotifierIF() {
