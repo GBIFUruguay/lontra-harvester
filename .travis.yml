@@ -1,10 +1,10 @@
 language: java
 before_install:
  - cd ..
- - git clone https://github.com/Canadensys/canadensys-data-access.git
- - cd canadensys-data-access
+ - git clone https://github.com/wingLongitude/liger-data-access.git
+ - cd liger-data-access
  - git checkout dev
- - mvn install
+ - mvn clean install
  - cd ..
  - git clone https://github.com/Canadensys/narwhal-processor.git
  - cd narwhal-processor
