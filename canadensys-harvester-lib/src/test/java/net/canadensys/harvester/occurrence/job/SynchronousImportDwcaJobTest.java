@@ -72,7 +72,7 @@ public class SynchronousImportDwcaJobTest {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(txManager.getDataSource());
 						
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, "qmor-specimens");
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
 		
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		importDwcaJob.doJob(jobStatusModel);

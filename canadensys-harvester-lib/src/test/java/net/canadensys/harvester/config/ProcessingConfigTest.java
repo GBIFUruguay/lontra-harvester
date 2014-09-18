@@ -5,10 +5,12 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
+import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
 import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
+import net.canadensys.harvester.ItemMapperIF;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
@@ -20,16 +22,21 @@ import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
+import net.canadensys.harvester.occurrence.mapper.OccurrenceExtensionMapper;
 import net.canadensys.harvester.occurrence.mock.MockComputeGISDataTask;
+import net.canadensys.harvester.occurrence.processor.DwcaExtensionLineProcessor;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceInformationProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaEmlReader;
+import net.canadensys.harvester.occurrence.reader.DwcaExtensionInfoReader;
+import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
 import net.canadensys.harvester.occurrence.step.InsertResourceInformationStep;
-import net.canadensys.harvester.occurrence.step.ProcessInsertOccurrenceStep;
-import net.canadensys.harvester.occurrence.step.StreamDwcContentStep;
 import net.canadensys.harvester.occurrence.step.StreamEmlContentStep;
+import net.canadensys.harvester.occurrence.step.SynchronousProcessOccurrenceExtensionStep;
+import net.canadensys.harvester.occurrence.step.async.ProcessInsertOccurrenceStep;
+import net.canadensys.harvester.occurrence.step.stream.StreamDwcContentStep;
 import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
 import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
@@ -39,6 +46,7 @@ import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.ResourceInformationHibernateWriter;
+import net.canadensys.harvester.writer.GenericHibernateWriter;
 
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
@@ -81,6 +89,9 @@ public class ProcessingConfigTest {
     @Value( "${occurrence.idGenerationSQL}" )
     private String idGenerationSQL;
     
+    @Value( "${occurrence.extension.idGenerationSQL}" )
+    private String extIdGenerationSQL;
+    
     @Value("${jms.broker_url}")
     private String jmsBrokerUrl;
     
@@ -100,9 +111,8 @@ public class ProcessingConfigTest {
     	LocalSessionFactoryBean sb = new LocalSessionFactoryBean(); 
     	sb.setDataSource(dataSource()); 
     	sb.setAnnotatedClasses(new Class[]{OccurrenceRawModel.class,
-    			OccurrenceModel.class,ImportLogModel.class,ResourceContactModel.class, ResourceInformationModel.class});
-
-		Properties hibernateProperties = new Properties();
+		OccurrenceModel.class,ImportLogModel.class,ResourceContactModel.class, ResourceInformationModel.class});
+    	Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
 		hibernateProperties.setProperty("hibernate.default_schema", hibernateBufferSchema);
@@ -175,8 +185,12 @@ public class ProcessingConfigTest {
 		return new InsertResourceInformationStep();
 	}
 	
-	//---TASK wiring---
+	@Bean(name="synchronousProcessOccurrenceExtensionStep")
+	public ProcessingStepIF synchronousProcessOccurrenceExtensionStep(){
+		return new SynchronousProcessOccurrenceExtensionStep();
+	}
 	
+	//---TASK wiring---
 	@Bean
 	public ItemTaskIF prepareDwcaTask(){
 		return new PrepareDwcaTask();
@@ -223,6 +237,12 @@ public class ProcessingConfigTest {
 		dwcaLineProcessor.setIdGenerationSQL(idGenerationSQL);
 		return dwcaLineProcessor;
 	}
+	@Bean(name="extLineProcessor")
+	public ItemProcessorIF<OccurrenceExtensionModel, OccurrenceExtensionModel> extLineProcessor(){
+		DwcaExtensionLineProcessor dwcaLineProcessor = new DwcaExtensionLineProcessor();
+		dwcaLineProcessor.setIdGenerationSQL(extIdGenerationSQL);
+		return dwcaLineProcessor;
+	}
 	
 	@Bean(name="occurrenceProcessor")
 	public ItemProcessorIF<OccurrenceRawModel, OccurrenceModel> occurrenceProcessor(){
@@ -245,6 +265,30 @@ public class ProcessingConfigTest {
 		return new DwcaEmlReader();
 	}
 	
+	@Bean
+	public ItemReaderIF<String> dwcaExtensionInfoReader(){
+		return new DwcaExtensionInfoReader();
+	}
+	
+	//--- MAPPER ---
+	@Bean(name="occurrenceExtensionMapper")
+	public ItemMapperIF<OccurrenceExtensionModel> occurrenceExtensionMapper(){
+		return new OccurrenceExtensionMapper();
+	}
+	
+	/**
+	 * Always return a new instance.
+	 * @return
+	 */
+	@Bean
+	@Scope("prototype")
+	public ItemReaderIF<OccurrenceExtensionModel> dwcaOccurrenceExtensionReader(){
+		DwcaExtensionReader<OccurrenceExtensionModel> dwcaExtReader = new DwcaExtensionReader<OccurrenceExtensionModel>();
+		dwcaExtReader.setMapper(occurrenceExtensionMapper());
+		return dwcaExtReader;
+	}
+	
+	
 	//---WRITER wiring---
 	@Bean(name="rawOccurrenceWriter")
 	public ItemWriterIF<OccurrenceRawModel> rawOccurrenceWriter(){
@@ -259,6 +303,11 @@ public class ProcessingConfigTest {
 	@Bean(name="resourceInformationWriter")
 	public ItemWriterIF<ResourceInformationModel> resourceInformationHibernateWriter(){
 		return new ResourceInformationHibernateWriter();
+	}
+	
+	@Bean(name="occurrenceExtensionWriter")
+	public ItemWriterIF<OccurrenceExtensionModel> occurrenceExtensionWriter(){
+		return new GenericHibernateWriter<OccurrenceExtensionModel>();
 	}
 	
 	/**

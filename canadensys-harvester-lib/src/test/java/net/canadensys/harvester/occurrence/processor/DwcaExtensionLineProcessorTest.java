@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
+import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
@@ -19,21 +19,26 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
+/**
+ * Test DwcaExtensionLineProcessor auto_id assignement
+ * @author cgendreau
+ *
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=ProcessingConfigTest.class, loader=AnnotationConfigContextLoader.class)
-public class DwcaLineProcessorTest {
+public class DwcaExtensionLineProcessorTest {
 	
 	@Autowired
-	@Qualifier("lineProcessor")
-	private ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> lineProcessor;
+	@Qualifier("extLineProcessor")
+	private ItemProcessorIF<OccurrenceExtensionModel, OccurrenceExtensionModel> extLineProcessor;
 	
 	@Test
 	public void testDwcALineProcessor(){
 		Map<SharedParameterEnum,Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "MySourceFileId");
 		
-		OccurrenceRawModel rawModel = new OccurrenceRawModel();
-		OccurrenceRawModel occModel = ProcessorRunner.runItemProcessor(lineProcessor, rawModel, sharedParameters);
+		OccurrenceExtensionModel rawModel = new OccurrenceExtensionModel();
+		OccurrenceExtensionModel occModel = ProcessorRunner.runItemProcessor(extLineProcessor, rawModel, sharedParameters);
 		
 		assertEquals("MySourceFileId", occModel.getSourcefileid());
 		assertTrue(occModel.getAuto_id() > 0);

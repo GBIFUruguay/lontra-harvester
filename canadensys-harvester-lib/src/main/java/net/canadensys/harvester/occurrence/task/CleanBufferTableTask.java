@@ -22,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class CleanBufferTableTask implements ItemTaskIF {
 	
-	private String datasetShortname = null;
-	
 	@Autowired
 	@Qualifier(value="bufferSessionFactory")
 	private SessionFactory sessionFactory;
@@ -32,30 +30,30 @@ public class CleanBufferTableTask implements ItemTaskIF {
 	private static final Logger LOGGER = Logger.getLogger(CleanBufferTableTask.class);
 	
 	/**
-	 * @param sharedParameters get BatchConstant.DWCA_IDENTIFIER_TAG
+	 * @param sharedParameters SharedParameterEnum.SOURCE_FILE_ID required
 	 */
 	@Transactional("bufferTransactionManager")
 	@Override
 	public void execute(Map<SharedParameterEnum,Object> sharedParameters){
-		datasetShortname = (String)sharedParameters.get(SharedParameterEnum.DATASET_SHORTNAME);
+		String sourceFileId = (String)sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
 		
 		Session session = sessionFactory.getCurrentSession();
 		
-		if(datasetShortname == null){
-			LOGGER.fatal("Misconfigured task : needs  datasetShortname");
+		if(sourceFileId == null){
+			LOGGER.fatal("Misconfigured task : needs  sourceFileId");
 			throw new TaskExecutionException("Misconfigured task");
 		}
 		try{
 			SQLQuery query = session.createSQLQuery("DELETE FROM buffer.occurrence_raw WHERE sourcefileid=?");
-			query.setString(0, datasetShortname);
+			query.setString(0, sourceFileId);
 			query.executeUpdate();
 			
 			query = session.createSQLQuery("DELETE FROM buffer.occurrence WHERE sourcefileid=?");
-			query.setString(0, datasetShortname);
+			query.setString(0, sourceFileId);
 			query.executeUpdate();
 			
 			query = session.createSQLQuery("DELETE FROM buffer.resource_information WHERE resource_uuid=?");
-			query.setString(0, datasetShortname);
+			query.setString(0, sourceFileId);
 			query.executeUpdate();
 		}
 		catch(HibernateException hEx){

@@ -38,10 +38,16 @@ import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceInformationProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaEmlReader;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
+<<<<<<< HEAD
 import net.canadensys.harvester.occurrence.step.InsertResourceInformationStep;
 import net.canadensys.harvester.occurrence.step.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.StreamDwcContentStep;
+=======
+import net.canadensys.harvester.occurrence.step.InsertResourceContactStep;
+>>>>>>> dev
 import net.canadensys.harvester.occurrence.step.StreamEmlContentStep;
+import net.canadensys.harvester.occurrence.step.async.ProcessInsertOccurrenceStep;
+import net.canadensys.harvester.occurrence.step.stream.StreamDwcContentStep;
 import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
 import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
 import net.canadensys.harvester.occurrence.task.ComputeGISDataTask;

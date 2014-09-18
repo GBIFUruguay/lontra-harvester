@@ -56,7 +56,7 @@ public class MoveToPublicSchemaTest {
 	public void testMoveToPublicSchema(){
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		
-		moveJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, "qmor-specimens");
+		moveJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
 		
 		moveJob.doJob(jobStatusModel);
 

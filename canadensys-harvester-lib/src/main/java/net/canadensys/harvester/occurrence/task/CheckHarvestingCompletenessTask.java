@@ -39,14 +39,14 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 	private AtomicBoolean taskCanceled = new AtomicBoolean(false);
 	
 	/**
-	 * @param sharedParameters get BatchConstant.NUMBER_OF_RECORDS and BatchConstant.DWCA_IDENTIFIER_TAG
+	 * @param sharedParameters SharedParameterEnum.NUMBER_OF_RECORDS, SharedParameterEnum.SOURCE_FILE_ID required
 	 */
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
 		final Integer numberOfRecords = (Integer)sharedParameters.get(SharedParameterEnum.NUMBER_OF_RECORDS);
-		final String datasetShortname = (String)sharedParameters.get(SharedParameterEnum.DATASET_SHORTNAME);
-		if(numberOfRecords == null || datasetShortname == null){
-			LOGGER.fatal("Misconfigured task : needs numberOfRecords, datasetShortname");
+		final String sourceFileId = (String)sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
+		if(numberOfRecords == null || sourceFileId == null){
+			LOGGER.fatal("Misconfigured task : needs numberOfRecords, sourceFileId");
 			throw new TaskExecutionException("Misconfigured task");
 		}
 		
@@ -56,7 +56,7 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 			public void run() {
 				Session session = sessionFactory.openSession();
 				SQLQuery query = session.createSQLQuery("SELECT count(*) FROM buffer.occurrence_raw WHERE sourcefileid=?");
-				query.setString(0, datasetShortname);
+				query.setString(0, sourceFileId);
 				try{
 					Number currNumberOfResult = (Number)query.uniqueResult();
 					while(!taskCanceled.get() && (currNumberOfResult.intValue() < numberOfRecords)){

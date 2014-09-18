@@ -63,7 +63,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 		jobStatusModel.setCurrentStatus(JobStatus.RUNNING);
 		
 		//optional task, could also import a DwcA from a local path but, at your own risk.
-		if(getResourceInfoTask != null && sharedParameters.containsKey(SharedParameterEnum.DATASET_SHORTNAME)){
+		if(getResourceInfoTask != null && sharedParameters.containsKey(SharedParameterEnum.SOURCE_FILE_ID)){
 			getResourceInfoTask.execute(sharedParameters);
 		}
 		
