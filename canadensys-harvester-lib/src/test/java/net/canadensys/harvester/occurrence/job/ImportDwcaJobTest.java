@@ -34,119 +34,129 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 /**
- * Test coverage : 
- * -Read a DarwinCore archive from a folder
- * -Send the content as JMS messages
- * -Insert raw data in buffer schema
- * -Process data and insert results in buffer schema
- * -Wait for completion
- * -Move to public schema
- * -Log the import
+ * Test coverage : -Read a DarwinCore archive from a folder -Send the content as
+ * JMS messages -Insert raw data in buffer schema -Process data and insert
+ * results in buffer schema -Wait for completion -Move to public schema -Log the
+ * import
  * 
- * Not cover by this test :
- * -GetResourceInfoTask
- * -ComputeGISDataTask
+ * Not cover by this test : -GetResourceInfoTask -ComputeGISDataTask
+ * 
  * @author canadensys
- *
+ * 
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes=ProcessingConfigTest.class, loader=AnnotationConfigContextLoader.class)
-public class ImportDwcaJobTest implements PropertyChangeListener{
-	
+@ContextConfiguration(classes = ProcessingConfigTest.class, loader = AnnotationConfigContextLoader.class)
+public class ImportDwcaJobTest implements PropertyChangeListener {
+
 	private static final String TEST_BROKER_URL = "vm://localhost?broker.persistent=false";
 	private static AtomicBoolean jobComplete = new AtomicBoolean(false);
-	private static AtomicBoolean controlMessageReceived = new AtomicBoolean(false);
+	private static AtomicBoolean controlMessageReceived = new AtomicBoolean(
+			false);
 	private static final int MAX_WAIT = 60000;
-	
+
 	private static final int EXPECTED_NUMBER_OF_RESULTS = 11;
 	private static final int MAX_NUMBER_OF_ATTEMP = 5;
-	
+
 	@Autowired
-	@Qualifier(value="bufferSessionFactory")
+	@Qualifier(value = "bufferSessionFactory")
 	private SessionFactory sessionFactory;
-	
+
 	@Autowired
-	@Qualifier(value="publicTransactionManager")
+	@Qualifier(value = "publicTransactionManager")
 	private HibernateTransactionManager txManager;
-	
+
 	private JMSConsumer reader;
 	private JMSControlConsumer controlConsumer;
-	
+
 	@Autowired
 	private ImportDwcaJob importDwcaJob;
-		
+
 	@Autowired
 	@Qualifier("processInsertOccurrenceStep")
 	private JMSConsumerMessageHandlerIF processInsertOccurrenceStep;
-	
+
 	@Autowired
 	@Qualifier("insertResourceInformationStep")
 	private JMSConsumerMessageHandlerIF insertResourceInformationStep;
-	
+
 	/**
-	 * Setup Test Consumer
-	 * This consumer will write to the database specified by the sessionFactory bean.
+	 * Setup Test Consumer This consumer will write to the database specified by
+	 * the sessionFactory bean.
 	 */
 	@Before
-	public void setup(){
+	public void setup() {
 		reader = new JMSConsumer(TEST_BROKER_URL);
 		reader.registerHandler(processInsertOccurrenceStep);
 		reader.registerHandler(insertResourceInformationStep);
-		
+
 		try {
-			((ProcessingStepIF)processInsertOccurrenceStep).preStep(null);
-			((ProcessingStepIF)insertResourceInformationStep).preStep(null);
+			((ProcessingStepIF) processInsertOccurrenceStep).preStep(null);
+			((ProcessingStepIF) insertResourceInformationStep).preStep(null);
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
 		}
 		reader.open();
-		
+
 		controlConsumer = new JMSControlConsumer(TEST_BROKER_URL);
 		controlConsumer.registerHandler(new MockControlMessageHandler());
 		controlConsumer.open();
 	}
 
 	@After
-	public void destroy(){
+	public void destroy() {
 		reader.close();
 		controlConsumer.close();
-		((ProcessingStepIF)processInsertOccurrenceStep).postStep();
-		((ProcessingStepIF)insertResourceInformationStep).postStep();
+		((ProcessingStepIF) processInsertOccurrenceStep).postStep();
+		((ProcessingStepIF) insertResourceInformationStep).postStep();
 	}
-	
+
 	@Test
-	public void testImport(){
+	public void testImport() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(txManager.getDataSource());
-						
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
-		
+
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH,
+				"src/test/resources/dwca-qmor-specimens");
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID,
+				"qmor-specimens");
+
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		jobStatusModel.addPropertyChangeListener(this);
 		importDwcaJob.doJob(jobStatusModel);
 		synchronized (jobComplete) {
 			try {
 				jobComplete.wait(MAX_WAIT);
-				//validate content of the database
-				if(jobComplete.get()){
-					int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.occurrence", BigDecimal.class).intValue();
-					//give a chance to the database to be updated (since it's triggered by a JMS message)
+				// validate content of the database
+				if (jobComplete.get()) {
+					int count = jdbcTemplate.queryForObject(
+							"SELECT count(*) FROM buffer.occurrence",
+							BigDecimal.class).intValue();
+					// give a chance to the database to be updated (since it's
+					// triggered by a JMS message)
 					int nbOfAttemp = 0;
-					while(count != EXPECTED_NUMBER_OF_RESULTS && nbOfAttemp < MAX_NUMBER_OF_ATTEMP){
+					while (count != EXPECTED_NUMBER_OF_RESULTS
+							&& nbOfAttemp < MAX_NUMBER_OF_ATTEMP) {
 						nbOfAttemp++;
 						Thread.sleep(1000);
-						count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.occurrence", BigDecimal.class).intValue();
+						count = jdbcTemplate.queryForObject(
+								"SELECT count(*) FROM buffer.occurrence",
+								BigDecimal.class).intValue();
 					}
-					
-					String state = jdbcTemplate.queryForObject("SELECT stateprovince FROM buffer.occurrence where dwcaid='3'", String.class);
+
+					String state = jdbcTemplate
+							.queryForObject(
+									"SELECT stateprovince FROM buffer.occurrence where dwcaid='3'",
+									String.class);
 					assertTrue("Florida".equals(state));
-					
-					String source = jdbcTemplate.queryForObject("SELECT sourcefileid FROM buffer.occurrence where dwcaid='1'", String.class);
+
+					String source = jdbcTemplate
+							.queryForObject(
+									"SELECT sourcefileid FROM buffer.occurrence where dwcaid='1'",
+									String.class);
 					assertTrue("qmor-specimens".equals(source));
 
-					assertTrue(new Integer(EXPECTED_NUMBER_OF_RESULTS).equals(count));
-				}
-				else{
+					assertTrue(new Integer(EXPECTED_NUMBER_OF_RESULTS)
+							.equals(count));
+				} else {
 					fail();
 				}
 			} catch (InterruptedException e) {
@@ -154,23 +164,23 @@ public class ImportDwcaJobTest implements PropertyChangeListener{
 			}
 		}
 	}
-	
+
 	/**
-	 * Test the behavior of a failing import.
-	 * A common reason for failing is when data can not fit into the defined space in the database.
+	 * Test the behavior of a failing import. A common reason for failing is
+	 * when data can not fit into the defined space in the database.
 	 */
 	@Test
-	public void testFailedImport(){						
+	public void testFailedImport() {
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens-broken");
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
-		
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID,"qmor-specimens");
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		importDwcaJob.doJob(jobStatusModel);
+		
 		synchronized (controlMessageReceived) {
 			try {
-				controlMessageReceived.wait(MAX_WAIT);
-				//validate content of the database
-				if(!controlMessageReceived.get()){
+				controlMessageReceived.wait(MAX_WAIT); 
+				// validate content of the database
+				if (!controlMessageReceived.get()) {
 					fail();
 				}
 			} catch (InterruptedException e) {
@@ -178,13 +188,15 @@ public class ImportDwcaJobTest implements PropertyChangeListener{
 			}
 		}
 	}
-	
+
 	/**
 	 * JMSControlConsumerMessageHandlerIF implementation for unit testing.
+	 * 
 	 * @author canadensys
-	 *
+	 * 
 	 */
-	private class MockControlMessageHandler implements JMSControlConsumerMessageHandlerIF{
+	private class MockControlMessageHandler implements
+			JMSControlConsumerMessageHandlerIF {
 
 		@Override
 		public Class<?> getMessageClass() {
@@ -203,17 +215,17 @@ public class ImportDwcaJobTest implements PropertyChangeListener{
 
 	@Override
 	public void propertyChange(PropertyChangeEvent pcEvt) {
-		if(JobStatusModel.CURRENT_STATUS_PROPERTY.equals(pcEvt.getPropertyName())) {
-			JobStatus newStatus = (JobStatus)pcEvt.getNewValue();
-			if(JobStatus.DONE == newStatus){
+		if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(pcEvt
+				.getPropertyName())) {
+			JobStatus newStatus = (JobStatus) pcEvt.getNewValue();
+			if (JobStatus.DONE == newStatus) {
 				onSuccess();
-			}
-			else if(JobStatus.ERROR == newStatus){
+			} else if (JobStatus.ERROR == newStatus) {
 				onError();
 			}
 		}
 	}
-	
+
 	public void onSuccess() {
 		synchronized (jobComplete) {
 			jobComplete.set(true);

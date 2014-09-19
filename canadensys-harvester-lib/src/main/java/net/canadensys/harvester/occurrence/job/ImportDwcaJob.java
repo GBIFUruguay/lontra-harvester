@@ -60,6 +60,8 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 		this.jobStatusModel = jobStatusModel;
 		//share the statusJobModel so step(s) can update it
 		sharedParameters.put(SharedParameterEnum.JOB_STATUS_MODEL, jobStatusModel);
+		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID,
+				"ada5d0b1-07de-4dc0-83d4-e312f0fb81cb");
 		jobStatusModel.setCurrentStatus(JobStatus.RUNNING);
 		
 		//optional task, could also import a DwcA from a local path but, at your own risk.

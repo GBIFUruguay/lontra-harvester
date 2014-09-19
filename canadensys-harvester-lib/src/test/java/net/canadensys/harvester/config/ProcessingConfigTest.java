@@ -111,7 +111,7 @@ public class ProcessingConfigTest {
     	LocalSessionFactoryBean sb = new LocalSessionFactoryBean(); 
     	sb.setDataSource(dataSource()); 
     	sb.setAnnotatedClasses(new Class[]{OccurrenceRawModel.class,
-		OccurrenceModel.class,ImportLogModel.class,ResourceContactModel.class, ResourceInformationModel.class});
+		OccurrenceModel.class,ImportLogModel.class,ResourceContactModel.class, ResourceInformationModel.class, OccurrenceExtensionModel.class});
     	Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
