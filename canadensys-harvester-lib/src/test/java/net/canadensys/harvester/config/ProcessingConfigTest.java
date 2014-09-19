@@ -34,6 +34,7 @@ import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
 import net.canadensys.harvester.occurrence.step.InsertResourceInformationStep;
 import net.canadensys.harvester.occurrence.step.StreamEmlContentStep;
+import net.canadensys.harvester.occurrence.step.SynchronousProcessEmlContentStep;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessOccurrenceExtensionStep;
 import net.canadensys.harvester.occurrence.step.async.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.stream.StreamDwcContentStep;
@@ -188,6 +189,11 @@ public class ProcessingConfigTest {
 	@Bean(name="synchronousProcessOccurrenceExtensionStep")
 	public ProcessingStepIF synchronousProcessOccurrenceExtensionStep(){
 		return new SynchronousProcessOccurrenceExtensionStep();
+	}
+	
+	@Bean(name="synchronousProcessEmlContentStep")
+	public ProcessingStepIF synchronousProcessEmlContentStep(){
+		return new SynchronousProcessEmlContentStep();
 	}
 	
 	//---TASK wiring---

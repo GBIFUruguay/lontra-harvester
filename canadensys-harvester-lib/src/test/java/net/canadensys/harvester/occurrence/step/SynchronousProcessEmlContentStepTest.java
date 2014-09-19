@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
@@ -13,9 +15,7 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
@@ -27,9 +27,12 @@ public class SynchronousProcessEmlContentStepTest {
 	@Autowired
 	private ProcessingStepIF synchronousProcessEmlContentStep;
 
+	private JdbcTemplate jdbcTemplate;
+
 	@Autowired
-	@Qualifier(value = "bufferTransactionManager")
-	private HibernateTransactionManager txManager;
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
 
 	@Test
 	public void testSynchronousProcessEmlContentStep() {
@@ -45,7 +48,6 @@ public class SynchronousProcessEmlContentStepTest {
 		synchronousProcessEmlContentStep.doStep();
 		synchronousProcessEmlContentStep.postStep();
 
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(txManager.getDataSource());
 		int count = jdbcTemplate.queryForObject(
 				"SELECT count(*) FROM buffer.resource_information",
 				BigDecimal.class).intValue();
