@@ -65,270 +65,285 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableTransactionManagement
 public class ProcessingConfigTest {
+
+	@Bean
+	public static PropertyPlaceholderConfigurer properties() {
+		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
+		ClassPathResource[] resources = new ClassPathResource[] { new ClassPathResource(
+				"test-harvester-config.properties") };
+		ppc.setLocations(resources);
+		return ppc;
+	}
+
+	@Value("${database.url}")
+	private String dbUrl;
 	
-    @Bean
-    public static PropertyPlaceholderConfigurer properties(){
-    	PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-    	ClassPathResource[] resources = new ClassPathResource[]
-    			{ new ClassPathResource( "test-harvester-config.properties" ) };
-    	ppc.setLocations( resources );
-    	return ppc;
-    }
-    
-    @Value("${database.url}")
-    private String dbUrl;
-    @Value( "${database.driver}" )
-    private String dbDriverClassName;
-    
-    @Value( "${hibernate.dialect}" )
-    private String hibernateDialect;
-    @Value( "${hibernate.show_sql}" )
-    private String hibernateShowSql;
-    @Value( "${hibernate.buffer_schema}" )
-    private String hibernateBufferSchema;
-    
-    @Value( "${occurrence.idGenerationSQL}" )
-    private String idGenerationSQL;
-    
-    @Value( "${occurrence.extension.idGenerationSQL}" )
-    private String extIdGenerationSQL;
-    
-    @Value("${jms.broker_url}")
-    private String jmsBrokerUrl;
-    
-    @Bean(name="datasource")
-    public DataSource dataSource() {
-    	return new EmbeddedDatabaseBuilder()
-			.setType(EmbeddedDatabaseType.H2)
-			.addScript("classpath:h2/h2setup.sql")
-			//those 2 scripts are loaded from canadensys-data-access
-		    .addScript("/script/occurrence/create_occurrence_tables.sql")
-		    .addScript("/script/occurrence/create_occurrence_tables_buffer_schema.sql")
-		    .build();
-    }
-    
-    @Bean(name="bufferSessionFactory")
-    public LocalSessionFactoryBean bufferSessionFactory() {
-    	LocalSessionFactoryBean sb = new LocalSessionFactoryBean(); 
-    	sb.setDataSource(dataSource()); 
-    	sb.setAnnotatedClasses(new Class[]{OccurrenceRawModel.class,
-		OccurrenceModel.class,ImportLogModel.class,ResourceContactModel.class, ResourceInformationModel.class, OccurrenceExtensionModel.class});
-    	Properties hibernateProperties = new Properties();
+	@Value("${database.driver}")
+	private String dbDriverClassName;
+
+	@Value("${hibernate.dialect}")
+	private String hibernateDialect;
+	
+	@Value("${hibernate.show_sql}")
+	private String hibernateShowSql;
+	
+	@Value("${hibernate.buffer_schema}")
+	private String hibernateBufferSchema;
+
+	@Value("${occurrence.idGenerationSQL}")
+	private String idGenerationSQL;
+
+	@Value("${occurrence.extension.idGenerationSQL}")
+	private String extIdGenerationSQL;
+
+	@Value("${jms.broker_url}")
+	private String jmsBrokerUrl;
+
+	@Bean(name = "datasource")
+	public DataSource dataSource() {
+		return new EmbeddedDatabaseBuilder()
+				.setType(EmbeddedDatabaseType.H2)
+				.addScript("classpath:h2/h2setup.sql")
+				// those 2 scripts are loaded from canadensys-data-access
+				.addScript("/script/occurrence/create_occurrence_tables.sql")
+				.addScript(
+						"/script/occurrence/create_occurrence_tables_buffer_schema.sql")
+				.build();
+	}
+
+	@Bean(name = "bufferSessionFactory")
+	public LocalSessionFactoryBean bufferSessionFactory() {
+		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
+		sb.setDataSource(dataSource());
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
+				OccurrenceModel.class, ImportLogModel.class,
+				ResourceContactModel.class, ResourceInformationModel.class,
+				OccurrenceExtensionModel.class });
+		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
-		hibernateProperties.setProperty("hibernate.default_schema", hibernateBufferSchema);
-		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
-    	sb.setHibernateProperties(hibernateProperties);
-    	return sb;
-    }
-    
-    @Bean(name="publicSessionFactory")
-    public LocalSessionFactoryBean publicSessionFactory() {
-    	LocalSessionFactoryBean sb = new LocalSessionFactoryBean(); 
-    	sb.setDataSource(dataSource()); 
-    	sb.setAnnotatedClasses(new Class[]{OccurrenceRawModel.class,
-    			OccurrenceModel.class,
-    			ImportLogModel.class});
+		hibernateProperties.setProperty("hibernate.default_schema",
+				hibernateBufferSchema);
+		hibernateProperties.setProperty("javax.persistence.validation.mode",
+				"none");
+		sb.setHibernateProperties(hibernateProperties);
+		return sb;
+	}
+
+	@Bean(name = "publicSessionFactory")
+	public LocalSessionFactoryBean publicSessionFactory() {
+		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
+		sb.setDataSource(dataSource());
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
+				OccurrenceModel.class, ImportLogModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
-		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
-    	sb.setHibernateProperties(hibernateProperties);
-    	return sb;
-    }
-    
-    @Bean(name="bufferTransactionManager")
-    public HibernateTransactionManager hibernateTransactionManager(){
-    	HibernateTransactionManager htmgr = new HibernateTransactionManager();
+		hibernateProperties.setProperty("javax.persistence.validation.mode",
+				"none");
+		sb.setHibernateProperties(hibernateProperties);
+		return sb;
+	}
+
+	@Bean(name = "bufferTransactionManager")
+	public HibernateTransactionManager hibernateTransactionManager() {
+		HibernateTransactionManager htmgr = new HibernateTransactionManager();
 		htmgr.setSessionFactory(bufferSessionFactory().getObject());
-    	return htmgr;
-    }
-    
-    @Bean(name="publicTransactionManager")
-    public HibernateTransactionManager publicHibernateTransactionManager(){
-    	HibernateTransactionManager htmgr = new HibernateTransactionManager();
+		return htmgr;
+	}
+
+	@Bean(name = "publicTransactionManager")
+	public HibernateTransactionManager publicHibernateTransactionManager() {
+		HibernateTransactionManager htmgr = new HibernateTransactionManager();
 		htmgr.setSessionFactory(publicSessionFactory().getObject());
-    	return htmgr;
-    }
-    
-    //---JOB---
+		return htmgr;
+	}
+
+	// ---JOB---
 	@Bean
-	public ImportDwcaJob importDwcaJob(){
+	public ImportDwcaJob importDwcaJob() {
 		return new ImportDwcaJob();
 	}
+
 	@Bean
-	public MoveToPublicSchemaJob moveToPublicSchemaJob(){
+	public MoveToPublicSchemaJob moveToPublicSchemaJob() {
 		return new MoveToPublicSchemaJob();
 	}
+
 	@Bean
-	public ComputeUniqueValueJob computeUniqueValueJob(){
+	public ComputeUniqueValueJob computeUniqueValueJob() {
 		return new ComputeUniqueValueJob();
 	}
-	
-	//---STEP---
-	@Bean(name="streamEmlContentStep")
-	public ProcessingStepIF streamEmlContentStep(){
+
+	// ---STEP---
+	@Bean(name = "streamEmlContentStep")
+	public ProcessingStepIF streamEmlContentStep() {
 		return new StreamEmlContentStep();
 	}
-	@Bean(name="streamDwcContentStep")
-	public ProcessingStepIF streamDwcContentStep(){
+
+	@Bean(name = "streamDwcContentStep")
+	public ProcessingStepIF streamDwcContentStep() {
 		return new StreamDwcContentStep();
 	}
-	
-	@Bean(name="processInsertOccurrenceStep")
-	public ProcessingStepIF processInsertOccurrenceStep(){
+
+	@Bean(name = "processInsertOccurrenceStep")
+	public ProcessingStepIF processInsertOccurrenceStep() {
 		return new ProcessInsertOccurrenceStep();
 	}
-	
-	@Bean(name="insertResourceInformationStep")
-	public ProcessingStepIF insertResourceInformationStep(){
+
+	@Bean(name = "insertResourceInformationStep")
+	public ProcessingStepIF insertResourceInformationStep() {
 		return new InsertResourceInformationStep();
 	}
-	
-	@Bean(name="synchronousProcessOccurrenceExtensionStep")
-	public ProcessingStepIF synchronousProcessOccurrenceExtensionStep(){
+
+	@Bean(name = "synchronousProcessOccurrenceExtensionStep")
+	public ProcessingStepIF synchronousProcessOccurrenceExtensionStep() {
 		return new SynchronousProcessOccurrenceExtensionStep();
 	}
-	
-	@Bean(name="synchronousProcessEmlContentStep")
-	public ProcessingStepIF synchronousProcessEmlContentStep(){
+
+	@Bean(name = "synchronousProcessEmlContentStep")
+	public ProcessingStepIF synchronousProcessEmlContentStep() {
 		return new SynchronousProcessEmlContentStep();
 	}
-	
-	//---TASK wiring---
+
+	// ---TASK wiring---
 	@Bean
-	public ItemTaskIF prepareDwcaTask(){
+	public ItemTaskIF prepareDwcaTask() {
 		return new PrepareDwcaTask();
 	}
-	
+
 	@Bean
-	public ItemTaskIF cleanBufferTableTask(){
+	public ItemTaskIF cleanBufferTableTask() {
 		return new CleanBufferTableTask();
 	}
-	
+
 	@Bean
-	public ItemTaskIF computeGISDataTask(){
+	public ItemTaskIF computeGISDataTask() {
 		return new MockComputeGISDataTask();
 	}
-	
+
 	@Bean
-	public LongRunningTaskIF checkProcessingCompletenessTask(){
+	public LongRunningTaskIF checkProcessingCompletenessTask() {
 		return new CheckHarvestingCompletenessTask();
 	}
-	
+
 	@Bean
-	public ItemTaskIF getResourceInfoTask(){
+	public ItemTaskIF getResourceInfoTask() {
 		return null;
 	}
-	
+
 	@Bean
-	public ItemTaskIF computeUniqueValueTask(){
+	public ItemTaskIF computeUniqueValueTask() {
 		return new ComputeUniqueValueTask();
 	}
-	
+
 	@Bean
-	public ItemTaskIF replaceOldOccurrenceTask(){
+	public ItemTaskIF replaceOldOccurrenceTask() {
 		return new ReplaceOldOccurrenceTask();
 	}
+
 	@Bean
-	public ItemTaskIF recordImportTask(){
+	public ItemTaskIF recordImportTask() {
 		return new RecordImportTask();
 	}
-	
-	//---PROCESSOR wiring---
-	@Bean(name="lineProcessor")
-	public ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> lineProcessor(){
+
+	// ---PROCESSOR wiring---
+	@Bean(name = "lineProcessor")
+	public ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> lineProcessor() {
 		DwcaLineProcessor dwcaLineProcessor = new DwcaLineProcessor();
 		dwcaLineProcessor.setIdGenerationSQL(idGenerationSQL);
 		return dwcaLineProcessor;
 	}
-	@Bean(name="extLineProcessor")
-	public ItemProcessorIF<OccurrenceExtensionModel, OccurrenceExtensionModel> extLineProcessor(){
+
+	@Bean(name = "extLineProcessor")
+	public ItemProcessorIF<OccurrenceExtensionModel, OccurrenceExtensionModel> extLineProcessor() {
 		DwcaExtensionLineProcessor dwcaLineProcessor = new DwcaExtensionLineProcessor();
 		dwcaLineProcessor.setIdGenerationSQL(extIdGenerationSQL);
 		return dwcaLineProcessor;
 	}
-	
-	@Bean(name="occurrenceProcessor")
-	public ItemProcessorIF<OccurrenceRawModel, OccurrenceModel> occurrenceProcessor(){
+
+	@Bean(name = "occurrenceProcessor")
+	public ItemProcessorIF<OccurrenceRawModel, OccurrenceModel> occurrenceProcessor() {
 		return new OccurrenceProcessor();
 	}
-	
-	@Bean(name="resourceInformationProcessor")
-	public ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor(){
+
+	@Bean(name = "resourceInformationProcessor")
+	public ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor() {
 		return new ResourceInformationProcessor();
 	}
-	
-	//---READER wiring---
+
+	// ---READER wiring---
 	@Bean
-	public ItemReaderIF<OccurrenceRawModel> dwcItemReader(){
+	public ItemReaderIF<OccurrenceRawModel> dwcItemReader() {
 		return new DwcaItemReader();
 	}
-	
+
 	@Bean
-	public ItemReaderIF<Eml> dwcaEmlReader(){
+	public ItemReaderIF<Eml> dwcaEmlReader() {
 		return new DwcaEmlReader();
 	}
-	
+
 	@Bean
-	public ItemReaderIF<String> dwcaExtensionInfoReader(){
+	public ItemReaderIF<String> dwcaExtensionInfoReader() {
 		return new DwcaExtensionInfoReader();
 	}
-	
-	//--- MAPPER ---
-	@Bean(name="occurrenceExtensionMapper")
-	public ItemMapperIF<OccurrenceExtensionModel> occurrenceExtensionMapper(){
+
+	// --- MAPPER ---
+	@Bean(name = "occurrenceExtensionMapper")
+	public ItemMapperIF<OccurrenceExtensionModel> occurrenceExtensionMapper() {
 		return new OccurrenceExtensionMapper();
 	}
-	
+
 	/**
 	 * Always return a new instance.
+	 * 
 	 * @return
 	 */
 	@Bean
 	@Scope("prototype")
-	public ItemReaderIF<OccurrenceExtensionModel> dwcaOccurrenceExtensionReader(){
+	public ItemReaderIF<OccurrenceExtensionModel> dwcaOccurrenceExtensionReader() {
 		DwcaExtensionReader<OccurrenceExtensionModel> dwcaExtReader = new DwcaExtensionReader<OccurrenceExtensionModel>();
 		dwcaExtReader.setMapper(occurrenceExtensionMapper());
 		return dwcaExtReader;
 	}
-	
-	
-	//---WRITER wiring---
-	@Bean(name="rawOccurrenceWriter")
-	public ItemWriterIF<OccurrenceRawModel> rawOccurrenceWriter(){
+
+	// ---WRITER wiring---
+	@Bean(name = "rawOccurrenceWriter")
+	public ItemWriterIF<OccurrenceRawModel> rawOccurrenceWriter() {
 		return new RawOccurrenceHibernateWriter();
 	}
-	
-	@Bean(name="occurrenceWriter")
-	public ItemWriterIF<OccurrenceModel> occurrenceWriter(){
+
+	@Bean(name = "occurrenceWriter")
+	public ItemWriterIF<OccurrenceModel> occurrenceWriter() {
 		return new OccurrenceHibernateWriter();
 	}
-	
-	@Bean(name="resourceInformationWriter")
-	public ItemWriterIF<ResourceInformationModel> resourceInformationHibernateWriter(){
+
+	@Bean(name = "resourceInformationWriter")
+	public ItemWriterIF<ResourceInformationModel> resourceInformationHibernateWriter() {
 		return new ResourceInformationHibernateWriter();
 	}
-	
-	@Bean(name="occurrenceExtensionWriter")
-	public ItemWriterIF<OccurrenceExtensionModel> occurrenceExtensionWriter(){
+
+	@Bean(name = "occurrenceExtensionWriter")
+	public ItemWriterIF<OccurrenceExtensionModel> occurrenceExtensionWriter() {
 		return new GenericHibernateWriter<OccurrenceExtensionModel>();
 	}
-	
+
 	/**
-	 * Always return a new instance. We do not want to share JMS Writer instance.
+	 * Always return a new instance. We do not want to share JMS Writer
+	 * instance.
+	 * 
 	 * @return
 	 */
 	@Bean
 	@Scope("prototype")
-	public JMSWriter jmsWriter(){
+	public JMSWriter jmsWriter() {
 		return new JMSWriter(jmsBrokerUrl);
 	}
-	
+
 	@Bean
-	public JMSControlProducer errorReporter(){
+	public JMSControlProducer errorReporter() {
 		return new JMSControlProducer(jmsBrokerUrl);
 	}
-	
+
 }

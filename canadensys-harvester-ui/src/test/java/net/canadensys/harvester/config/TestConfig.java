@@ -101,10 +101,7 @@ public class TestConfig {
 	public LocalSessionFactoryBean bufferSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
-				OccurrenceModel.class, ImportLogModel.class,
-				ResourceInformationModel.class });
-
+		sb.setAnnotatedPackages("net.canadensys.dataportal.occurrence.model");
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
@@ -279,10 +276,7 @@ public class TestConfig {
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
-				OccurrenceModel.class, ImportLogModel.class,
-				ResourceModel.class });
-
+		sb.setAnnotatedPackages("net.canadensys.dataportal.occurrence.model");
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);

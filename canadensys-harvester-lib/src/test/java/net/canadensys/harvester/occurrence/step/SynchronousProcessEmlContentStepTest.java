@@ -12,6 +12,7 @@ import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,13 @@ public class SynchronousProcessEmlContentStepTest {
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
+	
+	@Before
+    public void setupTest(){
+    	jdbcTemplate.batchUpdate(new String[]{
+    			"DELETE FROM buffer.resource_information"
+    	});
+    }
 
 	@Test
 	public void testSynchronousProcessEmlContentStep() {
