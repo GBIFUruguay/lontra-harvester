@@ -10,6 +10,7 @@ import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
 import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
+import net.canadensys.dataportal.occurrence.model.ResourceModel;
 import net.canadensys.harvester.ItemMapperIF;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
@@ -118,7 +119,7 @@ public class ProcessingConfigTest {
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
 				OccurrenceModel.class, ImportLogModel.class,
 				ResourceContactModel.class, ResourceInformationModel.class,
-				OccurrenceExtensionModel.class });
+				OccurrenceExtensionModel.class, ResourceModel.class });
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
@@ -135,7 +136,8 @@ public class ProcessingConfigTest {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
-				OccurrenceModel.class, ImportLogModel.class });
+				OccurrenceModel.class, ImportLogModel.class, ResourceContactModel.class, ResourceInformationModel.class,
+				OccurrenceExtensionModel.class, ResourceModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);

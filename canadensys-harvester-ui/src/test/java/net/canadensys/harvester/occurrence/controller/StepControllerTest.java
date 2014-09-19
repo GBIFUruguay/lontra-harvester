@@ -39,7 +39,7 @@ public class StepControllerTest {
 		resourceModel.setSourcefileid("test-resource");
 
 		// save it
-		stepController.updateResourceModel(resourceModel);
+		boolean saved = stepController.updateResourceModel(resourceModel);
 
 		List<ResourceModel> resourceModelList = stepController
 				.getResourceModelList();

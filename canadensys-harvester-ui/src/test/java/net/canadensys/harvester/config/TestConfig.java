@@ -8,8 +8,10 @@ import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.dao.ResourceDAO;
 import net.canadensys.dataportal.occurrence.dao.impl.HibernateResourceDAO;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
+import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
+import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
 import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
 import net.canadensys.dataportal.occurrence.model.ResourceModel;
 import net.canadensys.harvester.ItemProcessorIF;
@@ -22,6 +24,9 @@ import net.canadensys.harvester.config.harvester.HarvesterConfigIF;
 import net.canadensys.harvester.jms.JMSWriter;
 import net.canadensys.harvester.jms.control.JMSControlConsumer;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
+import net.canadensys.harvester.occurrence.controller.NodeStatusController;
+import net.canadensys.harvester.occurrence.controller.StepController;
+import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
@@ -51,7 +56,6 @@ import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ClassPathResource;
@@ -62,7 +66,6 @@ import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration("processingConfig")
-@ComponentScan(basePackages = "net.canadensys.harvester.occurrence")
 @EnableTransactionManagement
 public class TestConfig {
 
@@ -101,7 +104,10 @@ public class TestConfig {
 	public LocalSessionFactoryBean bufferSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedPackages("net.canadensys.dataportal.occurrence.model");
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
+				OccurrenceModel.class, ImportLogModel.class,
+				ResourceContactModel.class, ResourceInformationModel.class,
+				OccurrenceExtensionModel.class, ResourceModel.class });
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
@@ -111,6 +117,33 @@ public class TestConfig {
 				"none");
 		sb.setHibernateProperties(hibernateProperties);
 		return sb;
+	}
+	
+	@Bean(name = {"publicSessionFactory","sessionFactory"})
+	public LocalSessionFactoryBean publicSessionFactory() {
+		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
+		sb.setDataSource(dataSource());
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
+				OccurrenceModel.class, ImportLogModel.class,
+				ResourceContactModel.class, ResourceInformationModel.class,
+				OccurrenceExtensionModel.class, ResourceModel.class });
+		Properties hibernateProperties = new Properties();
+		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
+		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
+		hibernateProperties.setProperty("javax.persistence.validation.mode",
+				"none");
+		sb.setHibernateProperties(hibernateProperties);
+		return sb;
+	}
+	
+	@Bean
+	public StepControllerIF stepController(){
+	return new StepController();
+	}
+
+	@Bean
+	public NodeStatusController nodeStatusController(){
+	return new NodeStatusController();
 	}
 
 	@Bean
@@ -270,20 +303,6 @@ public class TestConfig {
 		HibernateTransactionManager htmgr = new HibernateTransactionManager();
 		htmgr.setSessionFactory(publicSessionFactory().getObject());
 		return htmgr;
-	}
-
-	@Bean(name = {"publicSessionFactory","sessionFactory"})
-	public LocalSessionFactoryBean publicSessionFactory() {
-		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
-		sb.setDataSource(dataSource());
-		sb.setAnnotatedPackages("net.canadensys.dataportal.occurrence.model");
-		Properties hibernateProperties = new Properties();
-		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
-		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
-		hibernateProperties.setProperty("javax.persistence.validation.mode",
-				"none");
-		sb.setHibernateProperties(hibernateProperties);
-		return sb;
 	}
 
 	// ---WRITER wiring---
