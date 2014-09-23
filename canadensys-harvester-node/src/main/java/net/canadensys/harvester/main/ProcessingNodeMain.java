@@ -38,7 +38,7 @@ public class ProcessingNodeMain {
 	private ProcessingStepIF processInsertOccurrenceStep;
 
 	@Autowired
-	private ProcessingStepIF insertResourceContactStep;
+	private ProcessingStepIF insertResourceInformationStep;
 	
 	@Autowired
 	private ProcessingStepIF asyncManageOccurrenceExtensionStep;
@@ -73,8 +73,8 @@ public class ProcessingNodeMain {
 		registeredMsgHandlers.add((JMSConsumerMessageHandlerIF) processInsertOccurrenceStep);
 		registeredSteps.add(processInsertOccurrenceStep);
 
-		registeredMsgHandlers.add((JMSConsumerMessageHandlerIF) insertResourceContactStep);
-		registeredSteps.add(insertResourceContactStep);
+		registeredMsgHandlers.add((JMSConsumerMessageHandlerIF) insertResourceInformationStep);
+		registeredSteps.add(insertResourceInformationStep);
 		
 		registeredMsgHandlers.add((JMSConsumerMessageHandlerIF) asyncManageOccurrenceExtensionStep);
 		registeredSteps.add(asyncManageOccurrenceExtensionStep);

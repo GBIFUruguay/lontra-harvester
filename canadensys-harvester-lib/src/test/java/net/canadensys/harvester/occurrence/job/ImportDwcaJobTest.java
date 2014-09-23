@@ -113,6 +113,8 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 	@Test
 	public void testImport() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(txManager.getDataSource());
+		// Clear records from table:
+		jdbcTemplate.update("DELETE FROM buffer.occurrence");
 
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH,
 				"src/test/resources/dwca-qmor-specimens");
