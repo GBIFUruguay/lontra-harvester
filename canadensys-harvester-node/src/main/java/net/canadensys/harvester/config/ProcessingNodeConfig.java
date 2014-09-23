@@ -266,7 +266,7 @@ public class ProcessingNodeConfig {
 		return new ProcessInsertOccurrenceStep();
 	}
 
-	@Bean
+	@Bean (name = "asyncManageOccurrenceExtensionStep")
 	public ProcessingStepIF asyncManageOccurrenceExtensionStep() {
 		return new AsyncManageOccurrenceExtensionStep();
 	}
