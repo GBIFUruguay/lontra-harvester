@@ -79,7 +79,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 	private HarvesterViewModel harvesterViewModel;
 
 	@Autowired
-	@Qualifier(value = "stepController")
+	@Qualifier("stepController")
 	private StepControllerIF stepController;
 
 	public void initView() {
