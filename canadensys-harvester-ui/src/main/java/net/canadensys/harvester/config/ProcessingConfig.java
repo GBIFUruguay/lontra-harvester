@@ -138,7 +138,7 @@ public class ProcessingConfig {
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
 				OccurrenceModel.class, ImportLogModel.class,
-				ResourceModel.class });
+				ResourceModel.class, ResourceInformationModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -159,7 +159,7 @@ public class ProcessingConfig {
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
 				OccurrenceModel.class, ImportLogModel.class,
-				ResourceModel.class });
+				ResourceModel.class, ResourceInformationModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
