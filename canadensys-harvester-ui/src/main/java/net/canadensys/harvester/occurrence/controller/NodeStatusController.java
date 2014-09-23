@@ -11,11 +11,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * Controller that will receive notifications from node(s) in case of error.
+ * 
  * @author canadensys
- *
+ * 
  */
 
-public class NodeStatusController implements JMSControlConsumerMessageHandlerIF{
+public class NodeStatusController implements JMSControlConsumerMessageHandlerIF {
 
 	private static final Logger LOGGER = Logger.getLogger(NodeStatusController.class);
 
@@ -26,7 +27,8 @@ public class NodeStatusController implements JMSControlConsumerMessageHandlerIF{
 	@Qualifier("stepController")
 	private StepControllerIF parentCtrl;
 
-	public NodeStatusController(){}
+	public NodeStatusController() {
+	}
 
 	@Override
 	public Class<?> getMessageClass() {
@@ -35,14 +37,14 @@ public class NodeStatusController implements JMSControlConsumerMessageHandlerIF{
 
 	@Override
 	public boolean handleMessage(ControlMessageIF message) {
-		NodeErrorControlMessage errorCtrlMsg = (NodeErrorControlMessage)message;
+		NodeErrorControlMessage errorCtrlMsg = (NodeErrorControlMessage) message;
 		System.out.println("ERROR receive from node " + message.getNodeIdentifier() + ". See log for details");
-		LOGGER.fatal("Received from node "+errorCtrlMsg.getNodeIdentifier(), errorCtrlMsg.getEnclosedException());
+		LOGGER.fatal("Received from node " + errorCtrlMsg.getNodeIdentifier(), errorCtrlMsg.getEnclosedException());
 		parentCtrl.onNodeError();
 		return true;
 	}
 
-	public void start(){
+	public void start() {
 		errorReceiver.registerHandler(this);
 		errorReceiver.open();
 	}

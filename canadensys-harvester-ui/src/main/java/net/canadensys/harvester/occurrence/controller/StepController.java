@@ -32,28 +32,29 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Main controller to initiate jobs.
  * This controller is NOT thread safe.
+ * 
  * @author canadensys
- *
+ * 
  */
 public class StepController implements StepControllerIF {
 
 	@Autowired
 	private HarvesterConfigIF harvesterConfig;
-	
+
 	@Qualifier("currentVersion")
 	@Autowired
 	private String currentVersion;
 
 	@Autowired
-	@Qualifier(value="publicSessionFactory")
+	@Qualifier(value = "publicSessionFactory")
 	private SessionFactory sessionFactory;
-	
+
 	@Autowired
 	private IPTFeedDAO iptFeedDAO;
-	
+
 	@Autowired
 	private ResourceDAO resourceDAO;
-	
+
 	@Autowired
 	private ResourceStatusNotifierIF notifier;
 
@@ -68,7 +69,7 @@ public class StepController implements StepControllerIF {
 
 	@Autowired
 	private HarvesterViewModel harvesterViewModel;
-	
+
 	@Autowired
 	private JMSControlProducer controlMessageProducer;
 
@@ -77,21 +78,22 @@ public class StepController implements StepControllerIF {
 
 	private AbstractProcessingJob currentJob;
 
-	public StepController(){}
+	public StepController() {
+	}
 
 	@Override
-	public void registerProgressListener(ItemProgressListenerIF progressListener){
+	public void registerProgressListener(ItemProgressListenerIF progressListener) {
 		importDwcaJob.setItemProgressListener(progressListener);
 	}
 
 	@Override
-	public void importDwcA(Integer resourceId){
+	public void importDwcA(Integer resourceId) {
 		controlMessageProducer.open();
-		//send the app verion
+		// send the app verion
 		controlMessageProducer.publish(new VersionControlMessage(currentVersion));
 		controlMessageProducer.close();
-		
-		//enable node status controller
+
+		// enable node status controller
 		nodeStatusController.start();
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceId);
 		currentJob = importDwcaJob;
@@ -102,8 +104,8 @@ public class StepController implements StepControllerIF {
 	}
 
 	@Override
-	public void importDwcAFromLocalFile(String dwcaFilePath){
-		//enable node status controller
+	public void importDwcAFromLocalFile(String dwcaFilePath) {
+		// enable node status controller
 		nodeStatusController.start();
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, dwcaFilePath);
 		currentJob = importDwcaJob;
@@ -114,11 +116,11 @@ public class StepController implements StepControllerIF {
 	}
 
 	@Override
-	public void moveToPublicSchema(String sourceFileId){
+	public void moveToPublicSchema(String sourceFileId) {
 		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, sourceFileId);
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		harvesterViewModel.encapsulateJobStatus(jobStatusModel);
-		
+
 		moveToPublicSchemaJob.doJob(jobStatusModel);
 		currentJob = moveToPublicSchemaJob;
 
@@ -126,10 +128,9 @@ public class StepController implements StepControllerIF {
 		currentJob = computeUniqueValueJob;
 	}
 
-
 	@Override
 	@Transactional("publicTransactionManager")
-	public List<ResourceModel> getResourceModelList(){
+	public List<ResourceModel> getResourceModelList() {
 		return resourceDAO.loadResources();
 	}
 
@@ -155,25 +156,26 @@ public class StepController implements StepControllerIF {
 	}
 
 	@Override
-	public void onNodeError(){
-		//stop the current job
+	public void onNodeError() {
+		// stop the current job
 		currentJob.cancel();
 	}
-	
+
 	@Override
 	@Transactional("publicTransactionManager")
 	public List<IPTFeedModel> getIPTFeed() {
-		
+
 		URL mainIPTUrl = null;
 		try {
 			mainIPTUrl = new URL(harvesterConfig.getIptRssAddress());
-		} catch (MalformedURLException e) {
+		}
+		catch (MalformedURLException e) {
 			e.printStackTrace();
 			return null;
 		}
 		return iptFeedDAO.getIPTFeed(mainIPTUrl);
 	}
-	
+
 	@Override
 	public List<ResourceModel> getResourceToHarvest() {
 		return notifier.getHarvestRequiredList();

@@ -8,15 +8,19 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
 /**
  * Common interface for tasks
+ * 
  * @author canadensys
- *
+ * 
  */
-public interface ItemTaskIF extends JobAction{
+public interface ItemTaskIF extends JobAction {
 	/**
 	 * Run this task
-	 * @param sharedParameters Shared parameters among different tasks or steps
-	 * @exception if something goes wrong
+	 * 
+	 * @param sharedParameters
+	 *            Shared parameters among different tasks or steps
+	 * @exception if
+	 *                something goes wrong
 	 */
-	public void execute(Map<SharedParameterEnum,Object> sharedParameters) throws TaskExecutionException;
+	public void execute(Map<SharedParameterEnum, Object> sharedParameters) throws TaskExecutionException;
 
 }

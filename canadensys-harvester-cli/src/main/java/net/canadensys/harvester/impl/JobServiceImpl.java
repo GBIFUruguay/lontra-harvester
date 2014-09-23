@@ -7,15 +7,15 @@ import net.canadensys.harvester.JobServiceIF;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-public class JobServiceImpl implements JobServiceIF{
+public class JobServiceImpl implements JobServiceIF {
 
 	@Autowired
 	private ResourceDAO resourceDAO;
-	
+
 	@Override
 	@Transactional("publicTransactionManager")
-	public ResourceModel loadResourceModel(String sourcefileid){
+	public ResourceModel loadResourceModel(String sourcefileid) {
 		return resourceDAO.load(sourcefileid);
 	}
-	
+
 }

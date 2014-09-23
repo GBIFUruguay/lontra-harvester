@@ -51,15 +51,14 @@ public class SynchronousImportDwcaJobTest {
 
 	@Configuration
 	@Import(ProcessingConfigTest.class)
-	public static class SynchronousProcessingConfigTest extends
-			ProcessingConfigTest {
+	public static class SynchronousProcessingConfigTest extends ProcessingConfigTest {
 
 		@Override
 		@Bean(name = "streamDwcContentStep")
 		public ProcessingStepIF streamDwcContentStep() {
 			return new SynchronousProcessOccurrenceStep();
 		}
-		
+
 		@Override
 		@Bean(name = "streamEmlContentStep")
 		public ProcessingStepIF streamEmlContentStep() {
@@ -71,37 +70,26 @@ public class SynchronousImportDwcaJobTest {
 	public void testImport() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(txManager.getDataSource());
 
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH,
-				"src/test/resources/dwca-qmor-specimens");
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID,
-				"qmor-specimens");
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID,
-				"ada5d0b1-07de-4dc0-83d4-e312f0fb81cb");
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, "ada5d0b1-07de-4dc0-83d4-e312f0fb81cb");
 
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		importDwcaJob.doJob(jobStatusModel);
 
-		int count = jdbcTemplate.queryForObject(
-				"SELECT count(*) FROM buffer.occurrence", BigDecimal.class)
-				.intValue();
+		int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.occurrence", BigDecimal.class).intValue();
 
-		String state = jdbcTemplate.queryForObject(
-				"SELECT stateprovince FROM buffer.occurrence where dwcaid='3'",
-				String.class);
+		String state = jdbcTemplate.queryForObject("SELECT stateprovince FROM buffer.occurrence where dwcaid='3'", String.class);
 		assertTrue("Florida".equals(state));
 
-		String source = jdbcTemplate.queryForObject(
-				"SELECT sourcefileid FROM buffer.occurrence where dwcaid='1'",
-				String.class);
+		String source = jdbcTemplate.queryForObject("SELECT sourcefileid FROM buffer.occurrence where dwcaid='1'", String.class);
 		assertTrue("qmor-specimens".equals(source));
-		
+
 		// Test information is being also processed from EML content:
-		String alternateIdentifier = jdbcTemplate
-				.queryForObject(
-						"SELECT alternate_identifier FROM buffer.resource_information where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'",
-						String.class);
-		assertTrue("Collection entomologique Ouellet-Robert (QMOR)"
-				.equals(alternateIdentifier));
+		String alternateIdentifier = jdbcTemplate.queryForObject(
+				"SELECT alternate_identifier FROM buffer.resource_information where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'",
+				String.class);
+		assertTrue("Collection entomologique Ouellet-Robert (QMOR)".equals(alternateIdentifier));
 
 		assertTrue(new Integer(EXPECTED_NUMBER_OF_RESULTS).equals(count));
 	}

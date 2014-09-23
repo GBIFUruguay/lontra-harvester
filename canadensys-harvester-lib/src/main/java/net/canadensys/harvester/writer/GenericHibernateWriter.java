@@ -17,12 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Generic item writer for Hibernate using buffer schema.
+ * 
  * @author canadensys
- *
+ * 
  * @param <T>
  */
 public class GenericHibernateWriter<T> implements ItemWriterIF<T> {
-	
+
 	private static final Logger LOGGER = Logger.getLogger(GenericHibernateWriter.class);
 
 	@Autowired
@@ -46,7 +47,7 @@ public class GenericHibernateWriter<T> implements ItemWriterIF<T> {
 	}
 
 	@Override
-	public void write(List<? extends T> elementList) throws WriterException{
+	public void write(List<? extends T> elementList) throws WriterException {
 		Transaction tx = null;
 		T lastElement = null;
 		try {
@@ -56,16 +57,17 @@ public class GenericHibernateWriter<T> implements ItemWriterIF<T> {
 				session.insert(currOccurrence);
 			}
 			tx.commit();
-		} catch (HibernateException hEx) {
+		}
+		catch (HibernateException hEx) {
 			LOGGER.fatal("Failed to write model", hEx);
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
-			if( tx != null){
+			if (tx != null) {
 				tx.rollback();
 			}
 			String id = (lastElement != null) ? lastElement.toString() : "?";
-			throw new WriterException(id ,hEx.getMessage(), hEx);
+			throw new WriterException(id, hEx.getMessage(), hEx);
 		}
 	}
 
@@ -75,12 +77,13 @@ public class GenericHibernateWriter<T> implements ItemWriterIF<T> {
 		try {
 			Session currSession = sessionFactory.getCurrentSession();
 			currSession.save(model);
-		} catch (HibernateException hEx) {
+		}
+		catch (HibernateException hEx) {
 			LOGGER.fatal("Failed to write model", hEx);
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
-			throw new WriterException(model.toString(),hEx.getMessage(), hEx);
+			throw new WriterException(model.toString(), hEx.getMessage(), hEx);
 		}
 	}
 }

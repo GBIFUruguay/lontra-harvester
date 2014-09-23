@@ -7,20 +7,21 @@ import net.canadensys.harvester.message.ProcessingMessageIF;
 
 /**
  * JMS ItemWriterIF implementation.
+ * 
  * @author canadensys
- *
+ * 
  */
-public class JMSWriter extends JMSProducer implements ItemWriterIF<ProcessingMessageIF>{
+public class JMSWriter extends JMSProducer implements ItemWriterIF<ProcessingMessageIF> {
 
-	public JMSWriter(String brokerURL){
+	public JMSWriter(String brokerURL) {
 		super(brokerURL);
 	}
-	
+
 	@Override
 	public void openWriter() {
 		init();
 	}
-	
+
 	@Override
 	public void closeWriter() {
 		close();
@@ -28,7 +29,7 @@ public class JMSWriter extends JMSProducer implements ItemWriterIF<ProcessingMes
 
 	@Override
 	public void write(List<? extends ProcessingMessageIF> elementList) {
-		for(ProcessingMessageIF currMsg : elementList){
+		for (ProcessingMessageIF currMsg : elementList) {
 			send(currMsg);
 		}
 	}

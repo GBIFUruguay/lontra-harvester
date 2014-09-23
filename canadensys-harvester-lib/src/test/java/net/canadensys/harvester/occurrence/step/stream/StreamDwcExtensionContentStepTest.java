@@ -29,48 +29,49 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 /**
  * Test StreamDwcExtensionContentStep
+ * 
  * @author cgendreau
- *
+ * 
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes=ProcessingConfigTest.class, loader=AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = ProcessingConfigTest.class, loader = AnnotationConfigContextLoader.class)
 public class StreamDwcExtensionContentStepTest {
-	
+
 	@Autowired
 	@Qualifier("extLineProcessor")
 	private ItemProcessorIF<OccurrenceExtensionModel, OccurrenceExtensionModel> extLineProcessor;
-	
+
 	@Test
-	public void testStreamDwcExtensionContentStep(){
+	public void testStreamDwcExtensionContentStep() {
 		StreamDwcExtensionContentStep streamExtStep = new StreamDwcExtensionContentStep();
-		
+
 		MockMessageWriter<ProcessingMessageIF> mockMessageWriter = new MockMessageWriter<ProcessingMessageIF>();
 		DwcaExtensionReader<OccurrenceExtensionModel> extReader = new DwcaExtensionReader<OccurrenceExtensionModel>();
 		extReader.setMapper(new OccurrenceExtensionMapper());
-		
+
 		List<Class<? extends JMSConsumerMessageHandlerIF>> msgHandlerClassList = new ArrayList<Class<? extends JMSConsumerMessageHandlerIF>>();
 		msgHandlerClassList.add(GenericAsyncStep.class);
 		streamExtStep.setMessageClasses(msgHandlerClassList);
-		
-		//create a mock writer
+
+		// create a mock writer
 		streamExtStep.setWriter(mockMessageWriter);
 		streamExtStep.setReader(extReader);
 		streamExtStep.setDwcaLineProcessor(extLineProcessor);
-		
-		Map<SharedParameterEnum,Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
+
+		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "dwca-vascan-checklist");
-		sharedParameters.put(SharedParameterEnum.DWCA_PATH,"src/test/resources/dwca-vascan-checklist");
-		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE,"description");
-		
+		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-vascan-checklist");
+		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE, "description");
+
 		streamExtStep.preStep(sharedParameters);
 		streamExtStep.doStep();
 		streamExtStep.postStep();
-		
-		//The list of object that would have been written to the database
+
+		// The list of object that would have been written to the database
 		List<ProcessingMessageIF> objList = mockMessageWriter.getContent();
-		DefaultMessage firstObj = (DefaultMessage)objList.get(0);
-		
-		assertEquals(OccurrenceExtensionModel.class, ((ArrayList<?>)firstObj.getContent()).get(0).getClass());
+		DefaultMessage firstObj = (DefaultMessage) objList.get(0);
+
+		assertEquals(OccurrenceExtensionModel.class, ((ArrayList<?>) firstObj.getContent()).get(0).getClass());
 	}
 
 }

@@ -6,9 +6,10 @@ import java.util.List;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 
 public interface IPTFeedDAO {
-	
+
 	/**
 	 * Get the list of IPTFeedModel from an IPT installation RSS feed.
+	 * 
 	 * @param iptFeedURL
 	 * @return
 	 */

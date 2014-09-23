@@ -62,13 +62,14 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
  * 
  */
 @Configuration
-//@ComponentScan(basePackages = "net.canadensys.harvester", excludeFilters = { @Filter(type = FilterType.CUSTOM, value = { ExcludeTestClassesTypeFilter.class }) })
+// @ComponentScan(basePackages = "net.canadensys.harvester", excludeFilters = { @Filter(type = FilterType.CUSTOM, value = {
+// ExcludeTestClassesTypeFilter.class }) })
 @EnableTransactionManagement
 public class ProcessingNodeConfig {
-	
+
 	private static String propertiesFileLocation = "config/harvester-config.properties";
-	
-	@Value( "${harvester.library.version:?}" )
+
+	@Value("${harvester.library.version:?}")
 	private String currentVersion;
 
 	@Value("${database.url}")
@@ -89,7 +90,7 @@ public class ProcessingNodeConfig {
 	private String hibernateBufferSchema;
 	@Value("${jms.broker_url}")
 	private String jmsBrokerUrl;
-	
+
 	@Bean
 	public static PropertyPlaceholderConfigurer properties() {
 		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
@@ -101,7 +102,8 @@ public class ProcessingNodeConfig {
 	public LocalSessionFactoryBean bufferSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceInformationModel.class, ResourceModel.class, ResourceContactModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceInformationModel.class,
+				ResourceModel.class, ResourceContactModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -112,9 +114,9 @@ public class ProcessingNodeConfig {
 		sb.setHibernateProperties(hibernateProperties);
 		return sb;
 	}
-	
+
 	@Bean
-	public ProcessingNodeMain processingNodeMain(){
+	public ProcessingNodeMain processingNodeMain() {
 		return new ProcessingNodeMain();
 	}
 
@@ -222,9 +224,9 @@ public class ProcessingNodeConfig {
 	public JMSConsumer jmsConsumer() {
 		return new JMSConsumer(jmsBrokerUrl);
 	}
-	
-	@Bean(destroyMethod="close")
-	public JMSControlConsumer controlMessageReceiver(){
+
+	@Bean(destroyMethod = "close")
+	public JMSControlConsumer controlMessageReceiver() {
 		return new JMSControlConsumer(jmsBrokerUrl);
 	}
 
@@ -263,7 +265,7 @@ public class ProcessingNodeConfig {
 	public ProcessingStepIF processInsertOccurrenceStep() {
 		return new ProcessInsertOccurrenceStep();
 	}
-	
+
 	@Bean
 	public ProcessingStepIF asyncManageOccurrenceExtensionStep() {
 		return new AsyncManageOccurrenceExtensionStep();
@@ -280,7 +282,8 @@ public class ProcessingNodeConfig {
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceInformationModel.class, ResourceModel.class, ResourceContactModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceInformationModel.class,
+				ResourceModel.class, ResourceContactModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -304,14 +307,12 @@ public class ProcessingNodeConfig {
 	@Bean(name = "resourceInformationProcessor")
 	public ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor() {
 		return new ResourceInformationProcessor();
-	} 
-
-	
-	@Bean(name="occurrenceExtensionWriter")
-	public ItemWriterIF<OccurrenceExtensionModel> occurrenceExtensionWriter(){
-		return new GenericHibernateWriter<OccurrenceExtensionModel>();
 	}
 
+	@Bean(name = "occurrenceExtensionWriter")
+	public ItemWriterIF<OccurrenceExtensionModel> occurrenceExtensionWriter() {
+		return new GenericHibernateWriter<OccurrenceExtensionModel>();
+	}
 
 	@Bean
 	public ResourceStatusNotifierIF resourceStatusNotifierIF() {
@@ -338,13 +339,13 @@ public class ProcessingNodeConfig {
 	public ProcessingStepIF updateResourceInformationStep() {
 		return null;
 	}
-	
+
 	@Bean
-	public VersionController versionController(){
+	public VersionController versionController() {
 		return new VersionController();
 	}
 
-	@Bean(name="currentVersion")
+	@Bean(name = "currentVersion")
 	public String getCurrentVersion() {
 		return currentVersion;
 	}

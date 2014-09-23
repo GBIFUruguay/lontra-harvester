@@ -23,38 +23,40 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
- * Step taking a ProcessOccurrenceMessage from JMS message, process a Occurrence Raw object list, writing the result as well as the origin data (OccurrenceRaw).
+ * Step taking a ProcessOccurrenceMessage from JMS message, process a Occurrence Raw object list, writing the result as well as the origin data
+ * (OccurrenceRaw).
  * NOT thread safe
+ * 
  * @author canadensys
- *
+ * 
  */
-public class ProcessInsertOccurrenceStep implements ProcessingStepIF,JMSConsumerMessageHandlerIF{
+public class ProcessInsertOccurrenceStep implements ProcessingStepIF, JMSConsumerMessageHandlerIF {
 	private static final Logger LOGGER = Logger.getLogger(ProcessInsertOccurrenceStep.class);
-	
+
 	@Autowired
 	@Qualifier("occurrenceProcessor")
 	private ItemProcessorIF<OccurrenceRawModel, OccurrenceModel> processor;
-	
+
 	@Autowired
 	@Qualifier("occurrenceWriter")
 	private ItemWriterIF<OccurrenceModel> writer;
-	
+
 	@Autowired
 	@Qualifier("rawOccurrenceWriter")
 	private ItemWriterIF<OccurrenceRawModel> rawWriter;
-	
+
 	@Autowired
 	private JMSControlProducer errorReporter;
-	
+
 	@Override
-	public void preStep(Map<SharedParameterEnum,Object> sharedParameters) throws IllegalStateException {
-		if(writer == null || rawWriter == null){
+	public void preStep(Map<SharedParameterEnum, Object> sharedParameters) throws IllegalStateException {
+		if (writer == null || rawWriter == null) {
 			throw new IllegalStateException("No writer defined");
 		}
-		if(processor == null){
+		if (processor == null) {
 			throw new IllegalStateException("No processor defined");
 		}
-		if(errorReporter == null){
+		if (errorReporter == null) {
 			throw new IllegalStateException("No errorReporter defined");
 		}
 		writer.openWriter();
@@ -68,13 +70,14 @@ public class ProcessInsertOccurrenceStep implements ProcessingStepIF,JMSConsumer
 		rawWriter.closeWriter();
 		errorReporter.close();
 	}
-	
+
 	/**
 	 * No implemented, async step
 	 */
 	@Override
-	public void doStep() {};
-	
+	public void doStep() {
+	};
+
 	@Override
 	public Class<?> getMessageClass() {
 		return ProcessOccurrenceMessage.class;
@@ -82,13 +85,13 @@ public class ProcessInsertOccurrenceStep implements ProcessingStepIF,JMSConsumer
 
 	@Override
 	public boolean handleMessage(ProcessingMessageIF message) {
-		BulkDataObject<OccurrenceRawModel> bulkDataObject = ((ProcessOccurrenceMessage)message).getBulkRawModel();
+		BulkDataObject<OccurrenceRawModel> bulkDataObject = ((ProcessOccurrenceMessage) message).getBulkRawModel();
 		int numberOfData = bulkDataObject.getData().size();
-				
+
 		List<OccurrenceModel> occList = new ArrayList<OccurrenceModel>(numberOfData);
 		List<OccurrenceRawModel> occRawList = new ArrayList<OccurrenceRawModel>(numberOfData);
 		OccurrenceRawModel extractedRawModel = null;
-		for(int idx=0;idx<numberOfData;idx++){
+		for (int idx = 0; idx < numberOfData; idx++) {
 			extractedRawModel = bulkDataObject.retrieveObject(idx, new OccurrenceRawModel());
 			occRawList.add(extractedRawModel);
 			occList.add(processor.process(extractedRawModel, null));
@@ -96,21 +99,22 @@ public class ProcessInsertOccurrenceStep implements ProcessingStepIF,JMSConsumer
 		try {
 			rawWriter.write(occRawList);
 			writer.write(occList);
-		} catch (WriterException e) {
+		}
+		catch (WriterException e) {
 			errorReporter.publish(new NodeErrorControlMessage(e));
 			return false;
 		}
 		return true;
 	}
-	
-	public void setProcessor(ItemProcessorIF<OccurrenceRawModel, OccurrenceModel> processor){
+
+	public void setProcessor(ItemProcessorIF<OccurrenceRawModel, OccurrenceModel> processor) {
 		this.processor = processor;
 	}
-	
-	public void setWriter(ItemWriterIF<OccurrenceModel> writer){
+
+	public void setWriter(ItemWriterIF<OccurrenceModel> writer) {
 		this.writer = writer;
 	}
-	
+
 	@Override
 	public String getTitle() {
 		return "Inserting and processing occurrence data";

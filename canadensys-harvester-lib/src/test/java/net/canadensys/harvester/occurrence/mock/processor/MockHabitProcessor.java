@@ -10,20 +10,19 @@ import net.canadensys.harvester.occurrence.mock.MockProcessedHabitObject;
 
 /**
  * Simple processor that will take the id in MockHabitObject and parse it as an int and return a MockProcessedHabitObject
+ * 
  * @author canadensys
- *
+ * 
  */
-public class MockHabitProcessor implements ItemProcessorIF<MockHabitObject, MockProcessedHabitObject>{
+public class MockHabitProcessor implements ItemProcessorIF<MockHabitObject, MockProcessedHabitObject> {
 
 	@Override
 	public void init() {
-		
+
 	}
 
 	@Override
-	public MockProcessedHabitObject process(MockHabitObject data,
-			Map<SharedParameterEnum, Object> sharedParameters)
-			throws ProcessException {
+	public MockProcessedHabitObject process(MockHabitObject data, Map<SharedParameterEnum, Object> sharedParameters) throws ProcessException {
 		MockProcessedHabitObject processedObj = new MockProcessedHabitObject();
 		processedObj.setId(Integer.parseInt(data.getId()));
 		processedObj.setDescription(data.getDescription());

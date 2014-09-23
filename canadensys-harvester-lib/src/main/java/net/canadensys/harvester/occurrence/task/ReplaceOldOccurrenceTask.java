@@ -17,34 +17,36 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Task to move all the records for a specific sourcefileid from buffer to public database schema
+ * 
  * @author canadensys
- *
+ * 
  */
-public class ReplaceOldOccurrenceTask implements ItemTaskIF{
-	//get log4j handler
+public class ReplaceOldOccurrenceTask implements ItemTaskIF {
+	// get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(ReplaceOldOccurrenceTask.class);
 
 	@Autowired
-	@Qualifier(value="publicSessionFactory")
+	@Qualifier(value = "publicSessionFactory")
 	private SessionFactory sessionFactory;
-	
+
 	/**
-	 * @param sharedParameters SharedParameterEnum.SOURCE_FILE_ID required
+	 * @param sharedParameters
+	 *            SharedParameterEnum.SOURCE_FILE_ID required
 	 */
 	@Transactional("publicTransactionManager")
 	@Override
-	public void execute(Map<SharedParameterEnum,Object> sharedParameters){
+	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
 		Session session = sessionFactory.getCurrentSession();
-		
-		String sourceFileId = (String)sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
 
-		if(sourceFileId == null){
+		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
+
+		if (sourceFileId == null) {
 			LOGGER.fatal("Misconfigured task : sourceFileId cannot be null");
 			throw new TaskExecutionException("Misconfigured task");
 		}
-		
-		try{
-			//delete old records
+
+		try {
+			// delete old records
 			SQLQuery query = session.createSQLQuery("DELETE FROM occurrence WHERE sourcefileid=?");
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
@@ -54,8 +56,8 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF{
 			query = session.createSQLQuery("DELETE FROM resource_information WHERE resource_uuid=?");
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
-			
-			//copy records from buffer
+
+			// copy records from buffer
 			query = session.createSQLQuery("INSERT INTO occurrence (SELECT * FROM buffer.occurrence WHERE sourcefileid=?)");
 			query.setString(0, sourceFileId);
 			int numberOfRecords = query.executeUpdate();
@@ -65,8 +67,8 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF{
 			query = session.createSQLQuery("INSERT INTO resource_information (SELECT * FROM buffer.resource_information WHERE resource_uuid=?)");
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
-			
-			//empty buffer schema for this sourcefileid
+
+			// empty buffer schema for this sourcefileid
 			query = session.createSQLQuery("DELETE FROM buffer.occurrence WHERE sourcefileid=?");
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
@@ -76,11 +78,11 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF{
 			query = session.createSQLQuery("DELETE FROM buffer.resource_information WHERE resource_uuid=?");
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
-			
+
 			sharedParameters.put(SharedParameterEnum.NUMBER_OF_RECORDS, numberOfRecords);
 		}
-		catch(HibernateException hEx){
-			LOGGER.fatal("Can't replace previous records in public schema.",hEx);
+		catch (HibernateException hEx) {
+			LOGGER.fatal("Can't replace previous records in public schema.", hEx);
 			throw new TaskExecutionException("Can't replace previous records in public schema.");
 		}
 	}
@@ -88,7 +90,7 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF{
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
-	
+
 	@Override
 	public String getTitle() {
 		return "Replacing old occurrences";

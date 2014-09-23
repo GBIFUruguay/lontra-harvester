@@ -19,53 +19,58 @@ import org.xml.sax.SAXException;
 
 /**
  * Item reader for an EML file inside a DarwinCore Archive
+ * 
  * @author canadensys
- *
+ * 
  */
-public class DwcaEmlReader implements ItemReaderIF<Eml>{
+public class DwcaEmlReader implements ItemReaderIF<Eml> {
 
 	private static final Logger LOGGER = Logger.getLogger(DwcaEmlReader.class);
-	
+
 	private final AtomicBoolean canceled = new AtomicBoolean(false);
 	private String dwcaFilePath = null;
 	private Eml eml = null;
-	
+
 	@Override
-	public Eml read(){
-		
-		if(canceled.get()){
+	public Eml read() {
+
+		if (canceled.get()) {
 			return null;
 		}
-		
+
 		Eml tmpEml = eml;
-		//the read method act like an iterator so we only return the eml once
-		if(eml != null){
+		// the read method act like an iterator so we only return the eml once
+		if (eml != null) {
 			eml = null;
 		}
 		return tmpEml;
 	}
 
 	@Override
-	public void openReader(Map<SharedParameterEnum,Object> sharedParameters){
-		dwcaFilePath = (String)sharedParameters.get(SharedParameterEnum.DWCA_PATH);
-		
+	public void openReader(Map<SharedParameterEnum, Object> sharedParameters) {
+		dwcaFilePath = (String) sharedParameters.get(SharedParameterEnum.DWCA_PATH);
+
 		File dwcaFile = null;
 		try {
 			dwcaFile = new File(dwcaFilePath);
 			Archive dwcArchive = ArchiveFactory.openArchive(dwcaFile);
 			eml = EmlFactory.build(new FileInputStream(dwcArchive.getMetadataLocationFile()));
-		} catch (UnsupportedArchiveException e) {
+		}
+		catch (UnsupportedArchiveException e) {
 			LOGGER.fatal("Can't open DwcaEmlReader", e);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			LOGGER.fatal("Can't open DwcaEmlReader", e);
-		} catch (SAXException e) {
+		}
+		catch (SAXException e) {
 			LOGGER.fatal("Can't open DwcaEmlReader", e);
 		}
 	}
-	
+
 	@Override
-	public void closeReader(){}
-	
+	public void closeReader() {
+	}
+
 	@Override
 	public void abort() {
 		// TODO implement

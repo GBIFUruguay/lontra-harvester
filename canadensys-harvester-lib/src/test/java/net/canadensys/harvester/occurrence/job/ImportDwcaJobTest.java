@@ -50,8 +50,7 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 
 	private static final String TEST_BROKER_URL = "vm://localhost?broker.persistent=false";
 	private static AtomicBoolean jobComplete = new AtomicBoolean(false);
-	private static AtomicBoolean controlMessageReceived = new AtomicBoolean(
-			false);
+	private static AtomicBoolean controlMessageReceived = new AtomicBoolean(false);
 	private static final int MAX_WAIT = 60000;
 
 	private static final int EXPECTED_NUMBER_OF_RESULTS = 11;
@@ -92,7 +91,8 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 		try {
 			((ProcessingStepIF) processInsertOccurrenceStep).preStep(null);
 			((ProcessingStepIF) insertResourceInformationStep).preStep(null);
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			e.printStackTrace();
 		}
 		reader.open();
@@ -116,10 +116,8 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 		// Clear records from table:
 		jdbcTemplate.update("DELETE FROM buffer.occurrence");
 
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH,
-				"src/test/resources/dwca-qmor-specimens");
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID,
-				"qmor-specimens");
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
 
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		jobStatusModel.addPropertyChangeListener(this);
@@ -129,39 +127,29 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 				jobComplete.wait(MAX_WAIT);
 				// validate content of the database
 				if (jobComplete.get()) {
-					int count = jdbcTemplate.queryForObject(
-							"SELECT count(*) FROM buffer.occurrence",
-							BigDecimal.class).intValue();
+					int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.occurrence", BigDecimal.class).intValue();
 					// give a chance to the database to be updated (since it's
 					// triggered by a JMS message)
 					int nbOfAttemp = 0;
-					while (count != EXPECTED_NUMBER_OF_RESULTS
-							&& nbOfAttemp < MAX_NUMBER_OF_ATTEMP) {
+					while (count != EXPECTED_NUMBER_OF_RESULTS && nbOfAttemp < MAX_NUMBER_OF_ATTEMP) {
 						nbOfAttemp++;
 						Thread.sleep(1000);
-						count = jdbcTemplate.queryForObject(
-								"SELECT count(*) FROM buffer.occurrence",
-								BigDecimal.class).intValue();
+						count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.occurrence", BigDecimal.class).intValue();
 					}
 
-					String state = jdbcTemplate
-							.queryForObject(
-									"SELECT stateprovince FROM buffer.occurrence where dwcaid='3'",
-									String.class);
+					String state = jdbcTemplate.queryForObject("SELECT stateprovince FROM buffer.occurrence where dwcaid='3'", String.class);
 					assertTrue("Florida".equals(state));
 
-					String source = jdbcTemplate
-							.queryForObject(
-									"SELECT sourcefileid FROM buffer.occurrence where dwcaid='1'",
-									String.class);
+					String source = jdbcTemplate.queryForObject("SELECT sourcefileid FROM buffer.occurrence where dwcaid='1'", String.class);
 					assertTrue("qmor-specimens".equals(source));
 
-					assertTrue(new Integer(EXPECTED_NUMBER_OF_RESULTS)
-							.equals(count));
-				} else {
+					assertTrue(new Integer(EXPECTED_NUMBER_OF_RESULTS).equals(count));
+				}
+				else {
 					fail();
 				}
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e) {
 				fail();
 			}
 		}
@@ -174,18 +162,19 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 	@Test
 	public void testFailedImport() {
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens-broken");
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID,"qmor-specimens");
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		importDwcaJob.doJob(jobStatusModel);
-		
+
 		synchronized (controlMessageReceived) {
 			try {
-				controlMessageReceived.wait(MAX_WAIT); 
+				controlMessageReceived.wait(MAX_WAIT);
 				// validate content of the database
 				if (!controlMessageReceived.get()) {
 					fail();
 				}
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e) {
 				fail();
 			}
 		}
@@ -197,8 +186,7 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 	 * @author canadensys
 	 * 
 	 */
-	private class MockControlMessageHandler implements
-			JMSControlConsumerMessageHandlerIF {
+	private class MockControlMessageHandler implements JMSControlConsumerMessageHandlerIF {
 
 		@Override
 		public Class<?> getMessageClass() {
@@ -217,12 +205,12 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 
 	@Override
 	public void propertyChange(PropertyChangeEvent pcEvt) {
-		if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(pcEvt
-				.getPropertyName())) {
+		if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(pcEvt.getPropertyName())) {
 			JobStatus newStatus = (JobStatus) pcEvt.getNewValue();
 			if (JobStatus.DONE == newStatus) {
 				onSuccess();
-			} else if (JobStatus.ERROR == newStatus) {
+			}
+			else if (JobStatus.ERROR == newStatus) {
 				onError();
 			}
 		}

@@ -10,24 +10,25 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.stereotype.Component;
 
 @Component
-public class JobInitiatorMain{
-	
+public class JobInitiatorMain {
+
 	@Autowired
 	private OccurrenceHarvesterMainView occurrenceHarvesterMainView;
-	
+
 	@Autowired
 	private JMSProducer jmsProducer;
 
-	public void initiateApp(String brokerURL){
+	public void initiateApp(String brokerURL) {
 		// check if we need to set a new broker URL
 		if (StringUtils.isNotBlank(brokerURL)) {
 			jmsProducer.setBrokerURL(brokerURL);
 		}
 		occurrenceHarvesterMainView.initView();
 	}
-	
+
 	/**
 	 * JobInitiator Entry point
+	 * 
 	 * @param args
 	 */
 	public static void main(String newBrokerIp) {

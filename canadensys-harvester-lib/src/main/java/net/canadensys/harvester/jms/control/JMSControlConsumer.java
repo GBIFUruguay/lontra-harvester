@@ -26,67 +26,69 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * JMS control message consumer.
+ * 
  * @author canadensys
- *
+ * 
  */
 public class JMSControlConsumer {
 	private static final Logger LOGGER = Logger.getLogger(JMSControlConsumer.class);
-	
+
 	public String brokerURL;
-		
-	//Topic connection is used to public control commands
+
+	// Topic connection is used to public control commands
 	private TopicConnection topicConnection;
 	private TopicSubscriber subscriber;
 	private TopicSession subSession;
-	
-	//Jackson Mapper to map JSON into Java object
+
+	// Jackson Mapper to map JSON into Java object
 	private ObjectMapper om;
-	
+
 	private List<JMSControlConsumerMessageHandlerIF> registeredHandlers;
-	
-	public JMSControlConsumer(String brokerURL){
+
+	public JMSControlConsumer(String brokerURL) {
 		this.brokerURL = brokerURL;
 		registeredHandlers = new ArrayList<JMSControlConsumerMessageHandlerIF>();
 	}
-	
+
 	public void open() {
 		om = new ObjectMapper();
 		BasicConfigurator.configure();
 		// Getting JMS connection from the server
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerURL);
-		
-		
-		try{				
-			//Control message
+
+		try {
+			// Control message
 			topicConnection = connectionFactory.createTopicConnection();
 			topicConnection.start();
-			subSession = topicConnection.createTopicSession(false,Session.AUTO_ACKNOWLEDGE);
+			subSession = topicConnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
 			subscriber = subSession.createSubscriber(subSession.createTopic(JMSControlProducer.CONTROL_TOPIC));
 			subscriber.setMessageListener(new JMSControlMessageListener());
 		}
-		catch(JMSException jmsEx){
+		catch (JMSException jmsEx) {
 			LOGGER.fatal("Can not initialize JMSConsumer", jmsEx);
 		}
 	}
-	
+
 	public void close() {
 		try {
 			subSession.close();
-			topicConnection.close();	
-		} catch (JMSException e) {
+			topicConnection.close();
+		}
+		catch (JMSException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Register a handler to notify when we receive a message
+	 * 
 	 * @param handler
 	 */
-	public void registerHandler(JMSControlConsumerMessageHandlerIF handler){
+	public void registerHandler(JMSControlConsumerMessageHandlerIF handler) {
 		registeredHandlers.add(handler);
 	}
-	
-	private class JMSControlMessageListener implements MessageListener{
+
+	private class JMSControlMessageListener implements MessageListener {
 		@Override
 		public void onMessage(Message message) {
 			// Producer sent us a TextMessage
@@ -95,30 +97,36 @@ public class JMSControlConsumer {
 			if (message instanceof TextMessage) {
 				TextMessage msg = (TextMessage) message;
 				try {
-					Class<?> msgClass = Class.forName(ObjectUtils.defaultIfNull(msg.getStringProperty("MessageClass"), Object.class.getCanonicalName()));
-					//validate if we can instantiate
-					for(JMSControlConsumerMessageHandlerIF currMsgHandler : registeredHandlers){
-						
-						if(currMsgHandler.getMessageClass().equals(msgClass)){
-							ControlMessageIF controlMessage = (ControlMessageIF)om.readValue(msg.getText(), msgClass);
-							if(!currMsgHandler.handleMessage(controlMessage)){
+					Class<?> msgClass = Class.forName(ObjectUtils.defaultIfNull(msg.getStringProperty("MessageClass"),
+							Object.class.getCanonicalName()));
+					// validate if we can instantiate
+					for (JMSControlConsumerMessageHandlerIF currMsgHandler : registeredHandlers) {
+
+						if (currMsgHandler.getMessageClass().equals(msgClass)) {
+							ControlMessageIF controlMessage = (ControlMessageIF) om.readValue(msg.getText(), msgClass);
+							if (!currMsgHandler.handleMessage(controlMessage)) {
 								throw new RuntimeException("Error while handling the control message");
 							}
 							break;
 						}
-						
-						//TODO : add support for ControlMessageIF
-						//TODO : raise error if no handler can process it
+
+						// TODO : add support for ControlMessageIF
+						// TODO : raise error if no handler can process it
 					}
-				} catch (JMSException e) {
+				}
+				catch (JMSException e) {
 					LOGGER.fatal("Can not consume message ", e);
-				} catch (ClassNotFoundException e) {
+				}
+				catch (ClassNotFoundException e) {
 					LOGGER.fatal("Can not consume message ", e);
-				} catch (JsonParseException e) {
+				}
+				catch (JsonParseException e) {
 					LOGGER.fatal("Can not consume message ", e);
-				} catch (JsonMappingException e) {
+				}
+				catch (JsonMappingException e) {
 					LOGGER.fatal("Can not consume message ", e);
-				} catch (IOException e) {
+				}
+				catch (IOException e) {
 					LOGGER.fatal("Can not consume message ", e);
 				}
 			}

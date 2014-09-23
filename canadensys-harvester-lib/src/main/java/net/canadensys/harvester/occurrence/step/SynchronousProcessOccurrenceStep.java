@@ -22,33 +22,33 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * This step is synchronous, it will block until the whole archive is written to the writer. May not be suitable for large Dwc-A.
  * 
  * @author cgendreau
- *
+ * 
  */
 public class SynchronousProcessOccurrenceStep implements ProcessingStepIF {
-	
+
 	private static final int DEFAULT_FLUSH_INTERVAL = 250;
-	
+
 	@Autowired
 	@Qualifier("dwcItemReader")
 	private ItemReaderIF<OccurrenceRawModel> reader;
-	
+
 	@Autowired
 	@Qualifier("lineProcessor")
 	private ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> lineProcessor;
-	
+
 	@Autowired
 	@Qualifier("occurrenceProcessor")
 	private ItemProcessorIF<OccurrenceRawModel, OccurrenceModel> processor;
-	
+
 	@Autowired
 	@Qualifier("occurrenceWriter")
 	private ItemWriterIF<OccurrenceModel> writer;
-	
+
 	@Autowired
 	@Qualifier("rawOccurrenceWriter")
 	private ItemWriterIF<OccurrenceRawModel> rawWriter;
-	
-	private Map<SharedParameterEnum,Object> sharedParameters;
+
+	private Map<SharedParameterEnum, Object> sharedParameters;
 	private int numberOfRecords = 0;
 
 	@Override
@@ -57,26 +57,25 @@ public class SynchronousProcessOccurrenceStep implements ProcessingStepIF {
 	}
 
 	@Override
-	public void preStep(Map<SharedParameterEnum, Object> sharedParameters)
-			throws IllegalStateException {
-		if(reader == null){
+	public void preStep(Map<SharedParameterEnum, Object> sharedParameters) throws IllegalStateException {
+		if (reader == null) {
 			throw new IllegalStateException("No reader defined");
 		}
-		if(writer == null || rawWriter == null){
+		if (writer == null || rawWriter == null) {
 			throw new IllegalStateException("No writer defined");
 		}
-		if(processor == null || lineProcessor == null){
+		if (processor == null || lineProcessor == null) {
 			throw new IllegalStateException("No processor defined");
 		}
 
 		this.sharedParameters = sharedParameters;
-		
+
 		writer.openWriter();
 		rawWriter.openWriter();
-		
+
 		lineProcessor.init();
 		processor.init();
-		
+
 		reader.openReader(sharedParameters);
 	}
 
@@ -84,9 +83,9 @@ public class SynchronousProcessOccurrenceStep implements ProcessingStepIF {
 	public void postStep() {
 		writer.closeWriter();
 		rawWriter.closeWriter();
-		
+
 		reader.closeReader();
-		
+
 		lineProcessor.destroy();
 		processor.destroy();
 	}
@@ -95,43 +94,43 @@ public class SynchronousProcessOccurrenceStep implements ProcessingStepIF {
 	public void doStep() {
 		List<OccurrenceModel> occList = new ArrayList<OccurrenceModel>(DEFAULT_FLUSH_INTERVAL);
 		List<OccurrenceRawModel> occRawList = new ArrayList<OccurrenceRawModel>(DEFAULT_FLUSH_INTERVAL);
-		
-		JobStatusModel jobStatus = (JobStatusModel)sharedParameters.get(SharedParameterEnum.JOB_STATUS_MODEL);
-		
+
+		JobStatusModel jobStatus = (JobStatusModel) sharedParameters.get(SharedParameterEnum.JOB_STATUS_MODEL);
+
 		try {
 			OccurrenceRawModel currRawModel = reader.read();
-			while(currRawModel != null){
+			while (currRawModel != null) {
 				currRawModel = lineProcessor.process(currRawModel, sharedParameters);
-				
+
 				occRawList.add(currRawModel);
 				occList.add(processor.process(currRawModel, sharedParameters));
-	
+
 				currRawModel = reader.read();
 				numberOfRecords++;
-				
-				if(numberOfRecords % DEFAULT_FLUSH_INTERVAL == 0){
+
+				if (numberOfRecords % DEFAULT_FLUSH_INTERVAL == 0) {
 					rawWriter.write(occRawList);
 					writer.write(occList);
-					
+
 					occRawList.clear();
 					occList.clear();
 					jobStatus.setCurrentJobProgress(numberOfRecords + " records");
 				}
 			}
-			//flush remaining content
-			if(occList.size() > 0){
+			// flush remaining content
+			if (occList.size() > 0) {
 				rawWriter.write(occRawList);
 				writer.write(occList);
-				
+
 				occRawList.clear();
 				occList.clear();
 				jobStatus.setCurrentJobProgress(numberOfRecords + " records");
 			}
 		}
-		catch(WriterException wEx){
+		catch (WriterException wEx) {
 			wEx.printStackTrace();
 		}
-		sharedParameters.put(SharedParameterEnum.NUMBER_OF_RECORDS,numberOfRecords);
+		sharedParameters.put(SharedParameterEnum.NUMBER_OF_RECORDS, numberOfRecords);
 	}
 
 }

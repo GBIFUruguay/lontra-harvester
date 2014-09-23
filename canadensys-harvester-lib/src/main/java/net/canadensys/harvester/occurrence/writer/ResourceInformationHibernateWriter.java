@@ -21,8 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  */
 public class ResourceInformationHibernateWriter implements ItemWriterIF<ResourceInformationModel> {
 
-	private static final Logger LOGGER = Logger
-			.getLogger(ResourceInformationHibernateWriter.class);
+	private static final Logger LOGGER = Logger.getLogger(ResourceInformationHibernateWriter.class);
 
 	@Autowired
 	@Qualifier(value = "bufferSessionFactory")
@@ -45,7 +44,7 @@ public class ResourceInformationHibernateWriter implements ItemWriterIF<Resource
 	}
 
 	@Override
-	public void write(List<? extends ResourceInformationModel> elementList) throws WriterException{
+	public void write(List<? extends ResourceInformationModel> elementList) throws WriterException {
 		String lastId = "";
 		try {
 			session.beginTransaction();
@@ -54,29 +53,31 @@ public class ResourceInformationHibernateWriter implements ItemWriterIF<Resource
 				session.save(resourceInformationModel);
 			}
 			session.getTransaction().commit();
-		} catch (HibernateException hEx) {
+		}
+		catch (HibernateException hEx) {
 			LOGGER.fatal("Failed to write resourceInformation", hEx);
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
-			throw new WriterException(lastId,hEx.getMessage());
+			throw new WriterException(lastId, hEx.getMessage());
 		}
 	}
 
 	@Override
-	public void write(ResourceInformationModel resourceInformationModel) throws WriterException{
+	public void write(ResourceInformationModel resourceInformationModel) throws WriterException {
 		openWriter();
 		try {
 			session.beginTransaction();
 			session.save(resourceInformationModel);
 			session.getTransaction().commit();
-		} catch (HibernateException hEx) {
+		}
+		catch (HibernateException hEx) {
 			LOGGER.fatal("Failed to write resourceInformation", hEx);
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
 			String id = resourceInformationModel.getAuto_id() != null ? resourceInformationModel.getAuto_id().toString() : "?";
-			throw new WriterException(id,hEx.getMessage());
+			throw new WriterException(id, hEx.getMessage());
 		}
 	}
 }

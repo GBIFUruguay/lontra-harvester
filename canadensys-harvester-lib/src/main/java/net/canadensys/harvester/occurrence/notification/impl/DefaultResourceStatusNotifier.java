@@ -29,8 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
  * 
  */
 public class DefaultResourceStatusNotifier implements ResourceStatusNotifierIF {
-	private static final Logger LOGGER = Logger
-			.getLogger(DefaultResourceStatusNotifier.class);
+	private static final Logger LOGGER = Logger.getLogger(DefaultResourceStatusNotifier.class);
 	private static final String IPT_RSS_SUFFIX = "/rss.do";
 
 	// very simple cache to avoid parsing the RSS feed on each resources
@@ -62,21 +61,18 @@ public class DefaultResourceStatusNotifier implements ResourceStatusNotifierIF {
 		for (ResourceModel currResource : resourcesList) {
 			currResource.getResource_uuid();
 			// we deduce the RSS feed address from the archive URL. This may become a problem in the future.
-			iptAddress = StringUtils.substringBeforeLast(
-					currResource.getArchive_url(), "/")
-					+ IPT_RSS_SUFFIX;
+			iptAddress = StringUtils.substringBeforeLast(currResource.getArchive_url(), "/") + IPT_RSS_SUFFIX;
 			if (!feedModelByIPTAddress.containsKey(iptAddress)) {
 				try {
 					iptURL = new URL(iptAddress);
-					feedModelByIPTAddress.put(iptAddress,
-							iptFeedDAO.getIPTFeed(iptURL));
-				} catch (MalformedURLException e) {
+					feedModelByIPTAddress.put(iptAddress, iptFeedDAO.getIPTFeed(iptURL));
+				}
+				catch (MalformedURLException e) {
 					LOGGER.error("Can't build IPT RSS feed address", e);
 				}
 			}
 
-			List<IPTFeedModel> feedEntryList = feedModelByIPTAddress
-					.get(iptAddress);
+			List<IPTFeedModel> feedEntryList = feedModelByIPTAddress.get(iptAddress);
 			String resourceKey;
 			ImportLogModel lastImportLog;
 
@@ -99,9 +95,9 @@ public class DefaultResourceStatusNotifier implements ResourceStatusNotifierIF {
 						}
 					}
 				}
-			} else {
-				LOGGER.warn("Resource [" + currResource.getSourcefileid()
-						+ "] doesn't have a key. Can't validate status.");
+			}
+			else {
+				LOGGER.warn("Resource [" + currResource.getSourcefileid() + "] doesn't have a key. Can't validate status.");
 			}
 		}
 		return resourceToHarvest;

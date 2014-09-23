@@ -10,15 +10,15 @@ import org.springframework.core.type.filter.RegexPatternTypeFilter;
  * The goal is to avoid annotation and bean conflicts.
  * 
  * @author canadensys
- *
+ * 
  */
-public class ExcludeTestClassesTypeFilter extends RegexPatternTypeFilter{
-    public ExcludeTestClassesTypeFilter() {
-        super(Pattern.compile("net\\.canadensys\\.harvester.*Test$"));
-    }
-    
-    @Override
-    protected boolean match(ClassMetadata metadata) {
-    	return super.match(metadata);
-    }
+public class ExcludeTestClassesTypeFilter extends RegexPatternTypeFilter {
+	public ExcludeTestClassesTypeFilter() {
+		super(Pattern.compile("net\\.canadensys\\.harvester.*Test$"));
+	}
+
+	@Override
+	protected boolean match(ClassMetadata metadata) {
+		return super.match(metadata);
+	}
 }

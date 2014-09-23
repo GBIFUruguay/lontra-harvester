@@ -45,9 +45,9 @@ public class JMSProducer {
 	public JMSProducer(String brokerURL) {
 		this.brokerURL = brokerURL;
 	}
-	
-	public void setBrokerURL(String brokerURL){
-		if(isOpen){
+
+	public void setBrokerURL(String brokerURL) {
+		if (isOpen) {
 			throw new IllegalStateException("Can not set broker URL if the connection is started.");
 		}
 		this.brokerURL = brokerURL;
@@ -58,19 +58,19 @@ public class JMSProducer {
 			connection.stop();
 			connection.close();
 			isOpen = false;
-		} catch (JMSException e) {
+		}
+		catch (JMSException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public void init() {
 		om = new ObjectMapper();
-		//do not serialize null data
+		// do not serialize null data
 		om.setSerializationInclusion(Include.NON_NULL);
-		
-		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(
-				brokerURL);
-		
+
+		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(brokerURL);
+
 		try {
 			// Getting JMS connection from the server and starting it
 			connection = factory.createConnection();
@@ -80,7 +80,8 @@ public class JMSProducer {
 			Destination destination = session.createQueue(QUEUE_NAME);
 			isOpen = true;
 			producer = session.createProducer(destination);
-		} catch (JMSException jEx) {
+		}
+		catch (JMSException jEx) {
 			LOGGER.fatal("Can not initialize JMSProducer", jEx);
 		}
 	}
@@ -96,13 +97,17 @@ public class JMSProducer {
 			message = session.createTextMessage(om.writeValueAsString(element));
 			message.setStringProperty("MessageClass", element.getClass().getCanonicalName());
 			producer.send(message);
-		} catch (JMSException e) {
+		}
+		catch (JMSException e) {
 			LOGGER.fatal("Can not send message", e);
-		} catch (JsonGenerationException e) {
+		}
+		catch (JsonGenerationException e) {
 			LOGGER.fatal("Can not send message", e);
-		} catch (JsonMappingException e) {
+		}
+		catch (JsonMappingException e) {
 			LOGGER.fatal("Can not send message", e);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			LOGGER.fatal("Can not send message", e);
 		}
 	}

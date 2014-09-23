@@ -5,8 +5,8 @@ package net.canadensys.harvester.message;
  * Empty interface for now.
  * 
  * @author canadensys
- *
+ * 
  */
-public interface ProcessingMessageIF {	
+public interface ProcessingMessageIF {
 
 }

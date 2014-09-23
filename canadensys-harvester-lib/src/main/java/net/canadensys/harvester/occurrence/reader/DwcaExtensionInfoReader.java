@@ -19,32 +19,34 @@ import org.gbif.dwc.text.UnsupportedArchiveException;
  * ItemReader to read the name(rowType) of all extensions included in a DarwinCore Archive.
  * 
  * @author cgendreau
- *
+ * 
  */
-public class DwcaExtensionInfoReader implements ItemReaderIF<String>{
-	
-	//get log4j handler
+public class DwcaExtensionInfoReader implements ItemReaderIF<String> {
+
+	// get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(DwcaExtensionInfoReader.class);
-	
+
 	private Iterator<ArchiveFile> extIt;
 
 	@Override
 	public void openReader(Map<SharedParameterEnum, Object> sharedParameters) {
-		String dwcaFilePath = (String)sharedParameters.get(SharedParameterEnum.DWCA_PATH);
-		if(StringUtils.isBlank(dwcaFilePath)){
+		String dwcaFilePath = (String) sharedParameters.get(SharedParameterEnum.DWCA_PATH);
+		if (StringUtils.isBlank(dwcaFilePath)) {
 			throw new IllegalStateException("sharedParameters missing: DWCA_PATH is required.");
 		}
-		
+
 		File dwcaFile = new File(dwcaFilePath);
 		Archive dwcArchive;
 		try {
 			dwcArchive = ArchiveFactory.openArchive(dwcaFile);
-			if(dwcArchive.getExtensions() != null && !dwcArchive.getExtensions().isEmpty()){
+			if (dwcArchive.getExtensions() != null && !dwcArchive.getExtensions().isEmpty()) {
 				extIt = dwcArchive.getExtensions().iterator();
 			}
-		} catch (UnsupportedArchiveException e) {
+		}
+		catch (UnsupportedArchiveException e) {
 			LOGGER.fatal("Can't open ExtensionInfoReader", e);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			LOGGER.fatal("Can't open ExtensionInfoReader", e);
 		}
 	}
@@ -61,7 +63,7 @@ public class DwcaExtensionInfoReader implements ItemReaderIF<String>{
 
 	@Override
 	public String read() {
-		if(extIt != null && extIt.hasNext()){
+		if (extIt != null && extIt.hasNext()) {
 			return extIt.next().getRowType();
 		}
 		return null;

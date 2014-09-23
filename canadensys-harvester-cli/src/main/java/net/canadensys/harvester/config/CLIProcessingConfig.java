@@ -61,62 +61,63 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /**
  * Configuration class using Spring annotations.
  * All the beans that could be changed based on configuration or could be mock are created from here.
+ * 
  * @author canadensys
- *
+ * 
  */
 @Configuration
-//@ComponentScan(basePackages ="net.canadensys.harvester",
-//excludeFilters = { @Filter(type = FilterType.CUSTOM, value = { ExcludeTestClassesTypeFilter.class }), 
-//		@Filter(type = FilterType.ASSIGNABLE_TYPE, value = TestConfig.class)})
+// @ComponentScan(basePackages ="net.canadensys.harvester",
+// excludeFilters = { @Filter(type = FilterType.CUSTOM, value = { ExcludeTestClassesTypeFilter.class }),
+// @Filter(type = FilterType.ASSIGNABLE_TYPE, value = TestConfig.class)})
 @EnableTransactionManagement
 public class CLIProcessingConfig {
 
 	@Bean
-	public static PropertyPlaceholderConfigurer properties(){
+	public static PropertyPlaceholderConfigurer properties() {
 		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-		ppc.setLocation( new FileSystemResource("config/harvester-config.properties") );
+		ppc.setLocation(new FileSystemResource("config/harvester-config.properties"));
 		return ppc;
 	}
-	
-	@Value( "${harvester.library.version:?}" )
+
+	@Value("${harvester.library.version:?}")
 	private String currentVersion;
 
 	@Value("${database.url}")
 	private String dbUrl;
-	@Value( "${database.driver}" )
+	@Value("${database.driver}")
 	private String dbDriverClassName;
-	@Value( "${database.username}" )
+	@Value("${database.username}")
 	private String username;
-	@Value( "${database.password}" )
+	@Value("${database.password}")
 	private String password;
 
-	@Value( "${hibernate.dialect}" )
+	@Value("${hibernate.dialect}")
 	private String hibernateDialect;
-	@Value( "${hibernate.show_sql}" )
+	@Value("${hibernate.show_sql}")
 	private String hibernateShowSql;
-	@Value( "${hibernate.buffer_schema}" )
+	@Value("${hibernate.buffer_schema}")
 	private String hibernateBufferSchema;
-	@Value( "${hibernate.jdbc.fetch_size}" )
+	@Value("${hibernate.jdbc.fetch_size}")
 	private String hibernateJDBCFetchSize;
 
 	@Value("${occurrence.idGenerationSQL}")
 	private String idGenerationSQL;
 
-	//optional
+	// optional
 	@Value("${harvester.import.allow_localfile:false}")
 	private Boolean allowLocalFileImport;
 
 	@Bean
-	public JobInitiatorMain jobInitiatorMain(){
+	public JobInitiatorMain jobInitiatorMain() {
 		return new JobInitiatorMain();
 	}
-	
+
 	@Bean
-	public JobServiceIF jobService(){
+	public JobServiceIF jobService() {
 		return new JobServiceImpl();
 	}
-	
-	@Bean(name="datasource")
+
+	@Bean(name = "datasource")
 	public DataSource dataSource() {
 		DriverManagerDataSource ds = new DriverManagerDataSource();
 		ds.setDriverClassName(dbDriverClassName);
@@ -126,12 +127,11 @@ public class CLIProcessingConfig {
 		return ds;
 	}
 
-	@Bean(name="bufferSessionFactory")
+	@Bean(name = "bufferSessionFactory")
 	public LocalSessionFactoryBean bufferSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[]{OccurrenceRawModel.class,
-				OccurrenceModel.class,ImportLogModel.class,ResourceContactModel.class});
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceContactModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -143,13 +143,11 @@ public class CLIProcessingConfig {
 		return sb;
 	}
 
-	@Bean(name={"publicSessionFactory","sessionFactory"})
+	@Bean(name = { "publicSessionFactory", "sessionFactory" })
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[]{
-				OccurrenceRawModel.class,OccurrenceModel.class,
-				ImportLogModel.class, ResourceModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -160,144 +158,148 @@ public class CLIProcessingConfig {
 		return sb;
 	}
 
-	@Bean(name="bufferTransactionManager")
-	public HibernateTransactionManager hibernateTransactionManager(){
+	@Bean(name = "bufferTransactionManager")
+	public HibernateTransactionManager hibernateTransactionManager() {
 		HibernateTransactionManager htmgr = new HibernateTransactionManager();
 		htmgr.setSessionFactory(bufferSessionFactory().getObject());
 		return htmgr;
 	}
 
-	@Bean(name="publicTransactionManager")
-	public HibernateTransactionManager publicHibernateTransactionManager(){
+	@Bean(name = "publicTransactionManager")
+	public HibernateTransactionManager publicHibernateTransactionManager() {
 		HibernateTransactionManager htmgr = new HibernateTransactionManager();
 		htmgr.setSessionFactory(publicSessionFactory().getObject());
 		return htmgr;
 	}
 
-	//---JOB---
+	// ---JOB---
 	@Bean
-	public ImportDwcaJob importDwcaJob(){
+	public ImportDwcaJob importDwcaJob() {
 		return new ImportDwcaJob();
 	}
+
 	@Bean
-	public MoveToPublicSchemaJob moveToPublicSchemaJob(){
+	public MoveToPublicSchemaJob moveToPublicSchemaJob() {
 		return new MoveToPublicSchemaJob();
 	}
+
 	@Bean
-	public ComputeUniqueValueJob computeUniqueValueJob(){
+	public ComputeUniqueValueJob computeUniqueValueJob() {
 		return new ComputeUniqueValueJob();
 	}
 
-	//---STEP Synchronous---
-	@Bean(name="streamEmlContentStep")
-	public ProcessingStepIF streamEmlContentStep(){
+	// ---STEP Synchronous---
+	@Bean(name = "streamEmlContentStep")
+	public ProcessingStepIF streamEmlContentStep() {
 		return new SynchronousProcessEmlContentStep();
 	}
 
-	@Bean(name="streamDwcContentStep")
-	public ProcessingStepIF StreamDwcContentStep(){
+	@Bean(name = "streamDwcContentStep")
+	public ProcessingStepIF StreamDwcContentStep() {
 		return new SynchronousProcessOccurrenceStep();
 	}
 
-	//---TASK wiring---
+	// ---TASK wiring---
 	@Bean
-	public ItemTaskIF prepareDwcaTask(){
+	public ItemTaskIF prepareDwcaTask() {
 		PrepareDwcaTask pdwca = new PrepareDwcaTask();
 		pdwca.setAllowDatasetShortnameExtraction(allowLocalFileImport);
 		return pdwca;
 	}
 
 	@Bean
-	public ItemTaskIF cleanBufferTableTask(){
+	public ItemTaskIF cleanBufferTableTask() {
 		return new CleanBufferTableTask();
 	}
 
 	@Bean
-	public ItemTaskIF computeGISDataTask(){
+	public ItemTaskIF computeGISDataTask() {
 		return new ComputeGISDataTask();
 	}
 
 	@Bean
-	public LongRunningTaskIF checkProcessingCompletenessTask(){
+	public LongRunningTaskIF checkProcessingCompletenessTask() {
 		return new CheckHarvestingCompletenessTask();
 	}
 
 	@Bean
-	public ItemTaskIF getResourceInfoTask(){
+	public ItemTaskIF getResourceInfoTask() {
 		return new GetResourceInfoTask();
 	}
 
 	@Bean
-	public ItemTaskIF replaceOldOccurrenceTask(){
+	public ItemTaskIF replaceOldOccurrenceTask() {
 		return new ReplaceOldOccurrenceTask();
 	}
 
 	@Bean
-	public ItemTaskIF recordImportTask(){
+	public ItemTaskIF recordImportTask() {
 		return new RecordImportTask();
 	}
 
 	@Bean
-	public ItemTaskIF computeUniqueValueTask(){
+	public ItemTaskIF computeUniqueValueTask() {
 		return new ComputeUniqueValueTask();
 	}
 
-	//---PROCESSOR wiring---
-	@Bean(name="lineProcessor")
-	public ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> lineProcessor(){
+	// ---PROCESSOR wiring---
+	@Bean(name = "lineProcessor")
+	public ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> lineProcessor() {
 		DwcaLineProcessor dwcaLineProcessor = new DwcaLineProcessor();
 		dwcaLineProcessor.setIdGenerationSQL(idGenerationSQL);
 		return dwcaLineProcessor;
 	}
 
-	@Bean(name="occurrenceProcessor")
-	public ItemProcessorIF<OccurrenceRawModel, OccurrenceModel> occurrenceProcessor(){
+	@Bean(name = "occurrenceProcessor")
+	public ItemProcessorIF<OccurrenceRawModel, OccurrenceModel> occurrenceProcessor() {
 		return new OccurrenceProcessor();
 	}
 
-	@Bean(name="resourceInformationProcessor")
-	public ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor(){
+	@Bean(name = "resourceInformationProcessor")
+	public ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor() {
 		return new ResourceInformationProcessor();
 	}
 
-	//---READER wiring---
+	// ---READER wiring---
 	@Bean
-	public ItemReaderIF<OccurrenceRawModel> dwcItemReader(){
+	public ItemReaderIF<OccurrenceRawModel> dwcItemReader() {
 		return new DwcaItemReader();
 	}
 
 	@Bean
-	public ItemReaderIF<Eml> dwcaEmlReader(){
+	public ItemReaderIF<Eml> dwcaEmlReader() {
 		return new DwcaEmlReader();
 	}
 
-	//---WRITER wiring---
-	@Bean(name="rawOccurrenceWriter")
-	public ItemWriterIF<OccurrenceRawModel> rawOccurrenceWriter(){
+	// ---WRITER wiring---
+	@Bean(name = "rawOccurrenceWriter")
+	public ItemWriterIF<OccurrenceRawModel> rawOccurrenceWriter() {
 		return new RawOccurrenceHibernateWriter();
 	}
 
-	@Bean(name="occurrenceWriter")
-	public ItemWriterIF<OccurrenceModel> occurrenceWriter(){
+	@Bean(name = "occurrenceWriter")
+	public ItemWriterIF<OccurrenceModel> occurrenceWriter() {
 		return new OccurrenceHibernateWriter();
 	}
 
-	@Bean(name="resourceInformationWriter")
-	public ItemWriterIF<ResourceInformationModel> resourceInformationHibernateWriter(){
+	@Bean(name = "resourceInformationWriter")
+	public ItemWriterIF<ResourceInformationModel> resourceInformationHibernateWriter() {
 		return new ResourceInformationHibernateWriter();
 	}
-	
-	//---DAO---
+
+	// ---DAO---
 	@Bean
-	public IPTFeedDAO iptFeedDAO(){
+	public IPTFeedDAO iptFeedDAO() {
 		return new HibernateIPTFeedDAO();
 	}
+
 	@Bean
-	public ResourceDAO resourceDAO(){
+	public ResourceDAO resourceDAO() {
 		return new HibernateResourceDAO();
 	}
+
 	@Bean
-	public ImportLogDAO importLogDAO(){
+	public ImportLogDAO importLogDAO() {
 		return new HibernateImportLogDAO();
 	}
 }

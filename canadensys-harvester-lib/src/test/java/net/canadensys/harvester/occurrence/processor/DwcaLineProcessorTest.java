@@ -20,21 +20,21 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes=ProcessingConfigTest.class, loader=AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = ProcessingConfigTest.class, loader = AnnotationConfigContextLoader.class)
 public class DwcaLineProcessorTest {
-	
+
 	@Autowired
 	@Qualifier("lineProcessor")
 	private ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> lineProcessor;
-	
+
 	@Test
-	public void testDwcALineProcessor(){
-		Map<SharedParameterEnum,Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
+	public void testDwcALineProcessor() {
+		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "MySourceFileId");
-		
+
 		OccurrenceRawModel rawModel = new OccurrenceRawModel();
 		OccurrenceRawModel occModel = ProcessorRunner.runItemProcessor(lineProcessor, rawModel, sharedParameters);
-		
+
 		assertEquals("MySourceFileId", occModel.getSourcefileid());
 		assertTrue(occModel.getAuto_id() > 0);
 	}

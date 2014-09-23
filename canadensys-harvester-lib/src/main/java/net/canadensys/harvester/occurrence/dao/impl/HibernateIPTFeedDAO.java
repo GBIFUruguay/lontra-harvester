@@ -15,8 +15,8 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
-public class HibernateIPTFeedDAO implements IPTFeedDAO{
-	
+public class HibernateIPTFeedDAO implements IPTFeedDAO {
+
 	@Override
 	public List<IPTFeedModel> getIPTFeed(URL iptFeedURL) {
 		List<IPTFeedModel> feedList = new ArrayList<IPTFeedModel>();
@@ -32,13 +32,17 @@ public class HibernateIPTFeedDAO implements IPTFeedDAO{
 				feedModel.setPublishedDate(currEntry.getPublishedDate());
 				feedList.add(feedModel);
 			}
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			e.printStackTrace();
-		} catch (MalformedURLException e) {
+		}
+		catch (MalformedURLException e) {
 			e.printStackTrace();
-		} catch (FeedException e) {
+		}
+		catch (FeedException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		return feedList;

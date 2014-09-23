@@ -94,8 +94,7 @@ public class TestConfig {
 	@Bean
 	public static PropertyPlaceholderConfigurer properties() {
 		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-		ClassPathResource[] resources = new ClassPathResource[] { new ClassPathResource(
-				"test-harvester-config.properties") };
+		ClassPathResource[] resources = new ClassPathResource[] { new ClassPathResource("test-harvester-config.properties") };
 		ppc.setLocations(resources);
 		return ppc;
 	}
@@ -104,46 +103,39 @@ public class TestConfig {
 	public LocalSessionFactoryBean bufferSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
-				OccurrenceModel.class, ImportLogModel.class,
-				ResourceContactModel.class, ResourceInformationModel.class,
-				OccurrenceExtensionModel.class, ResourceModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceContactModel.class,
+				ResourceInformationModel.class, OccurrenceExtensionModel.class, ResourceModel.class });
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
-		hibernateProperties.setProperty("hibernate.default_schema",
-				hibernateBufferSchema);
-		hibernateProperties.setProperty("javax.persistence.validation.mode",
-				"none");
+		hibernateProperties.setProperty("hibernate.default_schema", hibernateBufferSchema);
+		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
 		sb.setHibernateProperties(hibernateProperties);
 		return sb;
 	}
-	
-	@Bean(name = {"publicSessionFactory","sessionFactory"})
+
+	@Bean(name = { "publicSessionFactory", "sessionFactory" })
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
-				OccurrenceModel.class, ImportLogModel.class,
-				ResourceContactModel.class, ResourceInformationModel.class,
-				OccurrenceExtensionModel.class, ResourceModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceContactModel.class,
+				ResourceInformationModel.class, OccurrenceExtensionModel.class, ResourceModel.class });
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
-		hibernateProperties.setProperty("javax.persistence.validation.mode",
-				"none");
+		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
 		sb.setHibernateProperties(hibernateProperties);
 		return sb;
 	}
-	
+
 	@Bean
-	public StepControllerIF stepController(){
-	return new StepController();
+	public StepControllerIF stepController() {
+		return new StepController();
 	}
 
 	@Bean
-	public NodeStatusController nodeStatusController(){
-	return new NodeStatusController();
+	public NodeStatusController nodeStatusController() {
+		return new NodeStatusController();
 	}
 
 	@Bean
@@ -173,14 +165,12 @@ public class TestConfig {
 
 	@Bean(name = "datasource")
 	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder()
-				.setType(EmbeddedDatabaseType.H2)
+		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
 				// comes from lib project
 				.addScript("classpath:h2/h2setup.sql")
 				// those 2 scripts are loaded from canadensys-data-access
 				.addScript("/script/occurrence/create_occurrence_tables.sql")
-				.addScript("/script/occurrence/create_occurrence_tables_buffer_schema.sql")
-				.build();
+				.addScript("/script/occurrence/create_occurrence_tables_buffer_schema.sql").build();
 	}
 
 	@Bean
@@ -206,22 +196,25 @@ public class TestConfig {
 		hc.setIptRssAddress(iptRssAddress);
 		return hc;
 	}
-	
-	//---DAO---
+
+	// ---DAO---
 	@Bean
-	public IPTFeedDAO iptFeedDAO(){
+	public IPTFeedDAO iptFeedDAO() {
 		return null;
 	}
+
 	@Bean
-	public ResourceDAO resourceDAO(){
+	public ResourceDAO resourceDAO() {
 		return new HibernateResourceDAO();
 	}
+
 	@Bean
-	public ImportLogDAO importLogDAO(){
+	public ImportLogDAO importLogDAO() {
 		return null;
 	}
+
 	@Bean
-	public ResourceStatusNotifierIF resourceStatusNotifierIF(){
+	public ResourceStatusNotifierIF resourceStatusNotifierIF() {
 		return null;
 	}
 
@@ -343,15 +336,16 @@ public class TestConfig {
 	}
 
 	@Bean
-	public JMSControlConsumer errorReceiver(){
+	public JMSControlConsumer errorReceiver() {
 		return new JMSControlConsumer(jmsBrokerUrl);
 	}
+
 	@Bean
-	public JMSControlProducer errorReporter(){
+	public JMSControlProducer errorReporter() {
 		return null;
 	}
-	
-	@Bean(name="currentVersion")
+
+	@Bean(name = "currentVersion")
 	public String currentVersion() {
 		return "test-version";
 	}

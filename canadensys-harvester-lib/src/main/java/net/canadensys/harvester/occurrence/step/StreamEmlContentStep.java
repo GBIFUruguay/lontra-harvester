@@ -20,34 +20,35 @@ import org.springframework.beans.factory.annotation.Qualifier;
 /**
  * Step reading an EML file from a DarwinCore archive, process it, writing the result as a ProcessingMessageIF.
  * NOT thread safe
+ * 
  * @author canadensys
- *
+ * 
  */
-public class StreamEmlContentStep implements ProcessingStepIF{
+public class StreamEmlContentStep implements ProcessingStepIF {
 
 	@Autowired
 	@Qualifier("dwcaEmlReader")
 	private ItemReaderIF<Eml> reader;
-	
+
 	@Autowired
 	@Qualifier("jmsWriter")
 	private ItemWriterIF<ProcessingMessageIF> writer;
-	
+
 	@Autowired
 	@Qualifier("resourceInformationProcessor")
 	private ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor;
-	
-	private Map<SharedParameterEnum,Object> sharedParameters;
-	
+
+	private Map<SharedParameterEnum, Object> sharedParameters;
+
 	@Override
-	public void preStep(Map<SharedParameterEnum, Object> sharedParameters){
-		if(writer == null){
+	public void preStep(Map<SharedParameterEnum, Object> sharedParameters) {
+		if (writer == null) {
 			throw new IllegalStateException("No writer defined");
 		}
-		if(resourceInformationProcessor == null){
+		if (resourceInformationProcessor == null) {
 			throw new IllegalStateException("No processor defined");
 		}
-		if(reader == null){
+		if (reader == null) {
 			throw new IllegalStateException("No reader defined");
 		}
 		this.sharedParameters = sharedParameters;
@@ -65,18 +66,19 @@ public class StreamEmlContentStep implements ProcessingStepIF{
 
 	@Override
 	public void doStep() {
-		//For now, we only read and stream the resource information
+		// For now, we only read and stream the resource information
 		SaveResourceInformationMessage srcm = new SaveResourceInformationMessage();
 		srcm.setWhen(Calendar.getInstance().getTime().toString());
-		
+
 		Eml emlModel = reader.read();
 		ResourceInformationModel resourceInformationModel = resourceInformationProcessor.process(emlModel, sharedParameters);
-		
+
 		srcm.setResourceInformationModel(resourceInformationModel);
 
 		try {
 			writer.write(srcm);
-		} catch (WriterException e) {
+		}
+		catch (WriterException e) {
 			e.printStackTrace();
 		}
 	}

@@ -64,10 +64,8 @@ public class ResourceView extends AbstractDialog {
 		idValueLbl.setVisible(false);
 
 		/* Resource name */
-		JLabel nameLbl = new JLabel(
-				Messages.getString("resourceView.resource.name"));
-		nameLbl.setToolTipText(Messages
-				.getString("resourceView.resource.name.tooltip"));
+		JLabel nameLbl = new JLabel(Messages.getString("resourceView.resource.name"));
+		nameLbl.setToolTipText(Messages.getString("resourceView.resource.name.tooltip"));
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 1;
@@ -83,10 +81,8 @@ public class ResourceView extends AbstractDialog {
 		contentPanel.add(nameTxt, c);
 
 		/* Resource URL */
-		JLabel urlLbl = new JLabel(
-				Messages.getString("resourceView.resource.url"));
-		urlLbl.setToolTipText(Messages
-				.getString("resourceView.resource.url.tooltip"));
+		JLabel urlLbl = new JLabel(Messages.getString("resourceView.resource.url"));
+		urlLbl.setToolTipText(Messages.getString("resourceView.resource.url.tooltip"));
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 2;
@@ -102,10 +98,8 @@ public class ResourceView extends AbstractDialog {
 		contentPanel.add(urlTxt, c);
 
 		/* SourceFileId */
-		JLabel sfIdLbl = new JLabel(
-				Messages.getString("resourceView.resource.sourceFileID"));
-		sfIdLbl.setToolTipText(Messages
-				.getString("resourceView.resource.sourceFileID.tooltip"));
+		JLabel sfIdLbl = new JLabel(Messages.getString("resourceView.resource.sourceFileID"));
+		sfIdLbl.setToolTipText(Messages.getString("resourceView.resource.sourceFileID.tooltip"));
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 3;
@@ -156,19 +150,16 @@ public class ResourceView extends AbstractDialog {
 		String urlValue = urlTxt.getText();
 		String sourceFileIdValue = sfIdTxt.getText();
 
-		if (StringUtils.isNotBlank(nameValue)
-				&& StringUtils.isNotBlank(urlValue)
-				&& StringUtils.isNotBlank(sourceFileIdValue)) {
+		if (StringUtils.isNotBlank(nameValue) && StringUtils.isNotBlank(urlValue) && StringUtils.isNotBlank(sourceFileIdValue)) {
 			resourceModel.setName(nameValue);
 			resourceModel.setArchive_url(urlValue);
 			resourceModel.setSourcefileid(sourceFileIdValue);
 			exitValue = JOptionPane.OK_OPTION;
 			dispose();
-		} else {
-			JOptionPane.showMessageDialog(this, Messages
-					.getString("resourceView.resource.error.missing.msg"),
-					Messages.getString("resourceView.resource.error.title"),
-					JOptionPane.ERROR_MESSAGE);
+		}
+		else {
+			JOptionPane.showMessageDialog(this, Messages.getString("resourceView.resource.error.missing.msg"),
+					Messages.getString("resourceView.resource.error.title"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

@@ -11,24 +11,25 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Job to compute the unique values and their counts from the current content of the database.
  * Never run this job in parallel.
  * This job should be replaced by an ElasticSearch index eventually.
+ * 
  * @author canadensys
- *
+ * 
  */
-public class ComputeUniqueValueJob extends AbstractProcessingJob{
+public class ComputeUniqueValueJob extends AbstractProcessingJob {
 
 	@Autowired
 	private ItemTaskIF computeUniqueValueTask;
-	
-	public void doJob(JobStatusModel jobStatusModel){
+
+	public void doJob(JobStatusModel jobStatusModel) {
 		jobStatusModel.setCurrentStatusExplanation("Compute unique values");
 		computeUniqueValueTask.execute(null);
 	}
-	
+
 	public void setComputeUniqueValueTask(ComputeUniqueValueTask computeUniqueValueTask) {
 		this.computeUniqueValueTask = computeUniqueValueTask;
 	}
-	
+
 	@Override
-	public void cancel(){
+	public void cancel() {
 	}
 }

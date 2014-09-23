@@ -23,78 +23,78 @@ import org.springframework.beans.factory.annotation.Autowired;
  * 
  * The GetResourceInfoTask is optional if you plan to work from directly from an archive or folder. In this case, the DATASET_SHORTNAME will be
  * extracted from the file name which could lead to unwanted behavior since the name of the file could conflict with another resource.
+ * 
  * @author canadensys
- *
+ * 
  */
-public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgressListenerIF{
-	
-	//Task and step
+public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgressListenerIF {
+
+	// Task and step
 	@Autowired
 	private ItemTaskIF getResourceInfoTask;
-	
+
 	@Autowired
 	private ItemTaskIF prepareDwcaTask;
-	
+
 	@Autowired
 	private ItemTaskIF cleanBufferTableTask;
-	
+
 	@Autowired
 	private ProcessingStepIF streamEmlContentStep;
-	
+
 	@Autowired
 	private ProcessingStepIF streamDwcContentStep;
-	
+
 	@Autowired
 	private LongRunningTaskIF checkProcessingCompletenessTask;
-	
+
 	private JobStatusModel jobStatusModel;
-	
-	public ImportDwcaJob(){
+
+	public ImportDwcaJob() {
 		sharedParameters = new HashMap<SharedParameterEnum, Object>();
 	}
-		
+
 	/**
 	 * Run the actual job.
 	 */
-	public void doJob(JobStatusModel jobStatusModel){
+	public void doJob(JobStatusModel jobStatusModel) {
 		this.jobStatusModel = jobStatusModel;
-		//share the statusJobModel so step(s) can update it
+		// share the statusJobModel so step(s) can update it
 		sharedParameters.put(SharedParameterEnum.JOB_STATUS_MODEL, jobStatusModel);
-		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID,
-				"ada5d0b1-07de-4dc0-83d4-e312f0fb81cb");
+		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID, "ada5d0b1-07de-4dc0-83d4-e312f0fb81cb");
 		jobStatusModel.setCurrentStatus(JobStatus.RUNNING);
-		
-		//optional task, could also import a DwcA from a local path but, at your own risk.
-		if(getResourceInfoTask != null && sharedParameters.containsKey(SharedParameterEnum.SOURCE_FILE_ID)){
+
+		// optional task, could also import a DwcA from a local path but, at your own risk.
+		if (getResourceInfoTask != null && sharedParameters.containsKey(SharedParameterEnum.SOURCE_FILE_ID)) {
 			getResourceInfoTask.execute(sharedParameters);
 		}
-		
-		//TODO move strings to properties file
+
+		// TODO move strings to properties file
 		jobStatusModel.setCurrentStatusExplanation("Preparing DwcA");
 		prepareDwcaTask.execute(sharedParameters);
-		
+
 		jobStatusModel.setCurrentStatusExplanation("Cleaning buffer table");
 		cleanBufferTableTask.execute(sharedParameters);
-		
+
 		jobStatusModel.setCurrentStatusExplanation("Streaming EML");
 		executeStepSequentially(streamEmlContentStep, sharedParameters);
-		
+
 		jobStatusModel.setCurrentStatusExplanation("Streaming DwcA content");
 		executeStepSequentially(streamDwcContentStep, sharedParameters);
-		
+
 		jobStatusModel.setCurrentStatusExplanation("Waiting for completion");
-		((CheckHarvestingCompletenessTask)checkProcessingCompletenessTask).addItemProgressListenerIF(this);
+		((CheckHarvestingCompletenessTask) checkProcessingCompletenessTask).addItemProgressListenerIF(this);
 		checkProcessingCompletenessTask.execute(sharedParameters);
 	}
-	
-	public void setItemProgressListener(ItemProgressListenerIF listener){
-		((CheckHarvestingCompletenessTask)checkProcessingCompletenessTask).addItemProgressListenerIF(listener);
+
+	public void setItemProgressListener(ItemProgressListenerIF listener) {
+		((CheckHarvestingCompletenessTask) checkProcessingCompletenessTask).addItemProgressListenerIF(listener);
 	}
-	
-	public void setGetResourceInfoTask(GetResourceInfoTask getResourceInfoTask){
+
+	public void setGetResourceInfoTask(GetResourceInfoTask getResourceInfoTask) {
 		this.getResourceInfoTask = getResourceInfoTask;
 	}
-	
+
 	public void setPrepareDwcaTask(PrepareDwcaTask prepareDwcaTask) {
 		this.prepareDwcaTask = prepareDwcaTask;
 	}
@@ -103,26 +103,25 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 		this.cleanBufferTableTask = cleanBufferTableTask;
 	}
 
-	public void setCheckProcessingCompletenessTask(
-			CheckHarvestingCompletenessTask checkProcessingCompletenessTask) {
+	public void setCheckProcessingCompletenessTask(CheckHarvestingCompletenessTask checkProcessingCompletenessTask) {
 		this.checkProcessingCompletenessTask = checkProcessingCompletenessTask;
 	}
-	
+
 	@Override
-	public void cancel(){
+	public void cancel() {
 		checkProcessingCompletenessTask.cancel();
 	}
 
 	@Override
 	public void onProgress(String context, int current, int total) {
-		jobStatusModel.setCurrentJobProgress(current+"/"+total);
+		jobStatusModel.setCurrentJobProgress(current + "/" + total);
 	}
 
 	@Override
 	public void onSuccess() {
 		jobStatusModel.setCurrentStatus(JobStatus.DONE);
 	}
-	
+
 	@Override
 	public void onCancel() {
 		jobStatusModel.setCurrentStatus(JobStatus.CANCEL);

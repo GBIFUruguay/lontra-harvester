@@ -8,20 +8,21 @@ import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 
 /**
  * Dialog displaying the previous import log in a table.
+ * 
  * @author canadensys
- *
+ * 
  */
 public class ImportLogDialog extends AbstractTableBasedDialog {
-	
+
 	private static final long serialVersionUID = 5963921652318603960L;
 
-	public ImportLogDialog(Vector<String> headers){
+	public ImportLogDialog(Vector<String> headers) {
 		super(headers);
 		this.setTitle(Messages.getString("importLog.title"));
 		mainPanel.setPreferredSize(new Dimension(600, 400));
 	}
-	
-	public void loadData(List<ImportLogModel> importLogModelList){
+
+	public void loadData(List<ImportLogModel> importLogModelList) {
 		Vector<Vector<Object>> rowData = new Vector<Vector<Object>>();
 		for (ImportLogModel currImportLogModel : importLogModelList) {
 			Vector<Object> row = new Vector<Object>();

@@ -18,38 +18,38 @@ import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-public class JobInitiatorMain{
-		
+public class JobInitiatorMain {
+
 	@Autowired
 	private ImportDwcaJob importDwcaJob;
-	
+
 	@Autowired
 	private MoveToPublicSchemaJob moveToPublicSchemaJob;
 
 	@Autowired
 	private ComputeUniqueValueJob computeUniqueValueJob;
-	
+
 	@Autowired
 	private JobServiceIF jobService;
-	
-	public void initiateApp(final String sourcefileid){
-		
+
+	public void initiateApp(final String sourcefileid) {
+
 		ResourceModel resourceModel = jobService.loadResourceModel(sourcefileid);
-		
-		if(resourceModel != null){
-		
+
+		if (resourceModel != null) {
+
 			ExecutorService executor = Executors.newFixedThreadPool(2);
 			importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceModel.getId());
 			final JobStatusModel jobStatusModel = new JobStatusModel();
 			jobStatusModel.addPropertyChangeListener(new JobStatusModelListener());
-			
+
 			Runnable importJobThread = new Runnable() {
 				@Override
 				public void run() {
 					importDwcaJob.doJob(jobStatusModel);
 				}
 			};
-			
+
 			executor.execute(importJobThread);
 			executor.shutdown();
 			try {
@@ -58,22 +58,23 @@ public class JobInitiatorMain{
 			catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-	
+
 			System.out.println("done");
 		}
-		else{
-			System.out.println("Can't find the resource named ["+sourcefileid+"]");
+		else {
+			System.out.println("Can't find the resource named [" + sourcefileid + "]");
 		}
-		
-//		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, datasetShortName);
-//		JobStatusModel jobStatusModel = new JobStatusModel();
-//		moveToPublicSchemaJob.doJob(jobStatusModel);
-//
-//		computeUniqueValueJob.doJob(jobStatusModel);
+
+		// moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, datasetShortName);
+		// JobStatusModel jobStatusModel = new JobStatusModel();
+		// moveToPublicSchemaJob.doJob(jobStatusModel);
+		//
+		// computeUniqueValueJob.doJob(jobStatusModel);
 	}
-	
+
 	/**
 	 * JobInitiator Entry point
+	 * 
 	 * @param args
 	 */
 	public static void main(String sourcefileid) {
@@ -81,17 +82,18 @@ public class JobInitiatorMain{
 		JobInitiatorMain jim = ctx.getBean(JobInitiatorMain.class);
 		jim.initiateApp(sourcefileid);
 	}
-	
+
 	/**
 	 * Simple PropertyChangeListener to send notifications about the JobStatusModel to the console.
+	 * 
 	 * @author cgendreau
-	 *
+	 * 
 	 */
-	private static class JobStatusModelListener implements PropertyChangeListener{
+	private static class JobStatusModelListener implements PropertyChangeListener {
 		@Override
 		public void propertyChange(PropertyChangeEvent evt) {
 			System.out.println(evt.getNewValue());
 		}
-		
+
 	}
 }

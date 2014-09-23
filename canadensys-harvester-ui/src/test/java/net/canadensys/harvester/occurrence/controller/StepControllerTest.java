@@ -41,8 +41,7 @@ public class StepControllerTest {
 		// save it
 		boolean saved = stepController.updateResourceModel(resourceModel);
 
-		List<ResourceModel> resourceModelList = stepController
-				.getResourceModelList();
+		List<ResourceModel> resourceModelList = stepController.getResourceModelList();
 		boolean found = false;
 		for (ResourceModel currModel : resourceModelList) {
 			if ("test-resource".equals(currModel.getSourcefileid())) {

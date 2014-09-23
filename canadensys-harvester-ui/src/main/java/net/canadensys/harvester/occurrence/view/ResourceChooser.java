@@ -41,8 +41,7 @@ public class ResourceChooser extends JDialog {
 
 	private final StepControllerIF ctrl;
 
-	public ResourceChooser(StepControllerIF ctrl,
-			List<ResourceModel> knownResource) {
+	public ResourceChooser(StepControllerIF ctrl, List<ResourceModel> knownResource) {
 		this.ctrl = ctrl;
 		this.knownResource = knownResource;
 
@@ -52,8 +51,7 @@ public class ResourceChooser extends JDialog {
 
 		Vector<String> knowResourceVector = new Vector<String>();
 		for (ResourceModel resourceModel : knownResource) {
-			knowResourceVector.add(resourceModel.getName() + "-"
-					+ resourceModel.getSourcefileid());
+			knowResourceVector.add(resourceModel.getName() + "-" + resourceModel.getSourcefileid());
 		}
 		// add an empty record
 		knowResourceVector.add(0, null);
@@ -75,8 +73,7 @@ public class ResourceChooser extends JDialog {
 		this.add(mainPanel, c);
 
 		// known URL
-		JLabel knownUrlLbl = new JLabel(
-				Messages.getString("resourceChooser.knownResources"));
+		JLabel knownUrlLbl = new JLabel(Messages.getString("resourceChooser.knownResources"));
 		knownCbx = new JComboBox(initialValues);
 
 		c = new GridBagConstraints();
@@ -154,8 +151,7 @@ public class ResourceChooser extends JDialog {
 
 		knownCbx.addItem(null);
 		for (ResourceModel resourceModel : knownResource) {
-			knownCbx.addItem(resourceModel.getName() + "-"
-					+ resourceModel.getSourcefileid());
+			knownCbx.addItem(resourceModel.getName() + "-" + resourceModel.getSourcefileid());
 		}
 	}
 
@@ -173,12 +169,8 @@ public class ResourceChooser extends JDialog {
 
 		if (rmv.getExitValue() == JOptionPane.OK_OPTION) {
 			if (!ctrl.updateResourceModel(resourceModel)) {
-				JOptionPane
-						.showMessageDialog(
-								this,
-								Messages.getString("resourceView.resource.error.save.msg"),
-								Messages.getString("resourceView.resource.error.title"),
-								JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, Messages.getString("resourceView.resource.error.save.msg"),
+						Messages.getString("resourceView.resource.error.title"), JOptionPane.ERROR_MESSAGE);
 			}
 
 			// reload data to ensure we have the latest changes

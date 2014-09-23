@@ -21,59 +21,59 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Processing each line read from an Darwin Core extension.
  * Assign an unique id and set the sourceFileId.
  * NOT thread safe
+ * 
  * @author canadenys
- *
+ * 
  */
-public class DwcaExtensionLineProcessor implements ItemProcessorIF<OccurrenceExtensionModel, OccurrenceExtensionModel>{
-	
+public class DwcaExtensionLineProcessor implements ItemProcessorIF<OccurrenceExtensionModel, OccurrenceExtensionModel> {
+
 	@Autowired
-	@Qualifier(value="bufferSessionFactory")
+	@Qualifier(value = "bufferSessionFactory")
 	private SessionFactory sessionFactory;
-	
+
 	private StatelessSession session;
 	private SQLQuery sqlQuery;
-	
-	//get log4j handler
+
+	// get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(DwcaExtensionLineProcessor.class);
-	
+
 	private String idGenerationSQL = "SELECT 1";
 
-	//we take id by batch of 100 to reduce the number of calls
+	// we take id by batch of 100 to reduce the number of calls
 	private Long nextId = null;
 	private List<Number> idPoll = null;
-	
+
 	@Override
-	public void init(){
-		try{
+	public void init() {
+		try {
 			session = sessionFactory.openStatelessSession();
 			session.beginTransaction();
 			sqlQuery = session.createSQLQuery(idGenerationSQL);
 		}
-		catch(HibernateException hEx){
+		catch (HibernateException hEx) {
 			LOGGER.fatal("Can't initialize DwcaLineProcessor", hEx);
 		}
 	}
-	
+
 	@Override
-	public void destroy(){
+	public void destroy() {
 		session.getTransaction().commit();
 	}
 
 	@Override
-	public OccurrenceExtensionModel process(OccurrenceExtensionModel data, Map<SharedParameterEnum, Object> sharedParameters)
-			throws ProcessException {
-		
-		String sourceFileId = (String)sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
-        if(sourceFileId == null){
+	public OccurrenceExtensionModel process(OccurrenceExtensionModel data, Map<SharedParameterEnum, Object> sharedParameters) throws ProcessException {
+
+		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
+		if (sourceFileId == null) {
 			LOGGER.fatal("Misconfigured processor : needs  sourceFileId");
 			throw new TaskExecutionException("Misconfigured DwcaExtensionLineProcessor");
 		}
-        data.setSourcefileid(sourceFileId);
-        if(nextId == null || idPoll.isEmpty()){
-			try{
-				idPoll = (List<Number>)sqlQuery.list();
+		data.setSourcefileid(sourceFileId);
+		if (nextId == null || idPoll.isEmpty()) {
+			try {
+				idPoll = (List<Number>) sqlQuery.list();
 			}
-			catch(HibernateException hEx){
+			catch (HibernateException hEx) {
 				LOGGER.fatal("Can't get ID from sequence", hEx);
 			}
 			catch (ClassCastException ccEx) {
@@ -84,11 +84,11 @@ public class DwcaExtensionLineProcessor implements ItemProcessorIF<OccurrenceExt
 		data.setAuto_id(nextId.intValue());
 		return data;
 	}
-	
+
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
-	
+
 	public void setIdGenerationSQL(String idGenerationSQL) {
 		this.idGenerationSQL = idGenerationSQL;
 	}

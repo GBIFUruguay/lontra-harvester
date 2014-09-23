@@ -50,8 +50,7 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 		this.computeGISDataTask = computeGISDataTask;
 	}
 
-	public void setReplaceOldOccurrenceTask(
-			ReplaceOldOccurrenceTask replaceOldOccurrenceTask) {
+	public void setReplaceOldOccurrenceTask(ReplaceOldOccurrenceTask replaceOldOccurrenceTask) {
 		this.replaceOldOccurrenceTask = replaceOldOccurrenceTask;
 	}
 

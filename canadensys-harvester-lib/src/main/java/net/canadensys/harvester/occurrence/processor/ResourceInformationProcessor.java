@@ -25,12 +25,10 @@ import org.gbif.metadata.eml.KeywordSet;
  * @author canadensys
  * 
  */
-public class ResourceInformationProcessor implements
-		ItemProcessorIF<Eml, ResourceInformationModel> {
+public class ResourceInformationProcessor implements ItemProcessorIF<Eml, ResourceInformationModel> {
 
 	// get log4j handler
-	private static final Logger LOGGER = Logger
-			.getLogger(ResourceInformationProcessor.class);
+	private static final Logger LOGGER = Logger.getLogger(ResourceInformationProcessor.class);
 
 	@Override
 	public void init() {
@@ -38,17 +36,13 @@ public class ResourceInformationProcessor implements
 	}
 
 	@Override
-	public ResourceInformationModel process(Eml eml,
-			Map<SharedParameterEnum, Object> sharedParameters)
-			throws ProcessException {
+	public ResourceInformationModel process(Eml eml, Map<SharedParameterEnum, Object> sharedParameters) throws ProcessException {
 
 		ResourceInformationModel information = null;
-		String resourceUuid = (String) sharedParameters
-				.get(SharedParameterEnum.RESOURCE_UUID);
+		String resourceUuid = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
 		if (resourceUuid == null) {
 			LOGGER.fatal("Misconfigured processor: needs resource_uuid");
-			throw new TaskExecutionException(
-					"Misconfigured ResourceInformationProcessor");
+			throw new TaskExecutionException("Misconfigured ResourceInformationProcessor");
 		}
 		if (eml.getGuid().equalsIgnoreCase(resourceUuid)) {
 			information = new ResourceInformationModel();
@@ -56,10 +50,8 @@ public class ResourceInformationProcessor implements
 			information.set_abstract(eml.getAbstract());
 			// Fetch only first identifier available:
 			List<String> alternateIdentifiers = eml.getAlternateIdentifiers();
-			if (!alternateIdentifiers.equals(null)
-					&& !alternateIdentifiers.isEmpty()) {
-				information
-						.setAlternate_identifier(alternateIdentifiers.get(0));
+			if (!alternateIdentifiers.equals(null) && !alternateIdentifiers.isEmpty()) {
+				information.setAlternate_identifier(alternateIdentifiers.get(0));
 			}
 			information.setCitation(eml.getCitationString());
 			information.setCollection_identifier(eml.getCollectionId());
@@ -71,12 +63,10 @@ public class ResourceInformationProcessor implements
 			if (!keyList.equals(null) && !keyList.isEmpty()) {
 				KeywordSet keywordSet = keyList.get(0);
 				information.setKeyword(keywordSet.getKeywordsString());
-				information.setKeyword_thesaurus(keywordSet
-						.getKeywordThesaurus());
+				information.setKeyword_thesaurus(keywordSet.getKeywordThesaurus());
 			}
 			information.setLanguage(eml.getLanguage());
-			information.setParent_collection_identifier(eml
-					.getParentCollectionId());
+			information.setParent_collection_identifier(eml.getParentCollectionId());
 			information.setPublication_date(eml.getPubDate());
 			information.setResource_logo_url(eml.getLogoUrl());
 			// What field?

@@ -27,19 +27,19 @@ public class ProcessingNodeMain {
 
 	@Autowired
 	private JMSConsumer jmsConsumer;
-	
+
 	@Autowired
 	private VersionController versionController;
-	
+
 	@Autowired
 	private ProcessingNodeConfig nodeConfig;
-	
+
 	@Autowired
 	private ProcessingStepIF processInsertOccurrenceStep;
 
 	@Autowired
 	private ProcessingStepIF insertResourceInformationStep;
-	
+
 	@Autowired
 	private ProcessingStepIF asyncManageOccurrenceExtensionStep;
 
@@ -59,8 +59,7 @@ public class ProcessingNodeMain {
 	 * @param additionalMessageHandler
 	 *            user defined message handler (optional)
 	 */
-	public <T extends JMSConsumerMessageHandlerIF & ProcessingStepIF> void initiate(
-			String brokerURL, List<T> additionalMessageHandler) {
+	public <T extends JMSConsumerMessageHandlerIF & ProcessingStepIF> void initiate(String brokerURL, List<T> additionalMessageHandler) {
 		// check if we need to set a new broker URL
 		if (StringUtils.isNotBlank(brokerURL)) {
 			jmsConsumer.setBrokerURL(brokerURL);
@@ -75,10 +74,9 @@ public class ProcessingNodeMain {
 
 		registeredMsgHandlers.add((JMSConsumerMessageHandlerIF) insertResourceInformationStep);
 		registeredSteps.add(insertResourceInformationStep);
-		
+
 		registeredMsgHandlers.add((JMSConsumerMessageHandlerIF) asyncManageOccurrenceExtensionStep);
 		registeredSteps.add(asyncManageOccurrenceExtensionStep);
-		
 
 		if (additionalMessageHandler != null) {
 			registeredMsgHandlers.addAll(additionalMessageHandler);
@@ -118,10 +116,8 @@ public class ProcessingNodeMain {
 		// step
 		List<MessageHandlerStep> additionalMessageHandler = null;
 		System.out.println("Starting Harvester node ...");
-		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
-				ProcessingNodeConfig.class);
-		ProcessingNodeMain processingNodeBean = ctx
-				.getBean(ProcessingNodeMain.class);
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(ProcessingNodeConfig.class);
+		ProcessingNodeMain processingNodeBean = ctx.getBean(ProcessingNodeMain.class);
 		processingNodeBean.initiate(newBrokerUrl, additionalMessageHandler);
 	}
 
@@ -132,7 +128,6 @@ public class ProcessingNodeMain {
 	 * @author canadensys
 	 * 
 	 */
-	private interface MessageHandlerStep extends JMSConsumerMessageHandlerIF,
-			ProcessingStepIF {
+	private interface MessageHandlerStep extends JMSConsumerMessageHandlerIF, ProcessingStepIF {
 	}
 }

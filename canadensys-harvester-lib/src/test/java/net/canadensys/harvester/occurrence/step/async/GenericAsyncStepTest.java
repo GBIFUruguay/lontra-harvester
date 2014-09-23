@@ -15,70 +15,70 @@ import org.junit.Test;
  * Unit test for GenericAsyncStep
  * 
  * @author canadensys
- *
+ * 
  */
 public class GenericAsyncStepTest {
-	
+
 	@Test
-	public void testGenericAsyncStepWithList(){
+	public void testGenericAsyncStepWithList() {
 		GenericAsyncStep<MockHabitObject> asyncStep = new GenericAsyncStep<MockHabitObject>(MockHabitObject.class);
-		//create a mock writer
+		// create a mock writer
 		MockObjectWriter<MockHabitObject> writer = new MockObjectWriter<MockHabitObject>();
 		asyncStep.setWriter(writer);
-		
-		//Build the object
+
+		// Build the object
 		List<MockHabitObject> mhoList = new ArrayList<MockHabitObject>();
 		MockHabitObject mho = new MockHabitObject();
 		mho.setId("1");
 		mho.setDescription("description");
 		mhoList.add(mho);
-		
-		//Build mock DefaultMessage
+
+		// Build mock DefaultMessage
 		DefaultMessage dmsg = new DefaultMessage();
 		dmsg.setMsgHandlerClass(GenericAsyncStep.class);
 		dmsg.setContent(mhoList);
 		dmsg.setContentClass(mhoList.getClass());
-		
+
 		asyncStep.preStep(null);
 		asyncStep.handleMessage(dmsg);
 		asyncStep.postStep();
-		
-		//The list of object that would have been written to the database
+
+		// The list of object that would have been written to the database
 		List<MockHabitObject> objList = writer.getContent();
 		MockHabitObject firstObj = objList.get(0);
-		
-		//ensure class name are preserved
+
+		// ensure class name are preserved
 		assertEquals(firstObj.getId(), mho.getId());
 		assertEquals(firstObj.getDescription(), mho.getDescription());
 	}
-	
+
 	@Test
-	public void testGenericAsyncStepWithoutList(){
+	public void testGenericAsyncStepWithoutList() {
 		GenericAsyncStep<MockHabitObject> asyncStep = new GenericAsyncStep<MockHabitObject>(MockHabitObject.class);
-		//create a mock writer
+		// create a mock writer
 		MockObjectWriter<MockHabitObject> writer = new MockObjectWriter<MockHabitObject>();
 		asyncStep.setWriter(writer);
-		
-		//Build the object
+
+		// Build the object
 		MockHabitObject mho = new MockHabitObject();
 		mho.setId("1");
 		mho.setDescription("description");
 
-		//Build mock DefaultMessage
+		// Build mock DefaultMessage
 		DefaultMessage dmsg = new DefaultMessage();
 		dmsg.setMsgHandlerClass(GenericAsyncStep.class);
 		dmsg.setContent(mho);
 		dmsg.setContentClass(mho.getClass());
-		
+
 		asyncStep.preStep(null);
 		asyncStep.handleMessage(dmsg);
 		asyncStep.postStep();
-		
-		//The list of object that would have been written to the database
+
+		// The list of object that would have been written to the database
 		List<MockHabitObject> objList = writer.getContent();
 		MockHabitObject firstObj = objList.get(0);
-		
-		//ensure class name are preserved
+
+		// ensure class name are preserved
 		assertEquals(firstObj.getId(), mho.getId());
 		assertEquals(firstObj.getDescription(), mho.getDescription());
 	}

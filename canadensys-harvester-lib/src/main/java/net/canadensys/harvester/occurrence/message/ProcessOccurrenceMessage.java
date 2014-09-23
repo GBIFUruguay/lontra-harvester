@@ -8,23 +8,26 @@ import net.canadensys.harvester.model.BulkDataObject;
 
 /**
  * Message asking to process raw occurrence data.
+ * 
  * @author canadensys
- *
+ * 
  */
-public class ProcessOccurrenceMessage implements ProcessingMessageIF{
+public class ProcessOccurrenceMessage implements ProcessingMessageIF {
 	private String when;
-	
+
 	private BulkDataObject<OccurrenceRawModel> bulkRawModel;
-		
-	public ProcessOccurrenceMessage(){}
-	
-	public ProcessOccurrenceMessage(List<String> occurrenceRawModelProperties){
+
+	public ProcessOccurrenceMessage() {
+	}
+
+	public ProcessOccurrenceMessage(List<String> occurrenceRawModelProperties) {
 		bulkRawModel = new BulkDataObject<OccurrenceRawModel>(occurrenceRawModelProperties);
 	}
-	
+
 	public String getWhen() {
 		return when;
 	}
+
 	public void setWhen(String when) {
 		this.when = when;
 	}

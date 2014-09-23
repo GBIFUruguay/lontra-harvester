@@ -13,21 +13,21 @@ import org.junit.Test;
 
 /**
  * Test OccurrenceProcessor behavior
+ * 
  * @author cgendreau
- *
+ * 
  */
 public class ResourceInformationProcessorTest {
-	
+
 	/**
 	 * Test regular processing
 	 */
 	@Test
-	public void testProcessingMechanism(){
+	public void testProcessingMechanism() {
 		HashMap<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
-		ResourceInformationProcessor informationProcessor = new ResourceInformationProcessor();		
+		ResourceInformationProcessor informationProcessor = new ResourceInformationProcessor();
 		Eml eml = new Eml();
-		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID,
-				"foo");
+		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID, "foo");
 		eml.setAbstract("This is a generic abstract information");
 		eml.setTitle("This is a generic title");
 		eml.setGuid("foo");
@@ -36,7 +36,8 @@ public class ResourceInformationProcessorTest {
 			assertEquals("This is a generic abstract information", processedInformation.get_abstract());
 			assertEquals("This is a generic title", processedInformation.getTitle());
 			assertEquals("foo", processedInformation.getResource_uuid());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		}

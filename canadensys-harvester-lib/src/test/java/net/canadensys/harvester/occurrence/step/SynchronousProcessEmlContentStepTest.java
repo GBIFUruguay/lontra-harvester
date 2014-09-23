@@ -34,38 +34,29 @@ public class SynchronousProcessEmlContentStepTest {
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
-	
+
 	@Before
-    public void setupTest(){
-    	jdbcTemplate.batchUpdate(new String[]{
-    			"DELETE FROM buffer.resource_information"
-    	});
-    }
+	public void setupTest() {
+		jdbcTemplate.batchUpdate(new String[] { "DELETE FROM buffer.resource_information" });
+	}
 
 	@Test
 	public void testSynchronousProcessEmlContentStep() {
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
-		sharedParameters.put(SharedParameterEnum.DWCA_PATH,
-				"src/test/resources/dwca-qmor-specimens");
-		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID,
-				"qmor-specimens");
-		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID,
-				"ada5d0b1-07de-4dc0-83d4-e312f0fb81cb");
+		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
+		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
+		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID, "ada5d0b1-07de-4dc0-83d4-e312f0fb81cb");
 
 		synchronousProcessEmlContentStep.preStep(sharedParameters);
 		synchronousProcessEmlContentStep.doStep();
 		synchronousProcessEmlContentStep.postStep();
 
-		int count = jdbcTemplate.queryForObject(
-				"SELECT count(*) FROM buffer.resource_information",
-				BigDecimal.class).intValue();
+		int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.resource_information", BigDecimal.class).intValue();
 		assertTrue(count >= 1);
 
-		String alternateIdentifier = jdbcTemplate
-				.queryForObject(
-						"SELECT alternate_identifier FROM buffer.resource_information where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'",
-						String.class);
-		assertTrue("Collection entomologique Ouellet-Robert (QMOR)"
-				.equals(alternateIdentifier));
+		String alternateIdentifier = jdbcTemplate.queryForObject(
+				"SELECT alternate_identifier FROM buffer.resource_information where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'",
+				String.class);
+		assertTrue("Collection entomologique Ouellet-Robert (QMOR)".equals(alternateIdentifier));
 	}
 }

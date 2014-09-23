@@ -19,24 +19,25 @@ import org.springframework.beans.factory.annotation.Qualifier;
 /**
  * Step taking a SaveResourceInformationMessage from JMS and writing a ResourceInformationModel to a writer
  * NOT thread safe
+ * 
  * @author canadensys
- *
+ * 
  */
-public class InsertResourceInformationStep implements ProcessingStepIF,JMSConsumerMessageHandlerIF{
+public class InsertResourceInformationStep implements ProcessingStepIF, JMSConsumerMessageHandlerIF {
 
 	@Autowired
 	@Qualifier("resourceInformationWriter")
 	private ItemWriterIF<ResourceInformationModel> writer;
-	
+
 	@Autowired
 	private JMSControlProducer errorReporter;
 
 	@Override
-	public void preStep(Map<SharedParameterEnum,Object> sharedParameters) throws IllegalStateException{
-		if(writer == null){
+	public void preStep(Map<SharedParameterEnum, Object> sharedParameters) throws IllegalStateException {
+		if (writer == null) {
 			throw new IllegalStateException("No writer defined");
 		}
-		if(errorReporter == null){
+		if (errorReporter == null) {
 			throw new IllegalStateException("No errorReporter defined");
 		}
 		writer.openWriter();
@@ -48,7 +49,7 @@ public class InsertResourceInformationStep implements ProcessingStepIF,JMSConsum
 		writer.closeWriter();
 		errorReporter.close();
 	}
-	
+
 	@Override
 	public Class<?> getMessageClass() {
 		return SaveResourceInformationMessage.class;
@@ -57,27 +58,29 @@ public class InsertResourceInformationStep implements ProcessingStepIF,JMSConsum
 	@Override
 	public boolean handleMessage(ProcessingMessageIF message) {
 		long t = System.currentTimeMillis();
-		ResourceInformationModel rcm = ((SaveResourceInformationMessage)message).getResourceInformationModel();
+		ResourceInformationModel rcm = ((SaveResourceInformationMessage) message).getResourceInformationModel();
 		try {
 			writer.write(rcm);
-		} catch (WriterException e) {
+		}
+		catch (WriterException e) {
 			errorReporter.publish(new NodeErrorControlMessage(e));
 			return false;
 		}
-		System.out.println("Reading msg + Writing Resource Information :" + ( System.currentTimeMillis()-t) + "ms");
+		System.out.println("Reading msg + Writing Resource Information :" + (System.currentTimeMillis() - t) + "ms");
 		return true;
 	}
-	
+
 	/**
 	 * No implemented, async step
 	 */
 	@Override
-	public void doStep() {};
-	
-	public void setWriter(ItemWriterIF<ResourceInformationModel> writer){
+	public void doStep() {
+	};
+
+	public void setWriter(ItemWriterIF<ResourceInformationModel> writer) {
 		this.writer = writer;
 	}
-	
+
 	@Override
 	public String getTitle() {
 		return "Inserting resource Information data";

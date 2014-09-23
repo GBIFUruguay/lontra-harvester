@@ -83,9 +83,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 	private StepControllerIF stepController;
 
 	public void initView() {
-		loadingImg = new ImageIcon(
-				OccurrenceHarvesterMainView.class
-				.getResource("/ajax-loader.gif"));
+		loadingImg = new ImageIcon(OccurrenceHarvesterMainView.class.getResource("/ajax-loader.gif"));
 
 		harvesterFrame = new JFrame(Messages.getString("view.title"));
 		harvesterFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -95,8 +93,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		pathToImportTxt.setColumns(30);
 		pathToImportTxt.setEditable(false);
 		openFileBtn = new JButton(Messages.getString("view.button.openFile"));
-		openResourceBtn = new JButton(
-				Messages.getString("view.button.openResource"));
+		openResourceBtn = new JButton(Messages.getString("view.button.openResource"));
 		openFileBtn.setEnabled(false);
 		openFileBtn.addActionListener(new ActionListener() {
 			@Override
@@ -113,8 +110,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		});
 
 		importBtn = new JButton(Messages.getString("view.button.import"));
-		importBtn.setToolTipText(Messages
-				.getString("view.button.import.tooltip"));
+		importBtn.setToolTipText(Messages.getString("view.button.import.tooltip"));
 		importBtn.setEnabled(false);
 		importBtn.addActionListener(new ActionListener() {
 			@Override
@@ -129,8 +125,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		c.gridy = lineIdx;
 		c.anchor = GridBagConstraints.CENTER;
 		c.gridwidth = 3;
-		JLabel lbl = new JLabel(Messages.getString("view.info.currentDatabase")
-				+ harvesterViewModel.getDatabaseLocation());
+		JLabel lbl = new JLabel(Messages.getString("view.info.currentDatabase") + harvesterViewModel.getDatabaseLocation());
 		lbl.setForeground(Color.BLUE);
 		mainPanel.add(lbl, c);
 
@@ -140,8 +135,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		c.gridx = 0;
 		c.gridy = lineIdx;
 		c.anchor = GridBagConstraints.WEST;
-		mainPanel.add(new JLabel(Messages.getString("view.info.import.dwca")),
-				c);
+		mainPanel.add(new JLabel(Messages.getString("view.info.import.dwca")), c);
 
 		// UI line break
 		lineIdx++;
@@ -190,8 +184,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		// UI line break
 		lineIdx++;
 		moveToPublicBtn = new JButton(Messages.getString("view.button.move"));
-		moveToPublicBtn.setToolTipText(Messages
-				.getString("view.button.move.tooltip"));
+		moveToPublicBtn.setToolTipText(Messages.getString("view.button.move.tooltip"));
 		moveToPublicBtn.setEnabled(false);
 		moveToPublicBtn.addActionListener(new ActionListener() {
 			@Override
@@ -237,8 +230,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		c.gridx = 0;
 		c.gridy = lineIdx;
 		c.anchor = GridBagConstraints.WEST;
-		loadingLbl = new JLabel(Messages.getString("view.info.status.waiting"),
-				null, JLabel.CENTER);
+		loadingLbl = new JLabel(Messages.getString("view.info.status.waiting"), null, JLabel.CENTER);
 		mainPanel.add(loadingLbl, c);
 
 		// UI line break
@@ -274,8 +266,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 		// UI line break
 		lineIdx++;
-		viewImportLogBtn = new JButton(
-				Messages.getString("view.button.viewImportLog"));
+		viewImportLogBtn = new JButton(Messages.getString("view.button.viewImportLog"));
 		viewImportLogBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -290,8 +281,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 		// UI line break
 		lineIdx++;
-		viewIPTFeedBtn = new JButton(
-				Messages.getString("view.button.viewIPTrss"));
+		viewIPTFeedBtn = new JButton(Messages.getString("view.button.viewIPTrss"));
 		viewIPTFeedBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -320,19 +310,19 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 		redirectSystemStreams();
 
-		//register to received all updates to the model
+		// register to received all updates to the model
 		harvesterViewModel.addPropertyChangeListener(this);
-		
+
 		checkForOutdatedResources();
 	}
-	
+
 	/**
 	 * Display in text area resource that should be (re)harvested.
 	 */
-	private void checkForOutdatedResources(){
+	private void checkForOutdatedResources() {
 		List<ResourceModel> outdatedResources = stepController.getResourceToHarvest();
-		for(ResourceModel currResourceModel : outdatedResources){
-			appendToTextArea(Messages.getString("view.info.harvestRequired") + currResourceModel.getSourcefileid()+"\n");
+		for (ResourceModel currResourceModel : outdatedResources) {
+			appendToTextArea(Messages.getString("view.info.harvestRequired") + currResourceModel.getSourcefileid() + "\n");
 		}
 	}
 
@@ -352,8 +342,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 			@Override
 			public boolean accept(File file) {
-				if (FilenameUtils.getExtension(file.getName())
-						.equalsIgnoreCase("zip")) {
+				if (FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("zip")) {
 					return true;
 				}
 				return false;
@@ -370,8 +359,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 	 * Open a window to select a resource to import.
 	 */
 	private void onOpenResourceBtn() {
-		ResourceChooser urlChooser = new ResourceChooser(stepController,
-				stepController.getResourceModelList());
+		ResourceChooser urlChooser = new ResourceChooser(stepController, stepController.getResourceModelList());
 		urlChooser.setLocationRelativeTo(harvesterFrame);
 		urlChooser.setVisible(true);
 
@@ -396,12 +384,12 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		final SwingWorker<Void, Object> swingWorker = new SwingWorker<Void, Object>() {
 			@Override
 			public Void doInBackground() {
-				try{
-					if(resourceToImport != null){
+				try {
+					if (resourceToImport != null) {
 						stepController.importDwcA(resourceToImport.getId());
 					}
-					else{
-						if(StringUtils.isNotBlank(pathToImportTxt.getText())){
+					else {
+						if (StringUtils.isNotBlank(pathToImportTxt.getText())) {
 							stepController.importDwcAFromLocalFile(pathToImportTxt.getText());
 						}
 					}
@@ -409,7 +397,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 				catch (Exception e) {
 					// should not get there but just in case
 					e.printStackTrace();
-					
+
 				}
 				// async call, propertyChange(...) will be called once done
 				return null;
@@ -418,7 +406,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 			@Override
 			protected void done() {
 			}
-			
+
 		};
 		swingWorker.execute();
 	}
@@ -443,12 +431,15 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 				try {
 					if (get()) {
 						onMoveDone(JobStatus.DONE);
-					} else {
+					}
+					else {
 						onMoveDone(JobStatus.ERROR);
 					}
-				} catch (InterruptedException e) {
+				}
+				catch (InterruptedException e) {
 					onMoveDone(JobStatus.ERROR);
-				} catch (ExecutionException e) {
+				}
+				catch (ExecutionException e) {
 					onMoveDone(JobStatus.ERROR);
 				}
 			}
@@ -465,8 +456,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 		ImportLogDialog dlg = new ImportLogDialog(headers);
 
-		List<ImportLogModel> importLogModelList = stepController
-				.getSortedImportLogModelList();
+		List<ImportLogModel> importLogModelList = stepController.getSortedImportLogModelList();
 		dlg.loadData(importLogModelList);
 		dlg.setLocationRelativeTo(null);
 		dlg.setVisible(true);
@@ -486,10 +476,10 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		dlg.setLocationRelativeTo(null);
 		dlg.setVisible(true);
 	}
-	
-	private void onJobStatusChanged(JobStatus newStatus){
+
+	private void onJobStatusChanged(JobStatus newStatus) {
 		switch (newStatus) {
-			case DONE: 
+			case DONE:
 				loadingLbl.setIcon(null);
 				bufferSchemaTxt.setText(resourceToImport.getSourcefileid());
 				moveToPublicBtn.setEnabled(true);
@@ -498,9 +488,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 			case ERROR:
 				loadingLbl.setIcon(null);
 				updateStatusLabel(Messages.getString("view.info.status.error.importError"));
-				JOptionPane.showMessageDialog(
-						harvesterFrame,
-						Messages.getString("view.info.status.error.details"),
+				JOptionPane.showMessageDialog(harvesterFrame, Messages.getString("view.info.status.error.details"),
 						Messages.getString("view.info.status.error"), JOptionPane.ERROR_MESSAGE);
 				break;
 			case CANCEL:
@@ -511,8 +499,8 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 				break;
 		}
 	}
-	
-	private void updateStatusLabel(final String status){
+
+	private void updateStatusLabel(final String status) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -524,20 +512,16 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 	private void onMoveDone(JobStatus status) {
 		loadingLbl.setIcon(null);
 		if (JobStatus.DONE == status) {
-			JOptionPane.showMessageDialog(harvesterFrame,
-					Messages.getString("view.info.status.moveCompleted"),
-					Messages.getString("view.info.status.info"),
-					JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(harvesterFrame, Messages.getString("view.info.status.moveCompleted"),
+					Messages.getString("view.info.status.info"), JOptionPane.INFORMATION_MESSAGE);
 			bufferSchemaTxt.setText("");
 			pathToImportTxt.setText("");
 			loadingLbl.setText(Messages.getString("view.info.status.moveDone"));
-		} else {
-			JOptionPane.showMessageDialog(harvesterFrame,
-					Messages.getString("view.info.status.error.details"),
-					Messages.getString("view.info.status.error"),
-					JOptionPane.ERROR_MESSAGE);
-			loadingLbl.setText(Messages
-					.getString("view.info.status.error.moveError"));
+		}
+		else {
+			JOptionPane.showMessageDialog(harvesterFrame, Messages.getString("view.info.status.error.details"),
+					Messages.getString("view.info.status.error"), JOptionPane.ERROR_MESSAGE);
+			loadingLbl.setText(Messages.getString("view.info.status.error.moveError"));
 		}
 	}
 
@@ -586,15 +570,15 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if(JobStatusModel.CURRENT_STATUS_EXPLANATION_PROPERTY.equals(evt.getPropertyName())) {
-			appendToTextArea(">"+(String)evt.getNewValue() + END_LINE);
+		if (JobStatusModel.CURRENT_STATUS_EXPLANATION_PROPERTY.equals(evt.getPropertyName())) {
+			appendToTextArea(">" + (String) evt.getNewValue() + END_LINE);
 		}
-		else if(JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt.getPropertyName())) {
-			appendToTextArea("STATUS:"+evt.getNewValue() + END_LINE);
-			onJobStatusChanged((JobStatus)evt.getNewValue());
+		else if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt.getPropertyName())) {
+			appendToTextArea("STATUS:" + evt.getNewValue() + END_LINE);
+			onJobStatusChanged((JobStatus) evt.getNewValue());
 		}
-		else if(JobStatusModel.CURRENT_JOB_PROGRESS_PROPERTY.equals(evt.getPropertyName())) {
-			updateProgressText((String)evt.getNewValue());
+		else if (JobStatusModel.CURRENT_JOB_PROGRESS_PROPERTY.equals(evt.getPropertyName())) {
+			updateProgressText((String) evt.getNewValue());
 		}
 	}
 }

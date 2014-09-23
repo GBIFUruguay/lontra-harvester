@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Concrete implementation of GenericStreamProcessingStep for OccurrenceExtensionModel.
  * 
  * @author cgendreau
- *
+ * 
  */
-public class StreamDwcExtensionContentStep extends GenericStreamProcessingStep<OccurrenceExtensionModel,OccurrenceExtensionModel> {
+public class StreamDwcExtensionContentStep extends GenericStreamProcessingStep<OccurrenceExtensionModel, OccurrenceExtensionModel> {
 
 	/**
 	 * dwcaOccurrenceExtensionReader should be declared as a prototype.
@@ -24,18 +24,17 @@ public class StreamDwcExtensionContentStep extends GenericStreamProcessingStep<O
 	public void setReader(ItemReaderIF<OccurrenceExtensionModel> reader) {
 		super.setReader(reader);
 	}
-	
+
 	@Override
 	@Qualifier("jmsWriter")
 	public void setWriter(ItemWriterIF<ProcessingMessageIF> writer) {
 		super.setWriter(writer);
 	}
-	
+
 	@Override
 	@Qualifier("extLineProcessor")
-	public void setDwcaLineProcessor(
-			ItemProcessorIF<OccurrenceExtensionModel, OccurrenceExtensionModel> lineProcessor) {
+	public void setDwcaLineProcessor(ItemProcessorIF<OccurrenceExtensionModel, OccurrenceExtensionModel> lineProcessor) {
 		super.setDwcaLineProcessor(lineProcessor);
 	}
-	
+
 }

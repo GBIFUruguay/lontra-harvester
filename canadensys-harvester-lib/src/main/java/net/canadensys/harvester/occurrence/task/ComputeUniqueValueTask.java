@@ -31,12 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class ComputeUniqueValueTask implements ItemTaskIF {
 
-	//get log4j handler
+	// get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(ComputeUniqueValueTask.class);
-	
-	//for performance reason we use varchar(255) (and not text)
+
+	// for performance reason we use varchar(255) (and not text)
 	private static final int MAX_VALUE_LENGTH = 255;
-	
+
 	private static final int FETCH_SIZE = 1000;
 	private static String ABSTRACT_INSERT = "INSERT INTO unique_values (key,occurrence_count,value,unaccented_value) VALUES (:key,:occ_count,:value,:unaccented_value)";
 	private static String ABSTRACT_SELECT = "SELECT COUNT(%field) occurrence_count,%field FROM occurrence WHERE %field IS NOT NULL AND %field <> '' GROUP BY %field";
@@ -73,38 +73,26 @@ public class ComputeUniqueValueTask implements ItemTaskIF {
 
 		Session session = sessionFactory.getCurrentSession();
 		session.createSQLQuery("DELETE FROM unique_values").executeUpdate();
-		session.createSQLQuery(
-				"ALTER SEQUENCE unique_values_id_seq RESTART WITH 1")
-				.executeUpdate();
+		session.createSQLQuery("ALTER SEQUENCE unique_values_id_seq RESTART WITH 1").executeUpdate();
 		Object[] currentValue;
-		try{
+		try {
 			for (String currCol : columns) {
-				ScrollableResults cursor = session
-						.createSQLQuery(
-								ABSTRACT_SELECT.replaceAll("%field", currCol))
-						.addScalar("occurrence_count", StandardBasicTypes.INTEGER)
-						.addScalar(currCol, StandardBasicTypes.STRING)
-						.setCacheable(false)
-						.setCacheMode(CacheMode.IGNORE)
-						.setFetchSize(FETCH_SIZE).scroll();
+				ScrollableResults cursor = session.createSQLQuery(ABSTRACT_SELECT.replaceAll("%field", currCol))
+						.addScalar("occurrence_count", StandardBasicTypes.INTEGER).addScalar(currCol, StandardBasicTypes.STRING).setCacheable(false)
+						.setCacheMode(CacheMode.IGNORE).setFetchSize(FETCH_SIZE).scroll();
 				while (cursor.next()) {
 					currentValue = cursor.get();
-					if(((String)currentValue[1]).length() < MAX_VALUE_LENGTH){
-						session.createSQLQuery(ABSTRACT_INSERT)
-								.setParameter("key", currCol)
-								.setParameter("occ_count", currentValue[0])
+					if (((String) currentValue[1]).length() < MAX_VALUE_LENGTH) {
+						session.createSQLQuery(ABSTRACT_INSERT).setParameter("key", currCol).setParameter("occ_count", currentValue[0])
 								.setParameter("value", currentValue[1])
-								.setParameter(
-										"unaccented_value",
-										StringUtils.unaccent(((String) currentValue[1])
-												.toLowerCase())).executeUpdate();
+								.setParameter("unaccented_value", StringUtils.unaccent(((String) currentValue[1]).toLowerCase())).executeUpdate();
 					}
 				}
 				cursor.close();
 			}
 		}
-		catch(HibernateException hEx){
-			LOGGER.fatal("Can't compute unique values",hEx);
+		catch (HibernateException hEx) {
+			LOGGER.fatal("Can't compute unique values", hEx);
 			throw new TaskExecutionException("Can't compute unique values");
 		}
 	}
@@ -112,7 +100,7 @@ public class ComputeUniqueValueTask implements ItemTaskIF {
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
-	
+
 	@Override
 	public String getTitle() {
 		return "Computing unique values";

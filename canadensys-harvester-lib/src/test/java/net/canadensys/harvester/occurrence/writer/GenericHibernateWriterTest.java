@@ -35,36 +35,36 @@ public class GenericHibernateWriterTest {
 	public void testInsertInformationAndContact() {
 		ResourceInformationModel testInformation = new ResourceInformationModel();
 		testInformation.set_abstract("Test abstract information");
-		testInformation
-				.setCitation("please use this format to cite this dataset");
+		testInformation.setCitation("please use this format to cite this dataset");
 
-		/** Add Contact:
-		Set<ResourceContactModel> contacts = new HashSet<ResourceContactModel>();
-		ResourceContactModel testContact = new ResourceContactModel();
-		testContact.setName("Test Contact");
-		testContact.setAddress("Fools street, 0");
-		contacts.add(testContact);
-		testInformation.setContacts(contacts);
-		*/
+		/**
+		 * Add Contact:
+		 * Set<ResourceContactModel> contacts = new HashSet<ResourceContactModel>();
+		 * ResourceContactModel testContact = new ResourceContactModel();
+		 * testContact.setName("Test Contact");
+		 * testContact.setAddress("Fools street, 0");
+		 * contacts.add(testContact);
+		 * testInformation.setContacts(contacts);
+		 */
 		try {
 			genericResourceInformationWriter.write(testInformation);
-		} catch (WriterException e) {
+		}
+		catch (WriterException e) {
 			fail();
 		}
-		
-		Number informationId = jdbcTemplate
-				.queryForObject(
-						"SELECT auto_id FROM buffer.resource_information WHERE _abstract ='Test abstract information'",
-						Number.class);
+
+		Number informationId = jdbcTemplate.queryForObject(
+				"SELECT auto_id FROM buffer.resource_information WHERE _abstract ='Test abstract information'", Number.class);
 		assertNotNull(informationId);
 
-		/** Contact assert:
-		Number contactId = jdbcTemplate
-				.queryForObject(
-						"SELECT auto_id FROM buffer.resource_contact WHERE name ='Test Contact'",
-						Number.class);
-		assertNotNull(contactId);
-		*/
+		/**
+		 * Contact assert:
+		 * Number contactId = jdbcTemplate
+		 * .queryForObject(
+		 * "SELECT auto_id FROM buffer.resource_contact WHERE name ='Test Contact'",
+		 * Number.class);
+		 * assertNotNull(contactId);
+		 */
 	}
 
 }

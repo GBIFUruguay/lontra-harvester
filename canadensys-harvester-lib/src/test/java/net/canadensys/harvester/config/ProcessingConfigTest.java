@@ -70,24 +70,23 @@ public class ProcessingConfigTest {
 	@Bean
 	public static PropertyPlaceholderConfigurer properties() {
 		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-		ClassPathResource[] resources = new ClassPathResource[] { new ClassPathResource(
-				"test-harvester-config.properties") };
+		ClassPathResource[] resources = new ClassPathResource[] { new ClassPathResource("test-harvester-config.properties") };
 		ppc.setLocations(resources);
 		return ppc;
 	}
 
 	@Value("${database.url}")
 	private String dbUrl;
-	
+
 	@Value("${database.driver}")
 	private String dbDriverClassName;
 
 	@Value("${hibernate.dialect}")
 	private String hibernateDialect;
-	
+
 	@Value("${hibernate.show_sql}")
 	private String hibernateShowSql;
-	
+
 	@Value("${hibernate.buffer_schema}")
 	private String hibernateBufferSchema;
 
@@ -102,31 +101,23 @@ public class ProcessingConfigTest {
 
 	@Bean(name = "datasource")
 	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder()
-				.setType(EmbeddedDatabaseType.H2)
-				.addScript("classpath:h2/h2setup.sql")
+		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).addScript("classpath:h2/h2setup.sql")
 				// those 2 scripts are loaded from canadensys-data-access
 				.addScript("/script/occurrence/create_occurrence_tables.sql")
-				.addScript(
-						"/script/occurrence/create_occurrence_tables_buffer_schema.sql")
-				.build();
+				.addScript("/script/occurrence/create_occurrence_tables_buffer_schema.sql").build();
 	}
 
 	@Bean(name = "bufferSessionFactory")
 	public LocalSessionFactoryBean bufferSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
-				OccurrenceModel.class, ImportLogModel.class,
-				ResourceContactModel.class, ResourceInformationModel.class,
-				OccurrenceExtensionModel.class, ResourceModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceContactModel.class,
+				ResourceInformationModel.class, OccurrenceExtensionModel.class, ResourceModel.class });
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
-		hibernateProperties.setProperty("hibernate.default_schema",
-				hibernateBufferSchema);
-		hibernateProperties.setProperty("javax.persistence.validation.mode",
-				"none");
+		hibernateProperties.setProperty("hibernate.default_schema", hibernateBufferSchema);
+		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
 		sb.setHibernateProperties(hibernateProperties);
 		return sb;
 	}
@@ -135,15 +126,13 @@ public class ProcessingConfigTest {
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
-				OccurrenceModel.class, ImportLogModel.class, ResourceContactModel.class, ResourceInformationModel.class,
-				OccurrenceExtensionModel.class, ResourceModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceContactModel.class,
+				ResourceInformationModel.class, OccurrenceExtensionModel.class, ResourceModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
-		hibernateProperties.setProperty("javax.persistence.validation.mode",
-				"none");
+		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
 		sb.setHibernateProperties(hibernateProperties);
 		return sb;
 	}

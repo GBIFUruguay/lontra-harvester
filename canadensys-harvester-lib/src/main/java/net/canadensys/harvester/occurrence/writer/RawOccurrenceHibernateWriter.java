@@ -23,8 +23,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  */
 public class RawOccurrenceHibernateWriter implements ItemWriterIF<OccurrenceRawModel> {
 
-	private static final Logger LOGGER = Logger
-			.getLogger(RawOccurrenceHibernateWriter.class);
+	private static final Logger LOGGER = Logger.getLogger(RawOccurrenceHibernateWriter.class);
 
 	@Autowired
 	@Qualifier(value = "bufferSessionFactory")
@@ -57,12 +56,13 @@ public class RawOccurrenceHibernateWriter implements ItemWriterIF<OccurrenceRawM
 				session.insert(currRawOccurrence);
 			}
 			tx.commit();
-		} catch (HibernateException hEx) {
-			LOGGER.fatal("Failed to write OccurrenceRawModel ["+lastDwcaId+"]", hEx);
+		}
+		catch (HibernateException hEx) {
+			LOGGER.fatal("Failed to write OccurrenceRawModel [" + lastDwcaId + "]", hEx);
 			if (tx != null) {
 				tx.rollback();
 			}
-			throw new WriterException(lastDwcaId,hEx.getMessage());
+			throw new WriterException(lastDwcaId, hEx.getMessage());
 		}
 	}
 
@@ -74,12 +74,13 @@ public class RawOccurrenceHibernateWriter implements ItemWriterIF<OccurrenceRawM
 			tx = currSession.beginTransaction();
 			currSession.save(rawModel);
 			tx.commit();
-		} catch (HibernateException hEx) {
-			LOGGER.fatal("Failed to write OccurrenceRawModel [" +rawModel.getDwcaid() + "]", hEx);
+		}
+		catch (HibernateException hEx) {
+			LOGGER.fatal("Failed to write OccurrenceRawModel [" + rawModel.getDwcaid() + "]", hEx);
 			if (tx != null) {
 				tx.rollback();
 			}
-			throw new WriterException(rawModel.getDwcaid(),hEx.getMessage());
+			throw new WriterException(rawModel.getDwcaid(), hEx.getMessage());
 		}
 	}
 

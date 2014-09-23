@@ -7,8 +7,9 @@ import net.canadensys.harvester.occurrence.model.JobStatusModel;
 
 /**
  * Harvester view model with PropertyChangeSupport.
+ * 
  * @author canadensys
- *
+ * 
  */
 public class HarvesterViewModel {
 
@@ -17,18 +18,19 @@ public class HarvesterViewModel {
 
 	private String databaseLocation;
 
-	public HarvesterViewModel(){
+	public HarvesterViewModel() {
 		propertyChangeSupport = new PropertyChangeSupport(this);
-		//currentStatus = new ApplicationStatus();
+		// currentStatus = new ApplicationStatus();
 	}
 
-	public void addPropertyChangeListener(PropertyChangeListener listener){
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
 		propertyChangeSupport.addPropertyChangeListener(listener);
 	}
 
 	public String getDatabaseLocation() {
 		return databaseLocation;
 	}
+
 	public void setDatabaseLocation(String databaseLocation) {
 		this.databaseLocation = databaseLocation;
 		propertyChangeSupport.firePropertyChange("databaseLocation", null, databaseLocation);
@@ -37,10 +39,11 @@ public class HarvesterViewModel {
 	/**
 	 * Encapsulate the JobStatusModel into this model.
 	 * All PropertyChangeListeners will also be registered to the JobStatusModel.
+	 * 
 	 * @param currentJobStatusModel
 	 */
-	public void encapsulateJobStatus(JobStatusModel currentJobStatusModel){
-		//TODO we should probably unregister from previous currentJobStatusModel
+	public void encapsulateJobStatus(JobStatusModel currentJobStatusModel) {
+		// TODO we should probably unregister from previous currentJobStatusModel
 		this.currentJobStatusModel = currentJobStatusModel;
 		currentJobStatusModel.addPropertyChangeListener(propertyChangeSupport.getPropertyChangeListeners()[0]);
 	}

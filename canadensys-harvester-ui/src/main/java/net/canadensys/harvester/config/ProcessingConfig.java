@@ -84,8 +84,7 @@ public class ProcessingConfig {
 	@Bean
 	public static PropertyPlaceholderConfigurer properties() {
 		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-		ppc.setLocation(new FileSystemResource(
-				"config/harvester-config.properties"));
+		ppc.setLocation(new FileSystemResource("config/harvester-config.properties"));
 		return ppc;
 	}
 
@@ -136,19 +135,15 @@ public class ProcessingConfig {
 	public LocalSessionFactoryBean bufferSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
-				OccurrenceModel.class, ImportLogModel.class,
-				ResourceModel.class, ResourceInformationModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceModel.class,
+				ResourceInformationModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
-		hibernateProperties.setProperty("hibernate.default_schema",
-				hibernateBufferSchema);
-		hibernateProperties.setProperty("hibernate.jdbc.fetch_size",
-				hibernateJDBCFetchSize);
-		hibernateProperties.setProperty("javax.persistence.validation.mode",
-				"none");
+		hibernateProperties.setProperty("hibernate.default_schema", hibernateBufferSchema);
+		hibernateProperties.setProperty("hibernate.jdbc.fetch_size", hibernateJDBCFetchSize);
+		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
 		sb.setHibernateProperties(hibernateProperties);
 		return sb;
 	}
@@ -157,17 +152,14 @@ public class ProcessingConfig {
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
-				OccurrenceModel.class, ImportLogModel.class,
-				ResourceModel.class, ResourceInformationModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceModel.class,
+				ResourceInformationModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
-		hibernateProperties.setProperty("hibernate.jdbc.fetch_size",
-				hibernateJDBCFetchSize);
-		hibernateProperties.setProperty("javax.persistence.validation.mode",
-				"none");
+		hibernateProperties.setProperty("hibernate.jdbc.fetch_size", hibernateJDBCFetchSize);
+		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
 		sb.setHibernateProperties(hibernateProperties);
 		return sb;
 	}

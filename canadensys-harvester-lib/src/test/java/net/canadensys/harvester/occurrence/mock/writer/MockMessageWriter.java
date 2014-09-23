@@ -9,17 +9,18 @@ import net.canadensys.harvester.message.ProcessingMessageIF;
 
 /**
  * Mock writer to replace JMS writer to simplify unit testing.
+ * 
  * @author cgendreau
- *
+ * 
  * @param <T>
  */
-public class MockMessageWriter<T extends ProcessingMessageIF> implements ItemWriterIF<T>{
+public class MockMessageWriter<T extends ProcessingMessageIF> implements ItemWriterIF<T> {
 
 	private List<T> content = new ArrayList<T>();
-	
+
 	@Override
 	public void openWriter() {
-		//no op
+		// no op
 	}
 
 	@Override
@@ -36,8 +37,8 @@ public class MockMessageWriter<T extends ProcessingMessageIF> implements ItemWri
 	public void write(T element) throws WriterException {
 		content.add(element);
 	}
-	
-	public List<T> getContent(){
+
+	public List<T> getContent() {
 		return content;
 	}
 

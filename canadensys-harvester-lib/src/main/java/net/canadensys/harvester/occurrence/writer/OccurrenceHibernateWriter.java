@@ -47,7 +47,7 @@ public class OccurrenceHibernateWriter implements ItemWriterIF<OccurrenceModel> 
 	}
 
 	@Override
-	public void write(List<? extends OccurrenceModel> elementList) throws WriterException{
+	public void write(List<? extends OccurrenceModel> elementList) throws WriterException {
 		Transaction tx = null;
 		String lastDwcaId = "";
 		try {
@@ -57,12 +57,13 @@ public class OccurrenceHibernateWriter implements ItemWriterIF<OccurrenceModel> 
 				session.insert(currOccurrence);
 			}
 			tx.commit();
-		} catch (HibernateException hEx) {
-			LOGGER.fatal("Failed to write OccurrenceModel ["+lastDwcaId+"]", hEx);
-			if(tx != null){
+		}
+		catch (HibernateException hEx) {
+			LOGGER.fatal("Failed to write OccurrenceModel [" + lastDwcaId + "]", hEx);
+			if (tx != null) {
 				tx.rollback();
 			}
-			throw new WriterException(lastDwcaId,hEx.getMessage());
+			throw new WriterException(lastDwcaId, hEx.getMessage());
 		}
 	}
 
@@ -75,12 +76,13 @@ public class OccurrenceHibernateWriter implements ItemWriterIF<OccurrenceModel> 
 			tx = currSession.beginTransaction();
 			currSession.save(occModel);
 			tx.commit();
-		} catch (HibernateException hEx) {
-			LOGGER.fatal("Failed to write OccurrenceModel ["+occModel.getDwcaid()+"]", hEx);
-			if(tx != null){
+		}
+		catch (HibernateException hEx) {
+			LOGGER.fatal("Failed to write OccurrenceModel [" + occModel.getDwcaid() + "]", hEx);
+			if (tx != null) {
 				tx.rollback();
 			}
-			throw new WriterException(occModel.getDwcaid(),hEx.getMessage());
+			throw new WriterException(occModel.getDwcaid(), hEx.getMessage());
 		}
 	}
 }

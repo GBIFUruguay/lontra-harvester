@@ -22,49 +22,50 @@ import org.junit.Test;
 
 /**
  * Unit test for GenericStreamStep
+ * 
  * @author cgendreau
- *
+ * 
  */
 public class GenericStreamStepTest {
-	
+
 	@Test
-	public void testGenericStreamStep(){
+	public void testGenericStreamStep() {
 		GenericStreamStep<MockHabitObject> streamHabitStep = new GenericStreamStep<MockHabitObject>();
 		MockObjectWriter<ProcessingMessageIF> writer = new MockObjectWriter<ProcessingMessageIF>();
-		Map<SharedParameterEnum,Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
-		sharedParameters.put(SharedParameterEnum.DWCA_PATH,"src/test/resources/dwca-vascan-checklist");
-		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE,"description");
-		
-		//setup reader
+		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
+		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-vascan-checklist");
+		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE, "description");
+
+		// setup reader
 		DwcaExtensionReader<MockHabitObject> extReader = new DwcaExtensionReader<MockHabitObject>();
 		extReader.setMapper(new DefaultBeanMapper<MockHabitObject>(MockHabitObject.class));
-		
+
 		streamHabitStep.setReader(extReader);
 		streamHabitStep.setWriter(writer);
-		
+
 		List<Class<? extends JMSConsumerMessageHandlerIF>> msgHandlerClassList = new ArrayList<Class<? extends JMSConsumerMessageHandlerIF>>();
 		msgHandlerClassList.add(GenericAsyncStep.class);
 		streamHabitStep.setMessageClasses(msgHandlerClassList);
-		
-		//run the step
+
+		// run the step
 		streamHabitStep.preStep(sharedParameters);
 		streamHabitStep.doStep();
 		streamHabitStep.postStep();
-		
-		//get the message that would have been wrote to JMS
+
+		// get the message that would have been wrote to JMS
 		List<ProcessingMessageIF> messages = writer.getContent();
-		DefaultMessage firstMessage = (DefaultMessage)messages.get(0);
-		
-		//ensure class are preserved
-		assertEquals(GenericAsyncStep.class.getName(),firstMessage.getMsgHandlerClass().getName());
-		assertEquals(ArrayList.class.getName(),firstMessage.getContentClass().getName());
-		assertEquals(MockHabitObject.class,(((List<?>)firstMessage.getContent()).get(0)).getClass());
-		
-		//ensure that we can cast the content into the specified class
-		try{
+		DefaultMessage firstMessage = (DefaultMessage) messages.get(0);
+
+		// ensure class are preserved
+		assertEquals(GenericAsyncStep.class.getName(), firstMessage.getMsgHandlerClass().getName());
+		assertEquals(ArrayList.class.getName(), firstMessage.getContentClass().getName());
+		assertEquals(MockHabitObject.class, (((List<?>) firstMessage.getContent()).get(0)).getClass());
+
+		// ensure that we can cast the content into the specified class
+		try {
 			firstMessage.getContentClass().cast(firstMessage.getContent());
 		}
-		catch(ClassCastException ccEx){
+		catch (ClassCastException ccEx) {
 			fail("Can not cast the message object into the declared class");
 		}
 	}
