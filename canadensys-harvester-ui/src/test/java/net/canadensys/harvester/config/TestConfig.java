@@ -22,6 +22,9 @@ import net.canadensys.harvester.config.harvester.HarvesterConfigIF;
 import net.canadensys.harvester.jms.JMSWriter;
 import net.canadensys.harvester.jms.control.JMSControlConsumer;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
+import net.canadensys.harvester.occurrence.controller.NodeStatusController;
+import net.canadensys.harvester.occurrence.controller.StepController;
+import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
@@ -51,7 +54,6 @@ import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ClassPathResource;
@@ -62,7 +64,6 @@ import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration("processingConfig")
-@ComponentScan(basePackages = "net.canadensys.harvester.occurrence")
 @EnableTransactionManagement
 public class TestConfig {
 
@@ -114,6 +115,16 @@ public class TestConfig {
 				"none");
 		sb.setHibernateProperties(hibernateProperties);
 		return sb;
+	}
+	
+	@Bean
+	public StepControllerIF stepController(){
+		return new StepController();
+	}
+	
+	@Bean
+	public NodeStatusController nodeStatusController(){
+		return new NodeStatusController();
 	}
 
 	@Bean
