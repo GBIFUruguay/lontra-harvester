@@ -127,14 +127,14 @@ public class TestConfig {
 		sb.setHibernateProperties(hibernateProperties);
 		return sb;
 	}
-
+	
 	@Bean
-	public StepControllerIF stepController() {
+	public StepControllerIF stepController(){
 		return new StepController();
 	}
-
+	
 	@Bean
-	public NodeStatusController nodeStatusController() {
+	public NodeStatusController nodeStatusController(){
 		return new NodeStatusController();
 	}
 

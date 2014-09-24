@@ -11,6 +11,7 @@ import net.canadensys.dataportal.occurrence.dao.impl.HibernateResourceDAO;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
+import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
 import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
 import net.canadensys.dataportal.occurrence.model.ResourceModel;
 import net.canadensys.harvester.ItemProcessorIF;
@@ -25,6 +26,10 @@ import net.canadensys.harvester.jms.JMSConsumer;
 import net.canadensys.harvester.jms.JMSWriter;
 import net.canadensys.harvester.jms.control.JMSControlConsumer;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
+import net.canadensys.harvester.main.JobInitiatorMain;
+import net.canadensys.harvester.occurrence.controller.NodeStatusController;
+import net.canadensys.harvester.occurrence.controller.StepController;
+import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.dao.impl.HibernateIPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
@@ -49,6 +54,7 @@ import net.canadensys.harvester.occurrence.task.GetResourceInfoTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
+import net.canadensys.harvester.occurrence.view.OccurrenceHarvesterMainView;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
@@ -58,10 +64,7 @@ import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -77,14 +80,14 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * 
  */
 @Configuration
-@ComponentScan(basePackages = "net.canadensys.harvester", excludeFilters = { @Filter(type = FilterType.CUSTOM, value = { ExcludeTestClassesTypeFilter.class }) })
 @EnableTransactionManagement
-public class ProcessingConfig {
+public class UIConfig {
 
 	@Bean
 	public static PropertyPlaceholderConfigurer properties() {
 		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-		ppc.setLocation(new FileSystemResource("config/harvester-config.properties"));
+		ppc.setLocation(new FileSystemResource(
+				"config/harvester-config.properties"));
 		return ppc;
 	}
 
@@ -121,6 +124,12 @@ public class ProcessingConfig {
 	@Value("${harvester.import.allow_localfile:false}")
 	private Boolean allowLocalFileImport;
 
+	// --- Main ---
+	@Bean
+	public JobInitiatorMain jobInitiatorMain() {
+		return new JobInitiatorMain();
+	}
+
 	@Bean(name = "datasource")
 	public DataSource dataSource() {
 		DriverManagerDataSource ds = new DriverManagerDataSource();
@@ -135,15 +144,20 @@ public class ProcessingConfig {
 	public LocalSessionFactoryBean bufferSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceModel.class,
-				ResourceInformationModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
+				OccurrenceModel.class, ImportLogModel.class,
+				ResourceModel.class, ResourceInformationModel.class,
+				ResourceContactModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
-		hibernateProperties.setProperty("hibernate.default_schema", hibernateBufferSchema);
-		hibernateProperties.setProperty("hibernate.jdbc.fetch_size", hibernateJDBCFetchSize);
-		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
+		hibernateProperties.setProperty("hibernate.default_schema",
+				hibernateBufferSchema);
+		hibernateProperties.setProperty("hibernate.jdbc.fetch_size",
+				hibernateJDBCFetchSize);
+		hibernateProperties.setProperty("javax.persistence.validation.mode",
+				"none");
 		sb.setHibernateProperties(hibernateProperties);
 		return sb;
 	}
@@ -152,14 +166,18 @@ public class ProcessingConfig {
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceModel.class,
-				ResourceInformationModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
+				OccurrenceModel.class, ImportLogModel.class,
+				ResourceModel.class, ResourceInformationModel.class,
+				ResourceContactModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
-		hibernateProperties.setProperty("hibernate.jdbc.fetch_size", hibernateJDBCFetchSize);
-		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
+		hibernateProperties.setProperty("hibernate.jdbc.fetch_size",
+				hibernateJDBCFetchSize);
+		hibernateProperties.setProperty("javax.persistence.validation.mode",
+				"none");
 		sb.setHibernateProperties(hibernateProperties);
 		return sb;
 	}
@@ -178,7 +196,24 @@ public class ProcessingConfig {
 		return htmgr;
 	}
 
-	// ---VIEW MODEL---
+	// --- Controllers ---
+	@Bean
+	public StepControllerIF stepController() {
+		return new StepController();
+	}
+
+	@Bean
+	public NodeStatusController nodeStatusController() {
+		return new NodeStatusController();
+	}
+
+	// --- VIEW ---
+	@Bean
+	public OccurrenceHarvesterMainView occurrenceHarvesterMainView() {
+		return new OccurrenceHarvesterMainView();
+	}
+
+	// --- VIEW MODEL ---
 	@Bean
 	public HarvesterViewModel harvesterViewModel() {
 		HarvesterViewModel hvm = new HarvesterViewModel();

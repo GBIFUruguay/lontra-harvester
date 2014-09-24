@@ -62,8 +62,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
  * 
  */
 @Configuration
-// @ComponentScan(basePackages = "net.canadensys.harvester", excludeFilters = { @Filter(type = FilterType.CUSTOM, value = {
-// ExcludeTestClassesTypeFilter.class }) })
+
 @EnableTransactionManagement
 public class ProcessingNodeConfig {
 

@@ -38,6 +38,7 @@ public class CleanBufferTableTask implements ItemTaskIF {
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
 		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
+		String resourceUuid = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
 
 		Session session = sessionFactory.getCurrentSession();
 
@@ -55,7 +56,7 @@ public class CleanBufferTableTask implements ItemTaskIF {
 			query.executeUpdate();
 
 			query = session.createSQLQuery("DELETE FROM buffer.resource_information WHERE resource_uuid=?");
-			query.setString(0, sourceFileId);
+			query.setString(0, resourceUuid);
 			query.executeUpdate();
 		}
 		catch (HibernateException hEx) {
