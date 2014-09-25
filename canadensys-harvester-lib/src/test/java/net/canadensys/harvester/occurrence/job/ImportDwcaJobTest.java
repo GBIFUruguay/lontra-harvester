@@ -118,7 +118,8 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
-
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, "ada5d0b1-07de-4dc0-83d4-e312f0fb81cb");
+		
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		jobStatusModel.addPropertyChangeListener(this);
 		importDwcaJob.doJob(jobStatusModel);

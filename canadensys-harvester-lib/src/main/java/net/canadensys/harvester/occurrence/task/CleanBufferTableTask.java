@@ -43,8 +43,12 @@ public class CleanBufferTableTask implements ItemTaskIF {
 		Session session = sessionFactory.getCurrentSession();
 
 		if (sourceFileId == null) {
-			LOGGER.fatal("Misconfigured task : needs  sourceFileId");
-			throw new TaskExecutionException("Misconfigured task");
+			LOGGER.fatal("Misconfigured task : needs sourceFileId");
+			throw new TaskExecutionException("Misconfigured CleanBufferTableTask");
+		}
+		if (resourceUuid == null) {
+			LOGGER.fatal("Misconfigured task : needs resourceUuid");
+			throw new TaskExecutionException("Misconfigured CleanBufferTableTask");
 		}
 		try {
 			SQLQuery query = session.createSQLQuery("DELETE FROM buffer.occurrence_raw WHERE sourcefileid=?");
