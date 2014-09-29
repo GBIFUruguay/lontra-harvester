@@ -85,7 +85,13 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 
 		// keep the same auto_id
 		processedModel.setAuto_id(rawModel.getAuto_id());
-		processedModel.setBasisofrecord(rawModel.getBasisofrecord());
+		String basisofrecord = rawModel.getBasisofrecord();
+		if (basisofrecord != null) {
+			if (basisofrecord.length()>25) {
+				basisofrecord = basisofrecord.substring(0, 25);
+				processedModel.setBasisofrecord(basisofrecord);
+			}
+		}
 
 		// set a cleaned associatedmedia
 		processedModel.setAssociatedmedia(normalizeURLSeparator(rawModel.getAssociatedmedia()));

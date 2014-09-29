@@ -50,7 +50,7 @@ public class ResourceInformationHibernateWriter implements ItemWriterIF<Resource
 			session.beginTransaction();
 			for (ResourceInformationModel resourceInformationModel : elementList) {
 				lastId = resourceInformationModel.getAuto_id() != null ? resourceInformationModel.getAuto_id().toString() : "?";
-				session.save(resourceInformationModel);
+				System.out.println("*** Saved ResourceInformatinoModel: " + session.save(resourceInformationModel));
 			}
 			session.getTransaction().commit();
 		}

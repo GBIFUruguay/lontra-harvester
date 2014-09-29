@@ -420,7 +420,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
 			@Override
 			public Boolean doInBackground() {
-				stepController.moveToPublicSchema(bufferSchemaTxt.getText());
+				stepController.moveToPublicSchema(bufferSchemaTxt.getText(), resourceToImport.getResource_uuid());
 				return true;
 			}
 
