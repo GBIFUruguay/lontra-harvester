@@ -37,7 +37,7 @@ public class SynchronousProcessEmlContentStepTest {
 
 	@Before
 	public void setupTest() {
-		jdbcTemplate.batchUpdate(new String[] { "DELETE FROM buffer.resource_information" });
+		jdbcTemplate.batchUpdate(new String[] { "DELETE FROM buffer.resource_contact", "DELETE FROM buffer.resource_information" });
 	}
 
 	@Test

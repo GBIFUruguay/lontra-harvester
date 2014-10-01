@@ -81,29 +81,38 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 			information.setTitle(eml.getTitle());
 
 			Set<ResourceContactModel> contacts = new HashSet<ResourceContactModel>();
-			Agent temp = null;
+			Agent tempAgent = null;
+			ResourceContactModel tempContact = null;
 
 			// Add resource contacts information: */
-			temp = eml.getContact();
-			if (temp != null) {
-				contacts.add(setContactFromAgent(temp, eml.getGuid(), CONTACT));
+			tempAgent = eml.getContact();
+			if (tempAgent != null) {
+				tempContact = setContactFromAgent(tempAgent, eml.getGuid(), CONTACT);
+//				information.setResourceInformation(tempContact);
+				contacts.add(tempContact);
 			}	
 			
 			// Add resource metadata provider information:
-			temp = eml.getMetadataProvider();
-			if (temp != null) {
-				contacts.add(setContactFromAgent(temp, eml.getGuid(), METADATA_PROVIDER));
+			tempAgent = eml.getMetadataProvider();
+			if (tempAgent != null) {
+				tempContact = setContactFromAgent(tempAgent, eml.getGuid(), METADATA_PROVIDER); 
+//				information.setResourceInformation(tempContact);
+				contacts.add(tempContact);
 			}	
 			
 			// Add resource creator information:
-			temp = eml.getResourceCreator();
-			if (temp != null) {
-				contacts.add(setContactFromAgent(temp, eml.getGuid(), RESOURCE_CREATOR));
+			tempAgent = eml.getResourceCreator();
+			if (tempAgent != null) {
+				tempContact = setContactFromAgent(tempAgent, eml.getGuid(), RESOURCE_CREATOR); 
+//				information.setResourceInformation(tempContact);
+				contacts.add(tempContact);
 			}	
 			
 			// Add associatedParties information:
 			for (Agent a : eml.getAssociatedParties()) {
-				contacts.add(setContactFromAgent(a, eml.getGuid(), AGENT));
+				tempContact = setContactFromAgent(a, eml.getGuid(), AGENT);
+//				information.setResourceInformation(tempContact);
+				contacts.add(tempContact);
 			}
 
 			// Add contacts to the ResourceInformationModel:
