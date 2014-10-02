@@ -80,44 +80,34 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 			information.setResource_uuid(eml.getGuid());
 			information.setTitle(eml.getTitle());
 
-			Set<ResourceContactModel> contacts = new HashSet<ResourceContactModel>();
+			// Add resource contacts information: */
 			Agent tempAgent = null;
 			ResourceContactModel tempContact = null;
-
-			// Add resource contacts information: */
+			// Resource_uuid:
+			String resource_uuid = eml.getGuid();
+			// Add contact agent:
 			tempAgent = eml.getContact();
 			if (tempAgent != null) {
-				tempContact = setContactFromAgent(tempAgent, eml.getGuid(), CONTACT);
-//				information.setResourceInformation(tempContact);
-				contacts.add(tempContact);
+				tempContact = setContactFromAgent(tempAgent, resource_uuid, CONTACT);
+				information.addContact(tempContact);
 			}	
-			
 			// Add resource metadata provider information:
 			tempAgent = eml.getMetadataProvider();
 			if (tempAgent != null) {
-				tempContact = setContactFromAgent(tempAgent, eml.getGuid(), METADATA_PROVIDER); 
-//				information.setResourceInformation(tempContact);
-				contacts.add(tempContact);
-			}	
-			
+				tempContact = setContactFromAgent(tempAgent, resource_uuid, METADATA_PROVIDER); 
+				information.addContact(tempContact);
+			}
 			// Add resource creator information:
 			tempAgent = eml.getResourceCreator();
 			if (tempAgent != null) {
-				tempContact = setContactFromAgent(tempAgent, eml.getGuid(), RESOURCE_CREATOR); 
-//				information.setResourceInformation(tempContact);
-				contacts.add(tempContact);
-			}	
-			
+				tempContact = setContactFromAgent(tempAgent, resource_uuid, RESOURCE_CREATOR);
+				information.addContact(tempContact);
+			}
 			// Add associatedParties information:
 			for (Agent a : eml.getAssociatedParties()) {
-				tempContact = setContactFromAgent(a, eml.getGuid(), AGENT);
-//				information.setResourceInformation(tempContact);
-				contacts.add(tempContact);
+				tempContact = setContactFromAgent(a, resource_uuid, AGENT);
+				information.addContact(tempContact);
 			}
-
-			// Add contacts to the ResourceInformationModel:
-			System.out.println("*** Amount of contacts: " + contacts.size());
-			information.setContacts(contacts);
 		}
 		return information;
 	}

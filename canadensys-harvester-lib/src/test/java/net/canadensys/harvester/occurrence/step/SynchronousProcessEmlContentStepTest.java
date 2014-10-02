@@ -58,5 +58,12 @@ public class SynchronousProcessEmlContentStepTest {
 				"SELECT alternate_identifier FROM buffer.resource_information where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'",
 				String.class);
 		assertTrue("Collection entomologique Ouellet-Robert (QMOR)".equals(alternateIdentifier));
+		
+		// Test if the foreign key is being set:
+		Integer fkey  = jdbcTemplate.queryForObject(
+				"SELECT resource_information_fkey FROM buffer.resource_contact where contact_type='contact'",
+				Integer.class);
+		assertTrue(fkey==1);
+		
 	}
 }
