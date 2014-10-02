@@ -1,9 +1,7 @@
 package net.canadensys.harvester.occurrence.processor;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
 import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
@@ -52,8 +50,10 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 		// Check if the resource_uuid matches the eml field to ensure what is harvested is what is expected:
 		if (eml.getGuid().equalsIgnoreCase(resourceUuid)) {
 			information = new ResourceInformationModel();
+
 			/* Set information data from EML file: */
 			information.set_abstract(eml.getAbstract());
+
 			// Fetch only first identifier available:
 			List<String> alternateIdentifiers = eml.getAlternateIdentifiers();
 			if (!alternateIdentifiers.equals(null) && !alternateIdentifiers.isEmpty()) {
@@ -80,7 +80,7 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 			information.setResource_uuid(eml.getGuid());
 			information.setTitle(eml.getTitle());
 
-			// Add resource contacts information: */
+			// Add resource contacts information:
 			Agent tempAgent = null;
 			ResourceContactModel tempContact = null;
 			// Resource_uuid:

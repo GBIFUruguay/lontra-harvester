@@ -58,12 +58,13 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query = session.createSQLQuery("DELETE FROM occurrence_raw WHERE sourcefileid=?");
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
-			query = session.createSQLQuery("DELETE FROM resource_information WHERE resource_uuid=?");
-			query.setString(0, resourceUuid);
-			query.executeUpdate();
 			query = session.createSQLQuery("DELETE FROM resource_contact WHERE resource_uuid=?");
 			query.setString(0, resourceUuid);
 			query.executeUpdate();
+			query = session.createSQLQuery("DELETE FROM resource_information WHERE resource_uuid=?");
+			query.setString(0, resourceUuid);
+			query.executeUpdate();
+
 
 			// copy records from buffer
 			query = session.createSQLQuery("INSERT INTO occurrence (SELECT * FROM buffer.occurrence WHERE sourcefileid=?)");
@@ -75,7 +76,6 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query = session.createSQLQuery("INSERT INTO resource_information (SELECT * FROM buffer.resource_information WHERE resource_uuid=?)");
 			query.setString(0, resourceUuid);
 			query.executeUpdate();
-
 			query = session.createSQLQuery("INSERT INTO resource_contact (SELECT * FROM buffer.resource_contact WHERE resource_uuid=?)");
 			query.setString(0, resourceUuid);
 			query.executeUpdate();
@@ -89,10 +89,10 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query.executeUpdate();
 			
 			//empty buffer schema for resource_uuid
-			query = session.createSQLQuery("DELETE FROM buffer.resource_information WHERE resource_uuid=?");
+			query = session.createSQLQuery("DELETE FROM buffer.resource_contact WHERE resource_uuid=?");
 			query.setString(0, resourceUuid);
 			query.executeUpdate();
-			query = session.createSQLQuery("DELETE FROM buffer.resource_contact WHERE resource_uuid=?");
+			query = session.createSQLQuery("DELETE FROM buffer.resource_information WHERE resource_uuid=?");
 			query.setString(0, resourceUuid);
 			query.executeUpdate();
 

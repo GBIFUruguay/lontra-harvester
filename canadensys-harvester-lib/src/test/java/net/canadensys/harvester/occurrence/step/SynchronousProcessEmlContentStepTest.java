@@ -63,7 +63,7 @@ public class SynchronousProcessEmlContentStepTest {
 		Integer fkey  = jdbcTemplate.queryForObject(
 				"SELECT resource_information_fkey FROM buffer.resource_contact where contact_type='contact'",
 				Integer.class);
-		assertTrue(fkey==1);
-		
+		Integer auto_id = jdbcTemplate.queryForObject("SELECT auto_id FROM buffer.resource_information where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'", Integer.class);
+		assertTrue(fkey==auto_id);		
 	}
 }
