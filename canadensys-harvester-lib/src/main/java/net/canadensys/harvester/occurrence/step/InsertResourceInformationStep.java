@@ -12,7 +12,9 @@ import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.message.control.NodeErrorControlMessage;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.message.SaveResourceInformationMessage;
+import net.canadensys.harvester.occurrence.writer.ResourceInformationHibernateWriter;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -24,7 +26,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * 
  */
 public class InsertResourceInformationStep implements ProcessingStepIF, JMSConsumerMessageHandlerIF {
-
+	
 	@Autowired
 	@Qualifier("resourceInformationWriter")
 	private ItemWriterIF<ResourceInformationModel> writer;
@@ -57,16 +59,16 @@ public class InsertResourceInformationStep implements ProcessingStepIF, JMSConsu
 
 	@Override
 	public boolean handleMessage(ProcessingMessageIF message) {
-		long t = System.currentTimeMillis();
 		ResourceInformationModel rcm = ((SaveResourceInformationMessage) message).getResourceInformationModel();
-		try {
-			writer.write(rcm);
-		}
-		catch (WriterException e) {
-			errorReporter.publish(new NodeErrorControlMessage(e));
-			return false;
-		}
-		System.out.println("Reading msg + Writing Resource Information :" + (System.currentTimeMillis() - t) + "ms");
+		if (rcm== null) {
+			try {
+				writer.write(rcm);
+			}
+			catch (WriterException e) {
+				errorReporter.publish(new NodeErrorControlMessage(e));
+				return false;
+			}
+		}	
 		return true;
 	}
 

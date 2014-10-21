@@ -47,8 +47,21 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 			LOGGER.fatal("Misconfigured processor: needs resource_uuid");
 			throw new TaskExecutionException("Misconfigured ResourceInformationProcessor");
 		}
+		String guid = eml.getGuid();
+		// Guid is not the UUID, fetch from alternative identifiers:
+		if (eml.getGuid().contains("http")) {
+			for (String ai: eml.getAlternateIdentifiers()){
+				if (!ai.contains("http")){
+					// Sanity UUID check:
+					if ((ai.length()==36) && ai.charAt(8)=='-' && ai.charAt(13)=='-' && ai.charAt(18)=='-' && ai.charAt(23)=='-') {
+						guid = ai;
+						break;
+					}
+				}
+			}
+		}	
 		// Check if the resource_uuid matches the eml field to ensure what is harvested is what is expected:
-		if (eml.getGuid().equalsIgnoreCase(resourceUuid)) {
+		if (guid.equalsIgnoreCase(resourceUuid)) {
 			information = new ResourceInformationModel();
 
 			/* Set information data from EML file: */
@@ -77,35 +90,34 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 			information.setResource_logo_url(eml.getLogoUrl());
 			// TODO: verify what field should relate to this: 
 			information.setResource_name("");
-			information.setResource_uuid(eml.getGuid());
+			information.setResource_uuid(guid);
 			information.setTitle(eml.getTitle());
 
 			// Add resource contacts information:
 			Agent tempAgent = null;
 			ResourceContactModel tempContact = null;
-			// Resource_uuid:
-			String resource_uuid = eml.getGuid();
 			// Add contact agent:
 			tempAgent = eml.getContact();
 			if (tempAgent != null) {
-				tempContact = setContactFromAgent(tempAgent, resource_uuid, CONTACT);
+				tempContact = setContactFromAgent(tempAgent, guid, CONTACT);
 				information.addContact(tempContact);
 			}	
 			// Add resource metadata provider information:
 			tempAgent = eml.getMetadataProvider();
 			if (tempAgent != null) {
-				tempContact = setContactFromAgent(tempAgent, resource_uuid, METADATA_PROVIDER); 
+				tempContact = setContactFromAgent(tempAgent, guid, METADATA_PROVIDER); 
 				information.addContact(tempContact);
 			}
 			// Add resource creator information:
 			tempAgent = eml.getResourceCreator();
 			if (tempAgent != null) {
-				tempContact = setContactFromAgent(tempAgent, resource_uuid, RESOURCE_CREATOR);
+				tempContact = setContactFromAgent(tempAgent, guid, RESOURCE_CREATOR);
 				information.addContact(tempContact);
 			}
 			// Add associatedParties information:
 			for (Agent a : eml.getAssociatedParties()) {
-				tempContact = setContactFromAgent(a, resource_uuid, AGENT);
+				LOGGER.error(a.getFirstName());
+				tempContact = setContactFromAgent(a, guid, AGENT);
 				information.addContact(tempContact);
 			}
 		}
