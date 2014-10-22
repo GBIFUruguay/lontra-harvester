@@ -2,6 +2,7 @@ package net.canadensys.harvester.occurrence.processor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
 import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
@@ -49,17 +50,24 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 		}
 		String guid = eml.getGuid();
 		// Guid is not the UUID, fetch from alternative identifiers:
-		if (eml.getGuid().contains("http")) {
+		if (eml.getGuid().startsWith("http")) {
 			for (String ai: eml.getAlternateIdentifiers()){
-				if (!ai.contains("http")){
+				if (!ai.startsWith("http")) {
 					// Sanity UUID check:
-					if ((ai.length()==36) && ai.charAt(8)=='-' && ai.charAt(13)=='-' && ai.charAt(18)=='-' && ai.charAt(23)=='-') {
+					UUID uuid = UUID.fromString(ai);
+					if (uuid.toString().equals(ai)) {
 						guid = ai;
 						break;
-					}
+					}	
 				}
 			}
-		}	
+		} // Guid is the UUID: 
+		else {
+			UUID uuid = UUID.fromString(guid);
+			if (!uuid.toString().equals(guid)) {
+				throw new ProcessException("Alternate identifier didn't provide a proper UUID");
+			}
+		}
 		// Check if the resource_uuid matches the eml field to ensure what is harvested is what is expected:
 		if (guid.equalsIgnoreCase(resourceUuid)) {
 			information = new ResourceInformationModel();
@@ -116,7 +124,6 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 			}
 			// Add associatedParties information:
 			for (Agent a : eml.getAssociatedParties()) {
-				LOGGER.error(a.getFirstName());
 				tempContact = setContactFromAgent(a, guid, AGENT);
 				information.addContact(tempContact);
 			}

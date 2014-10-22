@@ -12,9 +12,7 @@ import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.message.control.NodeErrorControlMessage;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.message.SaveResourceInformationMessage;
-import net.canadensys.harvester.occurrence.writer.ResourceInformationHibernateWriter;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -60,16 +58,17 @@ public class InsertResourceInformationStep implements ProcessingStepIF, JMSConsu
 	@Override
 	public boolean handleMessage(ProcessingMessageIF message) {
 		ResourceInformationModel rcm = ((SaveResourceInformationMessage) message).getResourceInformationModel();
-		if (rcm== null) {
+		if (rcm != null) {
 			try {
 				writer.write(rcm);
+				return true;
 			}
 			catch (WriterException e) {
 				errorReporter.publish(new NodeErrorControlMessage(e));
-				return false;
-			}
-		}	
-		return true;
+			}	
+		}
+		errorReporter.publish(new NodeErrorControlMessage(new Exception("InsertResourceInformationStep :: ResourceInformationModel is null")));
+		return false;
 	}
 
 	/**
