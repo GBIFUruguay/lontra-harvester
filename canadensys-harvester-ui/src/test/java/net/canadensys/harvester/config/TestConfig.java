@@ -11,6 +11,8 @@ import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
+import net.canadensys.dataportal.occurrence.model.PublisherContactModel;
+import net.canadensys.dataportal.occurrence.model.PublisherInformationModel;
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
 import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
 import net.canadensys.dataportal.occurrence.model.ResourceModel;
@@ -104,7 +106,7 @@ public class TestConfig {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceContactModel.class,
-				ResourceInformationModel.class, OccurrenceExtensionModel.class, ResourceModel.class });
+				ResourceInformationModel.class, OccurrenceExtensionModel.class, ResourceModel.class, PublisherInformationModel.class, PublisherContactModel.class });
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
@@ -119,7 +121,7 @@ public class TestConfig {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceContactModel.class,
-				ResourceInformationModel.class, OccurrenceExtensionModel.class, ResourceModel.class });
+				ResourceInformationModel.class, OccurrenceExtensionModel.class, ResourceModel.class, PublisherInformationModel.class, PublisherContactModel.class });
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);

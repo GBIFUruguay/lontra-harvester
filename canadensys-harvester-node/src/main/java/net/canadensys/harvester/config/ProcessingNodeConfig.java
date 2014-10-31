@@ -10,6 +10,8 @@ import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
+import net.canadensys.dataportal.occurrence.model.PublisherContactModel;
+import net.canadensys.dataportal.occurrence.model.PublisherInformationModel;
 import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
 import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
 import net.canadensys.dataportal.occurrence.model.ResourceModel;
@@ -102,7 +104,7 @@ public class ProcessingNodeConfig {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceInformationModel.class,
-				ResourceModel.class, ResourceContactModel.class });
+				ResourceModel.class, ResourceContactModel.class, PublisherInformationModel.class, PublisherContactModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -282,7 +284,7 @@ public class ProcessingNodeConfig {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceInformationModel.class,
-				ResourceModel.class, ResourceContactModel.class });
+				ResourceModel.class, ResourceContactModel.class, PublisherInformationModel.class, PublisherContactModel.class});
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);

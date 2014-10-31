@@ -34,6 +34,9 @@ public class SynchronousProcessOccurrenceExtensionStepTest {
 
 	@Test
 	public void testSynchronousProcessOccurrenceExtensionStep() {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(txManager.getDataSource());
+		jdbcTemplate.update("DELETE FROM buffer.occurrence_extension");
+		
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
 		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
@@ -42,7 +45,6 @@ public class SynchronousProcessOccurrenceExtensionStepTest {
 		synchronousProcessOccurrenceExtensionStep.doStep();
 		synchronousProcessOccurrenceExtensionStep.postStep();
 
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(txManager.getDataSource());
 		int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.occurrence_extension", BigDecimal.class).intValue();
 		assertTrue(count >= 1);
 

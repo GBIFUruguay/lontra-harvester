@@ -58,7 +58,7 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 					if (uuid.toString().equals(ai)) {
 						guid = ai;
 						break;
-					}	
+					}
 				}
 			}
 		} // Guid is the UUID: 
