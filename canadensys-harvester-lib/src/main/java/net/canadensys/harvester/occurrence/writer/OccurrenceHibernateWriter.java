@@ -50,11 +50,9 @@ public class OccurrenceHibernateWriter implements ItemWriterIF<OccurrenceModel> 
 	public void write(List<? extends OccurrenceModel> elementList) throws WriterException {
 		Transaction tx = null;
 		String lastDwcaId = "";
-		OccurrenceModel logOcc = null;
 		try {
 			tx = session.beginTransaction();
 			for (OccurrenceModel currOccurrence : elementList) {
-				logOcc = currOccurrence;
 				lastDwcaId = currOccurrence.getDwcaid();
 				session.insert(currOccurrence);
 			}
@@ -62,15 +60,6 @@ public class OccurrenceHibernateWriter implements ItemWriterIF<OccurrenceModel> 
 		}
 		catch (HibernateException hEx) {
 			LOGGER.fatal("Failed to write OccurrenceModel [" + lastDwcaId + "]", hEx);
-			String log = "\n DWCAID: " + logOcc.getDwcaid();
-			log.concat("\n INSTITUTION_CODE: " + logOcc.getInstitutioncode());
-			log.concat("\n GENUS: " + logOcc.getGenus());
-			log.concat("\n PHYLUM: " + logOcc.getPhylum());
-			log.concat("\n CLASS: " + logOcc.get_class());
-			log.concat("\n BASIS_OF_RECORD: " + logOcc.getBasisofrecord());
-			log.concat("\n CONTINENT: " + logOcc.getContinent());
-			log.concat("\n COUNTRY: " + logOcc.getCountry());
-			log.concat("\n COUNTY: " + logOcc.getCounty());
 			if (tx != null) {
 				tx.rollback();
 			}
