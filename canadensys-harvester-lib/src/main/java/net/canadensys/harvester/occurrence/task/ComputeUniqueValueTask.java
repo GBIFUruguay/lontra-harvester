@@ -61,6 +61,8 @@ public class ComputeUniqueValueTask implements ItemTaskIF {
 		columns.add("county");
 		columns.add("municipality");
 		columns.add("sourcefileid");
+		columns.add("publishername");
+		columns.add("resourcename");
 	}
 
 	@Autowired
