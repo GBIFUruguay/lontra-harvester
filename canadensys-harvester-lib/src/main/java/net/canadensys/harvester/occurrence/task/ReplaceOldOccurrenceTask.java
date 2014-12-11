@@ -58,9 +58,15 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query = session.createSQLQuery("DELETE FROM occurrence_raw WHERE sourcefileid=?");
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
+			// Remove child resource_contacts before removing parent resource_information
 			query = session.createSQLQuery("DELETE FROM resource_contact WHERE resource_uuid=?");
 			query.setString(0, resourceUuid);
 			query.executeUpdate();
+			// Remove resource_management fkey dependency over publisher_information_fkey
+			query = session.createSQLQuery("update resource_management set resource_information_fkey = null where resource_information_fkey = (select auto_id FROM resource_information WHERE resource_uuid=?)");
+			query.setString(0, resourceUuid);
+			query.executeUpdate();
+			// Remove resource_information
 			query = session.createSQLQuery("DELETE FROM resource_information WHERE resource_uuid=?");
 			query.setString(0, resourceUuid);
 			query.executeUpdate();
