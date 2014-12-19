@@ -4,9 +4,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-import net.canadensys.dataportal.occurrence.dao.ResourceDAO;
+import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.config.harvester.HarvesterConfigIF;
@@ -53,7 +53,7 @@ public class StepController implements StepControllerIF {
 	private IPTFeedDAO iptFeedDAO;
 
 	@Autowired
-	private ResourceDAO resourceDAO;
+	private DwcaResourceDAO resourceDAO;
 
 	@Autowired
 	private ResourceStatusNotifierIF notifier;
@@ -131,13 +131,13 @@ public class StepController implements StepControllerIF {
 
 	@Override
 	@Transactional("publicTransactionManager")
-	public List<ResourceModel> getResourceModelList() {
+	public List<DwcaResourceModel> getResourceModelList() {
 		return resourceDAO.loadResources();
 	}
 
 	@Transactional("publicTransactionManager")
 	@Override
-	public boolean updateResourceModel(ResourceModel resourceModel) {
+	public boolean updateResourceModel(DwcaResourceModel resourceModel) {
 		return resourceDAO.save(resourceModel);
 	}
 
@@ -178,7 +178,7 @@ public class StepController implements StepControllerIF {
 	}
 
 	@Override
-	public List<ResourceModel> getResourceToHarvest() {
+	public List<DwcaResourceModel> getResourceToHarvest() {
 		return notifier.getHarvestRequiredList();
 	}
 }

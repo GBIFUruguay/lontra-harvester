@@ -3,7 +3,7 @@ package net.canadensys.harvester.occurrence.controller;
 import java.util.List;
 
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 
@@ -11,9 +11,9 @@ public interface StepControllerIF {
 
 	public List<IPTFeedModel> getIPTFeed();
 
-	public List<ResourceModel> getResourceToHarvest();
+	public List<DwcaResourceModel> getResourceToHarvest();
 
-	public List<ResourceModel> getResourceModelList();
+	public List<DwcaResourceModel> getResourceModelList();
 
 	public List<ImportLogModel> getSortedImportLogModelList();
 
@@ -38,7 +38,7 @@ public interface StepControllerIF {
 	 * @param resourceModel
 	 * @return
 	 */
-	public boolean updateResourceModel(ResourceModel resourceModel);
+	public boolean updateResourceModel(DwcaResourceModel resourceModel);
 
 	public void onNodeError();
 }

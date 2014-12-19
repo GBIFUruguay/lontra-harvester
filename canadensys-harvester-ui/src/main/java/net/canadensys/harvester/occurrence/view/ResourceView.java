@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,7 +23,7 @@ public class ResourceView extends AbstractDialog {
 
 	private static final long serialVersionUID = 1L;
 
-	private ResourceModel resourceModel = null;
+	private DwcaResourceModel resourceModel = null;
 	private static final int TXT_FIELD_LENGTH = 50;
 
 	private JLabel idLbl;
@@ -123,7 +123,7 @@ public class ResourceView extends AbstractDialog {
 	 * @return updated ResourceModel or null if resourceModel in parameter was
 	 *         null
 	 */
-	public ResourceModel displayResource(ResourceModel resourceModel) {
+	public DwcaResourceModel displayResource(DwcaResourceModel resourceModel) {
 		this.resourceModel = resourceModel;
 
 		if (resourceModel != null) {

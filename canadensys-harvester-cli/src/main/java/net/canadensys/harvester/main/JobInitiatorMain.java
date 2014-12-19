@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.JobServiceIF;
 import net.canadensys.harvester.config.CLIProcessingConfig;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
@@ -34,7 +34,7 @@ public class JobInitiatorMain {
 
 	public void initiateApp(final String sourcefileid) {
 
-		ResourceModel resourceModel = jobService.loadResourceModel(sourcefileid);
+		DwcaResourceModel resourceModel = jobService.loadResourceModel(sourcefileid);
 
 		if (resourceModel != null) {
 

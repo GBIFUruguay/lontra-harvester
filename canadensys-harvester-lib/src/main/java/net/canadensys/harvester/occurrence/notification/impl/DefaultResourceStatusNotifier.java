@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
-import net.canadensys.dataportal.occurrence.dao.ResourceDAO;
+import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
@@ -36,7 +36,7 @@ public class DefaultResourceStatusNotifier implements ResourceStatusNotifierIF {
 	private Map<String, List<IPTFeedModel>> feedModelByIPTAddress;
 
 	@Autowired
-	private ResourceDAO resourceDAO;
+	private DwcaResourceDAO resourceDAO;
 
 	@Autowired
 	private IPTFeedDAO iptFeedDAO;
@@ -50,15 +50,15 @@ public class DefaultResourceStatusNotifier implements ResourceStatusNotifierIF {
 
 	@Override
 	@Transactional("publicTransactionManager")
-	public List<ResourceModel> getHarvestRequiredList() {
+	public List<DwcaResourceModel> getHarvestRequiredList() {
 
-		List<ResourceModel> resourceToHarvest = new ArrayList<ResourceModel>();
-		List<ResourceModel> resourcesList = resourceDAO.loadResources();
+		List<DwcaResourceModel> resourceToHarvest = new ArrayList<DwcaResourceModel>();
+		List<DwcaResourceModel> resourcesList = resourceDAO.loadResources();
 
 		String iptAddress;
 		URL iptURL;
 
-		for (ResourceModel currResource : resourcesList) {
+		for (DwcaResourceModel currResource : resourcesList) {
 			currResource.getResource_uuid();
 			// we deduce the RSS feed address from the archive URL. This may become a problem in the future.
 			iptAddress = StringUtils.substringBeforeLast(currResource.getArchive_url(), "/") + IPT_RSS_SUFFIX;

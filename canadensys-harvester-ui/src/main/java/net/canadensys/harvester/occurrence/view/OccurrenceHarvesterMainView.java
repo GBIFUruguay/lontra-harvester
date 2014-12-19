@@ -31,7 +31,7 @@ import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
@@ -56,7 +56,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 	private JPanel mainPanel = null;
 	private JTextField pathToImportTxt = null;
-	private ResourceModel resourceToImport = null;
+	private DwcaResourceModel resourceToImport = null;
 
 	// Action buttons
 	private JButton openFileBtn = null;
@@ -318,8 +318,8 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 	 * Display in text area resource that should be (re)harvested.
 	 */
 	private void checkForOutdatedResources() {
-		List<ResourceModel> outdatedResources = stepController.getResourceToHarvest();
-		for (ResourceModel currResourceModel : outdatedResources) {
+		List<DwcaResourceModel> outdatedResources = stepController.getResourceToHarvest();
+		for (DwcaResourceModel currResourceModel : outdatedResources) {
 			appendToTextArea(Messages.getString("view.info.harvestRequired") + currResourceModel.getSourcefileid() + "\n");
 		}
 	}
@@ -361,7 +361,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		urlChooser.setLocationRelativeTo(harvesterFrame);
 		urlChooser.setVisible(true);
 
-		ResourceModel selectedResource = urlChooser.getSelectedResource();
+		DwcaResourceModel selectedResource = urlChooser.getSelectedResource();
 		if (selectedResource != null) {
 			pathToImportTxt.setText(selectedResource.getName());
 			importBtn.setEnabled(true);

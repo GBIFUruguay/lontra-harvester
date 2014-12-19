@@ -37,7 +37,7 @@ public class SynchronousProcessEmlContentStepTest {
 
 	@Before
 	public void setupTest() {
-		jdbcTemplate.batchUpdate(new String[] { "DELETE FROM buffer.resource_contact", "DELETE FROM buffer.resource_information" });
+		jdbcTemplate.batchUpdate(new String[] { "DELETE FROM buffer.contact", "DELETE FROM buffer.resource_metadata" });
 	}
 
 	@Test
@@ -51,19 +51,19 @@ public class SynchronousProcessEmlContentStepTest {
 		synchronousProcessEmlContentStep.doStep();
 		synchronousProcessEmlContentStep.postStep();
 
-		int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.resource_information", BigDecimal.class).intValue();
+		int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.resource_metadata", BigDecimal.class).intValue();
 		assertTrue(count >= 1);
 
 		String alternateIdentifier = jdbcTemplate.queryForObject(
-				"SELECT alternate_identifier FROM buffer.resource_information where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'",
+				"SELECT alternate_identifier FROM buffer.resource_metadata where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'",
 				String.class);
 		assertTrue("Collection entomologique Ouellet-Robert (QMOR)".equals(alternateIdentifier));
 		
 		// Test if the foreign key is being set:
 		Integer fkey  = jdbcTemplate.queryForObject(
-				"SELECT resource_information_fkey FROM buffer.resource_contact where contact_type='contact'",
+				"SELECT resource_metadata_fkey FROM buffer.contact where contact_type='contact'",
 				Integer.class);
-		Integer auto_id = jdbcTemplate.queryForObject("SELECT auto_id FROM buffer.resource_information where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'", Integer.class);
+		Integer auto_id = jdbcTemplate.queryForObject("SELECT dwca_resource_id FROM buffer.resource_metadata where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'", Integer.class);
 		assertTrue(fkey==auto_id);		
 	}
 }

@@ -5,12 +5,12 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
-import net.canadensys.dataportal.occurrence.dao.ResourceDAO;
+import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
-import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
@@ -96,7 +96,7 @@ public class TestConfig {
 	public LocalSessionFactoryBean bufferSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceInformationModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceMetadataModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -255,7 +255,7 @@ public class TestConfig {
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, DwcaResourceModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -282,17 +282,17 @@ public class TestConfig {
 	}
 
 	@Bean(name = "resourceInformationWriter")
-	public ItemWriterIF<ResourceInformationModel> resourceInformationHibernateWriter() {
+	public ItemWriterIF<ResourceMetadataModel> resourceInformationHibernateWriter() {
 		return new ResourceInformationHibernateWriter();
 	}
 
 	@Bean(name = "resourceInformationProcessor")
-	public ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor() {
+	public ItemProcessorIF<Eml, ResourceMetadataModel> resourceInformationProcessor() {
 		return new ResourceInformationProcessor();
 	}
 
 	@Bean
-	public ResourceDAO resourceDAO() {
+	public DwcaResourceDAO resourceDAO() {
 		return null;
 	}
 

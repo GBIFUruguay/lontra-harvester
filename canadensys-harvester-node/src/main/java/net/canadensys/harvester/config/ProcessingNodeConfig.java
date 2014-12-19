@@ -6,15 +6,14 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
+import net.canadensys.dataportal.occurrence.model.ContactModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
-import net.canadensys.dataportal.occurrence.model.PublisherContactModel;
-import net.canadensys.dataportal.occurrence.model.PublisherInformationModel;
-import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
-import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.PublisherModel;
+import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
@@ -103,8 +102,8 @@ public class ProcessingNodeConfig {
 	public LocalSessionFactoryBean bufferSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceInformationModel.class,
-				ResourceModel.class, ResourceContactModel.class, PublisherInformationModel.class, PublisherContactModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceMetadataModel.class,
+				DwcaResourceModel.class, ContactModel.class, PublisherModel.class});
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -283,8 +282,8 @@ public class ProcessingNodeConfig {
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceInformationModel.class,
-				ResourceModel.class, ResourceContactModel.class, PublisherInformationModel.class, PublisherContactModel.class});
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceMetadataModel.class,
+				DwcaResourceModel.class, ContactModel.class, PublisherModel.class});
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -301,12 +300,12 @@ public class ProcessingNodeConfig {
 	}
 
 	@Bean(name = "resourceInformationWriter")
-	public ItemWriterIF<ResourceInformationModel> resourceInformationHibernateWriter() {
+	public ItemWriterIF<ResourceMetadataModel> resourceInformationHibernateWriter() {
 		return new ResourceInformationHibernateWriter();
 	}
 
 	@Bean(name = "resourceInformationProcessor")
-	public ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor() {
+	public ItemProcessorIF<Eml, ResourceMetadataModel> resourceInformationProcessor() {
 		return new ResourceInformationProcessor();
 	}
 

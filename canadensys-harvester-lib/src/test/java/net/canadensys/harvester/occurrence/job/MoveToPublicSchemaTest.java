@@ -42,8 +42,8 @@ public class MoveToPublicSchemaTest {
 
 	@Before
 	public void setupTest() {
-		jdbcTemplate.batchUpdate(new String[] { "DELETE FROM buffer.occurrence", "DELETE FROM occurrence", "DELETE FROM buffer.resource_contact",
-				"DELETE FROM resource_contact",
+		jdbcTemplate.batchUpdate(new String[] { "DELETE FROM buffer.occurrence", "DELETE FROM occurrence", "DELETE FROM buffer.contact",
+				"DELETE FROM contact",
 				"INSERT INTO buffer.occurrence (auto_id,dwcaid,stateprovince,sourcefileid) VALUES (1,'1','Delaware','qmor-specimens')",
 				"INSERT INTO buffer.occurrence (auto_id,dwcaid,stateprovince,sourcefileid) VALUES (2,'3','Florida','qmor-specimens')", });
 	}

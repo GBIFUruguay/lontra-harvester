@@ -5,15 +5,15 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
-import net.canadensys.dataportal.occurrence.dao.ResourceDAO;
+import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.dao.impl.HibernateImportLogDAO;
-import net.canadensys.dataportal.occurrence.dao.impl.HibernateResourceDAO;
+import net.canadensys.dataportal.occurrence.dao.impl.HibernateDwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
-import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
-import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.ContactModel;
+import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
@@ -131,7 +131,7 @@ public class CLIProcessingConfig {
 	public LocalSessionFactoryBean bufferSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceContactModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ContactModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -147,7 +147,7 @@ public class CLIProcessingConfig {
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ResourceModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, DwcaResourceModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -256,7 +256,7 @@ public class CLIProcessingConfig {
 	}
 
 	@Bean(name = "resourceInformationProcessor")
-	public ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor() {
+	public ItemProcessorIF<Eml, ResourceMetadataModel> resourceInformationProcessor() {
 		return new ResourceInformationProcessor();
 	}
 
@@ -283,7 +283,7 @@ public class CLIProcessingConfig {
 	}
 
 	@Bean(name = "resourceInformationWriter")
-	public ItemWriterIF<ResourceInformationModel> resourceInformationHibernateWriter() {
+	public ItemWriterIF<ResourceMetadataModel> resourceInformationHibernateWriter() {
 		return new ResourceInformationHibernateWriter();
 	}
 
@@ -294,8 +294,8 @@ public class CLIProcessingConfig {
 	}
 
 	@Bean
-	public ResourceDAO resourceDAO() {
-		return new HibernateResourceDAO();
+	public DwcaResourceDAO resourceDAO() {
+		return new HibernateDwcaResourceDAO();
 	}
 
 	@Bean

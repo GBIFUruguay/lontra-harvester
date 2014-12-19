@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.config.TestConfig;
 
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class StepControllerTest {
 	@Test
 	public void testResourceManagement() {
 
-		ResourceModel resourceModel = new ResourceModel();
+		DwcaResourceModel resourceModel = new DwcaResourceModel();
 
 		resourceModel.setName("Test resource");
 		resourceModel.setArchive_url("http://locahost/testname.zip");
@@ -41,9 +41,9 @@ public class StepControllerTest {
 		// save it
 		boolean saved = stepController.updateResourceModel(resourceModel);
 
-		List<ResourceModel> resourceModelList = stepController.getResourceModelList();
+		List<DwcaResourceModel> resourceModelList = stepController.getResourceModelList();
 		boolean found = false;
-		for (ResourceModel currModel : resourceModelList) {
+		for (DwcaResourceModel currModel : resourceModelList) {
 			if ("test-resource".equals(currModel.getSourcefileid())) {
 				found = true;
 				assertEquals("kagf93u", currModel.getResource_uuid());

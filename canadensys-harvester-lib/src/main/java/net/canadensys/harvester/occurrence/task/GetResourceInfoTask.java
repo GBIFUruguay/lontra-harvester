@@ -2,7 +2,7 @@ package net.canadensys.harvester.occurrence.task;
 
 import java.util.Map;
 
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.exception.TaskExecutionException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
@@ -32,9 +32,9 @@ public class GetResourceInfoTask implements ItemTaskIF {
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) throws TaskExecutionException {
 		Integer resourceId = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
 
-		Criteria searchCriteria = sessionFactory.getCurrentSession().createCriteria(ResourceModel.class);
+		Criteria searchCriteria = sessionFactory.getCurrentSession().createCriteria(DwcaResourceModel.class);
 		searchCriteria.add(Restrictions.eq("id", resourceId));
-		ResourceModel resourceModel = (ResourceModel) searchCriteria.uniqueResult();
+		DwcaResourceModel resourceModel = (DwcaResourceModel) searchCriteria.uniqueResult();
 
 		if (resourceModel == null) {
 			throw new TaskExecutionException("ResourceID " + resourceId + " not found");

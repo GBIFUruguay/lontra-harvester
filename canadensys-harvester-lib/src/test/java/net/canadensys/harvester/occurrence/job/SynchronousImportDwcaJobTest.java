@@ -87,7 +87,7 @@ public class SynchronousImportDwcaJobTest {
 
 		// Test information is being also processed from EML content:
 		String alternateIdentifier = jdbcTemplate.queryForObject(
-				"SELECT alternate_identifier FROM buffer.resource_information where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'",
+				"SELECT alternate_identifier FROM buffer.resource_metadata where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'",
 				String.class);
 		assertTrue("Collection entomologique Ouellet-Robert (QMOR)".equals(alternateIdentifier));
 

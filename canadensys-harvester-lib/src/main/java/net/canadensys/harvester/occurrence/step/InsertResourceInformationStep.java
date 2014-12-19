@@ -2,7 +2,7 @@ package net.canadensys.harvester.occurrence.step;
 
 import java.util.Map;
 
-import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
+import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.ProcessingStepIF;
 import net.canadensys.harvester.exception.WriterException;
@@ -27,7 +27,7 @@ public class InsertResourceInformationStep implements ProcessingStepIF, JMSConsu
 	
 	@Autowired
 	@Qualifier("resourceInformationWriter")
-	private ItemWriterIF<ResourceInformationModel> writer;
+	private ItemWriterIF<ResourceMetadataModel> writer;
 
 	@Autowired
 	private JMSControlProducer errorReporter;
@@ -57,7 +57,7 @@ public class InsertResourceInformationStep implements ProcessingStepIF, JMSConsu
 
 	@Override
 	public boolean handleMessage(ProcessingMessageIF message) {
-		ResourceInformationModel rcm = ((SaveResourceInformationMessage) message).getResourceInformationModel();
+		ResourceMetadataModel rcm = ((SaveResourceInformationMessage) message).getResourceInformationModel();
 		if (rcm != null) {
 			try {
 				writer.write(rcm);
@@ -78,7 +78,7 @@ public class InsertResourceInformationStep implements ProcessingStepIF, JMSConsu
 	public void doStep() {
 	};
 
-	public void setWriter(ItemWriterIF<ResourceInformationModel> writer) {
+	public void setWriter(ItemWriterIF<ResourceMetadataModel> writer) {
 		this.writer = writer;
 	}
 
