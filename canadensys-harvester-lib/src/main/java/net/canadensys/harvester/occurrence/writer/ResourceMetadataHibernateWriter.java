@@ -19,9 +19,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author canadensys
  * 
  */
-public class ResourceInformationHibernateWriter implements ItemWriterIF<ResourceMetadataModel> {
+public class ResourceMetadataHibernateWriter implements ItemWriterIF<ResourceMetadataModel> {
 
-	private static final Logger LOGGER = Logger.getLogger(ResourceInformationHibernateWriter.class);
+	private static final Logger LOGGER = Logger.getLogger(ResourceMetadataHibernateWriter.class);
 
 	@Autowired
 	@Qualifier(value = "bufferSessionFactory")

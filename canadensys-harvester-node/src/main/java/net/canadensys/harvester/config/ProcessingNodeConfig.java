@@ -40,7 +40,7 @@ import net.canadensys.harvester.occurrence.step.async.AsyncManageOccurrenceExten
 import net.canadensys.harvester.occurrence.step.async.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
-import net.canadensys.harvester.occurrence.writer.ResourceInformationHibernateWriter;
+import net.canadensys.harvester.occurrence.writer.ResourceMetadataHibernateWriter;
 import net.canadensys.harvester.writer.GenericHibernateWriter;
 
 import org.gbif.metadata.eml.Eml;
@@ -301,7 +301,7 @@ public class ProcessingNodeConfig {
 
 	@Bean(name = "resourceInformationWriter")
 	public ItemWriterIF<ResourceMetadataModel> resourceInformationHibernateWriter() {
-		return new ResourceInformationHibernateWriter();
+		return new ResourceMetadataHibernateWriter();
 	}
 
 	@Bean(name = "resourceInformationProcessor")

@@ -45,7 +45,7 @@ import net.canadensys.harvester.occurrence.task.RecordImportTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
-import net.canadensys.harvester.occurrence.writer.ResourceInformationHibernateWriter;
+import net.canadensys.harvester.occurrence.writer.ResourceMetadataHibernateWriter;
 
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
@@ -284,7 +284,7 @@ public class CLIProcessingConfig {
 
 	@Bean(name = "resourceInformationWriter")
 	public ItemWriterIF<ResourceMetadataModel> resourceInformationHibernateWriter() {
-		return new ResourceInformationHibernateWriter();
+		return new ResourceMetadataHibernateWriter();
 	}
 
 	// ---DAO---
