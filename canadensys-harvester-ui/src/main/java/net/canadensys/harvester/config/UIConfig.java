@@ -5,17 +5,16 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
-import net.canadensys.dataportal.occurrence.dao.ResourceDAO;
+import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.dao.impl.HibernateImportLogDAO;
-import net.canadensys.dataportal.occurrence.dao.impl.HibernateResourceDAO;
+import net.canadensys.dataportal.occurrence.dao.impl.HibernateDwcaResourceDAO;
+import net.canadensys.dataportal.occurrence.model.ContactModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
-import net.canadensys.dataportal.occurrence.model.PublisherContactModel;
-import net.canadensys.dataportal.occurrence.model.PublisherInformationModel;
-import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
-import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.PublisherModel;
+import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
@@ -60,7 +59,7 @@ import net.canadensys.harvester.occurrence.view.OccurrenceHarvesterMainView;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
-import net.canadensys.harvester.occurrence.writer.ResourceInformationHibernateWriter;
+import net.canadensys.harvester.occurrence.writer.ResourceMetadataHibernateWriter;
 
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
@@ -148,9 +147,8 @@ public class UIConfig {
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
 				OccurrenceModel.class, ImportLogModel.class,
-				ResourceModel.class, ResourceInformationModel.class,
-				ResourceContactModel.class, PublisherInformationModel.class,
-				PublisherContactModel.class });
+				DwcaResourceModel.class, ResourceMetadataModel.class,
+				ContactModel.class, PublisherModel.class});
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -171,8 +169,8 @@ public class UIConfig {
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class,
 				OccurrenceModel.class, ImportLogModel.class,
-				ResourceModel.class, ResourceInformationModel.class,
-				ResourceContactModel.class, PublisherInformationModel.class, PublisherContactModel.class });
+				DwcaResourceModel.class, ResourceMetadataModel.class,
+				ContactModel.class, PublisherModel.class});
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -323,7 +321,7 @@ public class UIConfig {
 	}
 
 	@Bean(name = "resourceInformationProcessor")
-	public ItemProcessorIF<Eml, ResourceInformationModel> resourceContactProcessor() {
+	public ItemProcessorIF<Eml, ResourceMetadataModel> resourceContactProcessor() {
 		return new ResourceInformationProcessor();
 	}
 
@@ -350,8 +348,8 @@ public class UIConfig {
 	}
 
 	@Bean(name = "resourceInformationWriter")
-	public ItemWriterIF<ResourceInformationModel> resourceInformationHibernateWriter() {
-		return new ResourceInformationHibernateWriter();
+	public ItemWriterIF<ResourceMetadataModel> resourceInformationHibernateWriter() {
+		return new ResourceMetadataHibernateWriter();
 	}
 
 	// ---Config---
@@ -369,8 +367,8 @@ public class UIConfig {
 	}
 
 	@Bean
-	public ResourceDAO resourceDAO() {
-		return new HibernateResourceDAO();
+	public DwcaResourceDAO resourceDAO() {
+		return new HibernateDwcaResourceDAO();
 	}
 
 	@Bean

@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.canadensys.dataportal.occurrence.model.ResourceContactModel;
-import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
+import net.canadensys.dataportal.occurrence.model.ContactModel;
+import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.exception.ProcessException;
 import net.canadensys.harvester.exception.TaskExecutionException;
@@ -23,7 +23,7 @@ import org.gbif.metadata.eml.KeywordSet;
  * @author canadensys
  * 
  */
-public class ResourceInformationProcessor implements ItemProcessorIF<Eml, ResourceInformationModel> {
+public class ResourceInformationProcessor implements ItemProcessorIF<Eml, ResourceMetadataModel> {
 
 	// get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(ResourceInformationProcessor.class);
@@ -39,9 +39,9 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 	}
 
 	@Override
-	public ResourceInformationModel process(Eml eml, Map<SharedParameterEnum, Object> sharedParameters) throws ProcessException {
+	public ResourceMetadataModel process(Eml eml, Map<SharedParameterEnum, Object> sharedParameters) throws ProcessException {
 
-		ResourceInformationModel information = null;
+		ResourceMetadataModel metadata = null;
 
 		String resourceUuid = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
 		if (resourceUuid == null) {
@@ -70,65 +70,65 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 		}
 		// Check if the resource_uuid matches the eml field to ensure what is harvested is what is expected:
 		if (guid.equalsIgnoreCase(resourceUuid)) {
-			information = new ResourceInformationModel();
+			metadata = new ResourceMetadataModel();
 
 			/* Set information data from EML file: */
-			information.set_abstract(eml.getAbstract());
+			metadata.set_abstract(eml.getAbstract());
 
 			// Fetch only first identifier available:
 			List<String> alternateIdentifiers = eml.getAlternateIdentifiers();
 			if (!alternateIdentifiers.equals(null) && !alternateIdentifiers.isEmpty()) {
-				information.setAlternate_identifier(alternateIdentifiers.get(0));
+				metadata.setAlternate_identifier(alternateIdentifiers.get(0));
 			}
-			information.setCitation(eml.getCitationString());
-			information.setCollection_identifier(eml.getCollectionId());
-			information.setCollection_name(eml.getCollectionName());
-			information.setHierarchy_level(eml.getHierarchyLevel());
-			information.setIntellectual_rights(eml.getIntellectualRights());
+			metadata.setCitation(eml.getCitationString());
+			metadata.setCollection_identifier(eml.getCollectionId());
+			metadata.setCollection_name(eml.getCollectionName());
+			metadata.setHierarchy_level(eml.getHierarchyLevel());
+			metadata.setIntellectual_rights(eml.getIntellectualRights());
 			// Fetch only the first keywords/thesaurus available:
 			List<KeywordSet> keyList = eml.getKeywords();
 			if (!keyList.equals(null) && !keyList.isEmpty()) {
 				KeywordSet keywordSet = keyList.get(0);
-				information.setKeyword(keywordSet.getKeywordsString());
-				information.setKeyword_thesaurus(keywordSet.getKeywordThesaurus());
+				metadata.setKeyword(keywordSet.getKeywordsString());
+				metadata.setKeyword_thesaurus(keywordSet.getKeywordThesaurus());
 			}
-			information.setLanguage(eml.getLanguage());
-			information.setParent_collection_identifier(eml.getParentCollectionId());
-			information.setPublication_date(eml.getPubDate());
-			information.setResource_logo_url(eml.getLogoUrl());
+			metadata.setLanguage(eml.getLanguage());
+			metadata.setParent_collection_identifier(eml.getParentCollectionId());
+			metadata.setPublication_date(eml.getPubDate());
+			metadata.setResource_logo_url(eml.getLogoUrl());
 			// TODO: verify what field should relate to this: 
-			information.setResource_name("");
-			information.setResource_uuid(guid);
-			information.setTitle(eml.getTitle());
+			metadata.setResource_name("");
+			metadata.setResource_uuid(guid);
+			metadata.setTitle(eml.getTitle());
 
 			// Add resource contacts information:
 			Agent tempAgent = null;
-			ResourceContactModel tempContact = null;
+			ContactModel tempContact = null;
 			// Add contact agent:
 			tempAgent = eml.getContact();
 			if (tempAgent != null) {
 				tempContact = setContactFromAgent(tempAgent, guid, CONTACT);
-				information.addContact(tempContact);
+				metadata.addContact(tempContact);
 			}	
 			// Add resource metadata provider information:
 			tempAgent = eml.getMetadataProvider();
 			if (tempAgent != null) {
 				tempContact = setContactFromAgent(tempAgent, guid, METADATA_PROVIDER); 
-				information.addContact(tempContact);
+				metadata.addContact(tempContact);
 			}
 			// Add resource creator information:
 			tempAgent = eml.getResourceCreator();
 			if (tempAgent != null) {
 				tempContact = setContactFromAgent(tempAgent, guid, RESOURCE_CREATOR);
-				information.addContact(tempContact);
+				metadata.addContact(tempContact);
 			}
 			// Add associatedParties information:
 			for (Agent a : eml.getAssociatedParties()) {
 				tempContact = setContactFromAgent(a, guid, AGENT);
-				information.addContact(tempContact);
+				metadata.addContact(tempContact);
 			}
 		}
-		return information;
+		return metadata;
 	}
 
 	/**
@@ -138,8 +138,8 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 	 * @param contact_type
 	 * @return
 	 */
-	private ResourceContactModel setContactFromAgent(Agent agent, String resource_uuid, String contact_type) {
-		ResourceContactModel contact = new ResourceContactModel();
+	private ContactModel setContactFromAgent(Agent agent, String resource_uuid, String contact_type) {
+		ContactModel contact = new ContactModel();
 		contact.setAddress(agent.getAddress().getAddress());
 		contact.setAdministrative_area(agent.getAddress().getProvince());
 		contact.setCity(agent.getAddress().getCity());
@@ -149,9 +149,7 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 		contact.setOrganization_name(agent.getOrganisation());
 		contact.setPhone(agent.getPhone());
 		contact.setPosition_name(agent.getPosition());
-		contact.setPostal_code(agent.getAddress().getPostalCode());		
-		contact.setContact_type(contact_type);
-		contact.setResource_uuid(resource_uuid);
+		contact.setPostal_code(agent.getAddress().getPostalCode());
 		return contact;
 	}
 	@Override

@@ -2,7 +2,7 @@ package net.canadensys.harvester.occurrence.step;
 
 import java.util.Map;
 
-import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
+import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemWriterIF;
@@ -29,11 +29,11 @@ public class SynchronousProcessEmlContentStep implements ProcessingStepIF {
 
 	@Autowired
 	@Qualifier("resourceInformationWriter")
-	private ItemWriterIF<ResourceInformationModel> writer;
+	private ItemWriterIF<ResourceMetadataModel> writer;
 
 	@Autowired
 	@Qualifier("resourceInformationProcessor")
-	private ItemProcessorIF<Eml, ResourceInformationModel> resourceInformationProcessor;
+	private ItemProcessorIF<Eml, ResourceMetadataModel> resourceInformationProcessor;
 
 	private Map<SharedParameterEnum, Object> sharedParameters;
 
@@ -64,7 +64,7 @@ public class SynchronousProcessEmlContentStep implements ProcessingStepIF {
 	@Override
 	public void doStep() {
 		Eml emlModel = reader.read();
-		ResourceInformationModel resourceInformationModel = resourceInformationProcessor.process(emlModel, sharedParameters);
+		ResourceMetadataModel resourceInformationModel = resourceInformationProcessor.process(emlModel, sharedParameters);
 
 		try {
 			writer.write(resourceInformationModel);

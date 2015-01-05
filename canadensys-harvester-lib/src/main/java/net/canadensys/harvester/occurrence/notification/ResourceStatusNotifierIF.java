@@ -2,7 +2,7 @@ package net.canadensys.harvester.occurrence.notification;
 
 import java.util.List;
 
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 
 /**
  * ResourceStatusNotifier is used to check and validate the status of a set of resources.
@@ -17,6 +17,6 @@ public interface ResourceStatusNotifierIF {
 	 * 
 	 * @return
 	 */
-	public List<ResourceModel> getHarvestRequiredList();
+	public List<DwcaResourceModel> getHarvestRequiredList();
 
 }

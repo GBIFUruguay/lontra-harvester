@@ -2,7 +2,7 @@ package net.canadensys.harvester.occurrence.writer;
 
 import java.util.List;
 
-import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
+import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.exception.WriterException;
 
@@ -19,9 +19,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author canadensys
  * 
  */
-public class ResourceInformationHibernateWriter implements ItemWriterIF<ResourceInformationModel> {
+public class ResourceMetadataHibernateWriter implements ItemWriterIF<ResourceMetadataModel> {
 
-	private static final Logger LOGGER = Logger.getLogger(ResourceInformationHibernateWriter.class);
+	private static final Logger LOGGER = Logger.getLogger(ResourceMetadataHibernateWriter.class);
 
 	@Autowired
 	@Qualifier(value = "bufferSessionFactory")
@@ -44,12 +44,12 @@ public class ResourceInformationHibernateWriter implements ItemWriterIF<Resource
 	}
 
 	@Override
-	public void write(List<? extends ResourceInformationModel> elementList) throws WriterException {
+	public void write(List<? extends ResourceMetadataModel> elementList) throws WriterException {
 		String lastId = "";
 		try {
 			session.beginTransaction();
-			for (ResourceInformationModel resourceInformationModel : elementList) {
-				lastId = resourceInformationModel.getAuto_id() != null ? resourceInformationModel.getAuto_id().toString() : "?";
+			for (ResourceMetadataModel resourceMetadataModel : elementList) {
+				lastId = resourceMetadataModel.getDwca_resource_id() != null ? resourceMetadataModel.getDwca_resource_id().toString() : "?";
 			}
 			session.getTransaction().commit();
 		}
@@ -63,11 +63,11 @@ public class ResourceInformationHibernateWriter implements ItemWriterIF<Resource
 	}
 
 	@Override
-	public void write(ResourceInformationModel resourceInformationModel) throws WriterException {
+	public void write(ResourceMetadataModel resourceMetadataModel) throws WriterException {
 		openWriter();
 		try {
 			session.beginTransaction();
-			session.save(resourceInformationModel);
+			session.save(resourceMetadataModel);
 			session.getTransaction().commit();
 		}
 		catch (HibernateException hEx) {
@@ -75,7 +75,7 @@ public class ResourceInformationHibernateWriter implements ItemWriterIF<Resource
 			if (session.getTransaction() != null) {
 				session.getTransaction().rollback();
 			}
-			String id = resourceInformationModel.getAuto_id() != null ? resourceInformationModel.getAuto_id().toString() : "?";
+			String id = resourceMetadataModel.getDwca_resource_id() != null ? resourceMetadataModel.getDwca_resource_id().toString() : "?";
 			throw new WriterException(id, hEx.getMessage());
 		}
 	}

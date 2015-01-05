@@ -55,11 +55,11 @@ public class CleanBufferTableTask implements ItemTaskIF {
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
 
-			query = session.createSQLQuery("DELETE FROM buffer.resource_contact WHERE resource_uuid=?");
+			query = session.createSQLQuery("DELETE FROM buffer.contact WHERE resource_metadata_fkey = (SELECT dwca_resource_id FROM buffer.resource_metadata where resource_uuid = ?)");
 			query.setString(0, resourceUuid);
 			query.executeUpdate();
 			
-			query = session.createSQLQuery("DELETE FROM buffer.resource_information WHERE resource_uuid=?");
+			query = session.createSQLQuery("DELETE FROM buffer.resource_metadata WHERE resource_uuid=?");
 			query.setString(0, resourceUuid);
 			query.executeUpdate();
 		}

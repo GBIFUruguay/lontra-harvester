@@ -6,7 +6,7 @@ import static org.junit.Assert.fail;
 import java.util.HashMap;
 import java.util.UUID;
 
-import net.canadensys.dataportal.occurrence.model.ResourceInformationModel;
+import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
 import org.gbif.metadata.eml.Eml;
@@ -34,7 +34,7 @@ public class ResourceInformationProcessorTest {
 		eml.setTitle("This is a generic title");
 		eml.setGuid(uuid);
 		try {
-			ResourceInformationModel processedInformation = informationProcessor.process(eml, sharedParameters);
+			ResourceMetadataModel processedInformation = informationProcessor.process(eml, sharedParameters);
 			assertEquals("This is a generic abstract information", processedInformation.get_abstract());
 			assertEquals("This is a generic title", processedInformation.getTitle());
 			assertEquals(uuid, processedInformation.getResource_uuid());

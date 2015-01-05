@@ -1,8 +1,8 @@
 package net.canadensys.harvester;
 
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 
 public interface JobServiceIF {
 
-	ResourceModel loadResourceModel(String sourcefileid);
+	DwcaResourceModel loadResourceModel(String sourcefileid);
 }

@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.canadensys.dataportal.occurrence.model.ResourceModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 
 /**
@@ -27,8 +27,8 @@ public class ResourceChooser extends JDialog {
 
 	private static final long serialVersionUID = 6415119692476515726L;
 
-	private List<ResourceModel> knownResource;
-	private ResourceModel selectedResource = null;
+	private List<DwcaResourceModel> knownResource;
+	private DwcaResourceModel selectedResource = null;
 
 	// UI components
 	private JPanel mainPanel;
@@ -41,7 +41,7 @@ public class ResourceChooser extends JDialog {
 
 	private final StepControllerIF ctrl;
 
-	public ResourceChooser(StepControllerIF ctrl, List<ResourceModel> knownResource) {
+	public ResourceChooser(StepControllerIF ctrl, List<DwcaResourceModel> knownResource) {
 		this.ctrl = ctrl;
 		this.knownResource = knownResource;
 
@@ -50,7 +50,7 @@ public class ResourceChooser extends JDialog {
 		this.setModal(true);
 
 		Vector<String> knowResourceVector = new Vector<String>();
-		for (ResourceModel resourceModel : knownResource) {
+		for (DwcaResourceModel resourceModel : knownResource) {
 			knowResourceVector.add(resourceModel.getName() + "-" + resourceModel.getSourcefileid());
 		}
 		// add an empty record
@@ -150,12 +150,12 @@ public class ResourceChooser extends JDialog {
 		knownCbx.removeAllItems();
 
 		knownCbx.addItem(null);
-		for (ResourceModel resourceModel : knownResource) {
+		for (DwcaResourceModel resourceModel : knownResource) {
 			knownCbx.addItem(resourceModel.getName() + "-" + resourceModel.getSourcefileid());
 		}
 	}
 
-	public ResourceModel getSelectedResource() {
+	public DwcaResourceModel getSelectedResource() {
 		return selectedResource;
 	}
 
@@ -164,7 +164,7 @@ public class ResourceChooser extends JDialog {
 	 */
 	private void onAdd() {
 		ResourceView rmv = new ResourceView(this);
-		ResourceModel resourceModel = new ResourceModel();
+		DwcaResourceModel resourceModel = new DwcaResourceModel();
 		resourceModel = rmv.displayResource(resourceModel);
 
 		if (rmv.getExitValue() == JOptionPane.OK_OPTION) {
