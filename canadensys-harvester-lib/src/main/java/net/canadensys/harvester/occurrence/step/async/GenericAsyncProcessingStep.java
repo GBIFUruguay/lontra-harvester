@@ -6,7 +6,7 @@ import java.util.Map;
 
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemWriterIF;
-import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 import net.canadensys.harvester.message.ProcessingMessageIF;
@@ -24,7 +24,7 @@ import net.canadensys.harvester.occurrence.message.DefaultMessage;
  * @param <S>
  *            type of object out of the processor that will be written
  */
-public class GenericAsyncProcessingStep<T, S> implements ProcessingStepIF, JMSConsumerMessageHandlerIF {
+public class GenericAsyncProcessingStep<T, S> implements StepIF, JMSConsumerMessageHandlerIF {
 
 	private ItemProcessorIF<T, S> itemProcessor;
 	private ItemWriterIF<S> writer;

@@ -20,7 +20,7 @@ import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.LongRunningTaskIF;
-import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.config.harvester.HarvesterConfig;
 import net.canadensys.harvester.config.harvester.HarvesterConfigIF;
 import net.canadensys.harvester.jms.JMSConsumer;
@@ -240,27 +240,27 @@ public class UIConfig {
 
 	// ---STEP---
 	@Bean(name = "streamEmlContentStep")
-	public ProcessingStepIF streamEmlContentStep() {
+	public StepIF streamEmlContentStep() {
 		return new StreamEmlContentStep();
 	}
 
 	@Bean(name = "streamDwcContentStep")
-	public ProcessingStepIF StreamDwcContentStep() {
+	public StepIF StreamDwcContentStep() {
 		return new StreamDwcContentStep();
 	}
 
 	@Bean(name = "processInsertOccurrenceStep")
-	public ProcessingStepIF processInsertOccurrenceStep() {
+	public StepIF processInsertOccurrenceStep() {
 		return new ProcessInsertOccurrenceStep();
 	}
 
 	@Bean(name = "insertResourceInformationStep")
-	public ProcessingStepIF insertResourceInformationStep() {
+	public StepIF insertResourceInformationStep() {
 		return new InsertResourceInformationStep();
 	}
 
 	@Bean(name = "processOccurrenceStatisticsStep")
-	public ProcessingStepIF processOccurrenceStatisticsStep() {
+	public StepIF processOccurrenceStatisticsStep() {
 		return null;
 	}
 

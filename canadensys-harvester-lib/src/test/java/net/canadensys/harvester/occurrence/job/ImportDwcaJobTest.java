@@ -8,7 +8,7 @@ import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.jms.JMSConsumer;
 import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
@@ -89,8 +89,8 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 		reader.registerHandler(insertResourceInformationStep);
 
 		try {
-			((ProcessingStepIF) processInsertOccurrenceStep).preStep(null);
-			((ProcessingStepIF) insertResourceInformationStep).preStep(null);
+			((StepIF) processInsertOccurrenceStep).preStep(null);
+			((StepIF) insertResourceInformationStep).preStep(null);
 		}
 		catch (IllegalStateException e) {
 			e.printStackTrace();
@@ -106,8 +106,8 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 	public void destroy() {
 		reader.close();
 		controlConsumer.close();
-		((ProcessingStepIF) processInsertOccurrenceStep).postStep();
-		((ProcessingStepIF) insertResourceInformationStep).postStep();
+		((StepIF) processInsertOccurrenceStep).postStep();
+		((StepIF) insertResourceInformationStep).postStep();
 	}
 
 	@Test

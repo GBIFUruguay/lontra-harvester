@@ -4,7 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
-import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
@@ -55,13 +55,13 @@ public class SynchronousImportDwcaJobTest {
 
 		@Override
 		@Bean(name = "streamDwcContentStep")
-		public ProcessingStepIF streamDwcContentStep() {
+		public StepIF streamDwcContentStep() {
 			return new SynchronousProcessOccurrenceStep();
 		}
 
 		@Override
 		@Bean(name = "streamEmlContentStep")
-		public ProcessingStepIF streamEmlContentStep() {
+		public StepIF streamEmlContentStep() {
 			return new SynchronousProcessEmlContentStep();
 		}
 	}

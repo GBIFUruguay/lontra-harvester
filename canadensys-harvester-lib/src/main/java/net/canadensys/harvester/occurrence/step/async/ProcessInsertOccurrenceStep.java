@@ -8,7 +8,7 @@ import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemWriterIF;
-import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author canadensys
  * 
  */
-public class ProcessInsertOccurrenceStep implements ProcessingStepIF, JMSConsumerMessageHandlerIF {
+public class ProcessInsertOccurrenceStep implements StepIF, JMSConsumerMessageHandlerIF {
 	private static final Logger LOGGER = Logger.getLogger(ProcessInsertOccurrenceStep.class);
 
 	@Autowired

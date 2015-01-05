@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemMapperIF;
 import net.canadensys.harvester.ItemProcessorIF;
-import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.jms.JMSConsumer;
 import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 import net.canadensys.harvester.jms.JMSWriter;
@@ -136,7 +136,7 @@ public class UserDefinedJobTest {
 		jmsReader.registerHandler(asyncStep);
 
 		try {
-			((ProcessingStepIF) asyncStep).preStep(null);
+			((StepIF) asyncStep).preStep(null);
 		}
 		catch (IllegalStateException e) {
 			e.printStackTrace();
@@ -164,7 +164,7 @@ public class UserDefinedJobTest {
 		jmsReader.registerHandler(asyncStepWithProcessing);
 
 		try {
-			((ProcessingStepIF) asyncStepWithProcessing).preStep(null);
+			((StepIF) asyncStepWithProcessing).preStep(null);
 		}
 		catch (IllegalStateException e) {
 			e.printStackTrace();
@@ -250,13 +250,13 @@ public class UserDefinedJobTest {
 	 * 
 	 */
 	private class InnerUserDefinedJob extends AbstractProcessingJob {
-		private ProcessingStepIF genericStreamStep;
+		private StepIF genericStreamStep;
 
 		public InnerUserDefinedJob() {
 			sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		}
 
-		public void setGenericStreamStep(ProcessingStepIF genericStreamStep) {
+		public void setGenericStreamStep(StepIF genericStreamStep) {
 			this.genericStreamStep = genericStreamStep;
 		}
 

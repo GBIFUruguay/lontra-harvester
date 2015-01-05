@@ -12,7 +12,7 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
  * @author canadensys
  * 
  */
-public interface ProcessingStepIF extends JobAction {
+public interface StepIF extends JobAction {
 
 	/**
 	 * Check that the step is ready to go.

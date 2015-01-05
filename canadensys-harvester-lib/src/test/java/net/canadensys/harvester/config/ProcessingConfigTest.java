@@ -18,7 +18,7 @@ import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.LongRunningTaskIF;
-import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.jms.JMSWriter;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
@@ -171,32 +171,32 @@ public class ProcessingConfigTest {
 
 	// ---STEP---
 	@Bean(name = "streamEmlContentStep")
-	public ProcessingStepIF streamEmlContentStep() {
+	public StepIF streamEmlContentStep() {
 		return new StreamEmlContentStep();
 	}
 
 	@Bean(name = "streamDwcContentStep")
-	public ProcessingStepIF streamDwcContentStep() {
+	public StepIF streamDwcContentStep() {
 		return new StreamDwcContentStep();
 	}
 
 	@Bean(name = "processInsertOccurrenceStep")
-	public ProcessingStepIF processInsertOccurrenceStep() {
+	public StepIF processInsertOccurrenceStep() {
 		return new ProcessInsertOccurrenceStep();
 	}
 
 	@Bean(name = "insertResourceInformationStep")
-	public ProcessingStepIF insertResourceInformationStep() {
+	public StepIF insertResourceInformationStep() {
 		return new InsertResourceInformationStep();
 	}
 
 	@Bean(name = "synchronousProcessOccurrenceExtensionStep")
-	public ProcessingStepIF synchronousProcessOccurrenceExtensionStep() {
+	public StepIF synchronousProcessOccurrenceExtensionStep() {
 		return new SynchronousProcessOccurrenceExtensionStep();
 	}
 
 	@Bean(name = "synchronousProcessEmlContentStep")
-	public ProcessingStepIF synchronousProcessEmlContentStep() {
+	public StepIF synchronousProcessEmlContentStep() {
 		return new SynchronousProcessEmlContentStep();
 	}
 

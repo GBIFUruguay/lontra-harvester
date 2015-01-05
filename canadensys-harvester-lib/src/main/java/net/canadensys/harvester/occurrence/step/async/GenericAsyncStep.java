@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.canadensys.harvester.ItemWriterIF;
-import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 import net.canadensys.harvester.message.ProcessingMessageIF;
@@ -20,7 +20,7 @@ import net.canadensys.harvester.occurrence.message.DefaultMessage;
  * 
  * @param <T>
  */
-public class GenericAsyncStep<T> implements ProcessingStepIF, JMSConsumerMessageHandlerIF {
+public class GenericAsyncStep<T> implements StepIF, JMSConsumerMessageHandlerIF {
 
 	private ItemWriterIF<T> writer;
 	private Class<T> messageContentClass;

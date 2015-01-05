@@ -9,7 +9,7 @@ import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemWriterIF;
-import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author canadensys
  * 
  */
-public class StreamDwcContentStep implements ProcessingStepIF {
+public class StreamDwcContentStep implements StepIF {
 
 	private static final Logger LOGGER = Logger.getLogger(StreamDwcContentStep.class);
 	private static final int DEFAULT_FLUSH_INTERVAL = 250;

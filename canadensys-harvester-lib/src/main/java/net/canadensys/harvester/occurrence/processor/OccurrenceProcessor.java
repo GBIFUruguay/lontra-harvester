@@ -56,17 +56,17 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 	private static final Integer MAX_DATE = Calendar.getInstance().get(Calendar.YEAR);
 	private static final int DATE_INTERVAL_THRESHOLD = 16; // minimum date length = 8 (2002-1-1)
 
-	private NameParser GBIF_NAME_PARSER = new NameParser();
+	private final NameParser GBIF_NAME_PARSER = new NameParser();
 
 	// Processors
-	private CountryProcessor countryProcessor = new CountryProcessor();
-	private CountryContinentProcessor countryContinentProcessor = new CountryContinentProcessor();
-	private AbstractDataProcessor latLongProcessor = new DecimalLatLongProcessor("decimallatitude", "decimallongitude");
-	private DateProcessor dateProcessor = new DateProcessor("eventdate", "syear", "smonth", "sday");
-	private DateIntervalProcessor dateIntervalProcessor = new DateIntervalProcessor();
+	private final CountryProcessor countryProcessor = new CountryProcessor();
+	private final CountryContinentProcessor countryContinentProcessor = new CountryContinentProcessor();
+	private final AbstractDataProcessor latLongProcessor = new DecimalLatLongProcessor("decimallatitude", "decimallongitude");
+	private final DateProcessor dateProcessor = new DateProcessor("eventdate", "syear", "smonth", "sday");
+	private final DateIntervalProcessor dateIntervalProcessor = new DateIntervalProcessor();
 
-	private AbstractDataProcessor altitudeProcessor = new NumericPairDataProcessor("minimumelevationinmeters", "maximumelevationinmeters");
-	private DegreeMinuteToDecimalProcessor dmsProcessor = new DegreeMinuteToDecimalProcessor();
+	private final AbstractDataProcessor altitudeProcessor = new NumericPairDataProcessor("minimumelevationinmeters", "maximumelevationinmeters");
+	private final DegreeMinuteToDecimalProcessor dmsProcessor = new DegreeMinuteToDecimalProcessor();
 
 	private static Map<String, AbstractDataProcessor> stateProvinceProcessorMap = new HashMap<String, AbstractDataProcessor>();
 	static {
@@ -85,13 +85,8 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 
 		// keep the same auto_id
 		processedModel.setAuto_id(rawModel.getAuto_id());
-		String basisofrecord = rawModel.getBasisofrecord();
-		if (basisofrecord != null) {
-			if (basisofrecord.length()>25) {
-				basisofrecord = basisofrecord.substring(0, 25);
-				processedModel.setBasisofrecord(basisofrecord);
-			}
-		}
+
+		processedModel.setBasisofrecord(rawModel.getBasisofrecord());
 
 		// set a cleaned associatedmedia
 		processedModel.setAssociatedmedia(normalizeURLSeparator(rawModel.getAssociatedmedia()));

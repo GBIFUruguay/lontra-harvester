@@ -39,7 +39,7 @@ public abstract class AbstractProcessingJob {
 	 * @throws IllegalStateException
 	 *             from ProcessingStepIF.preStep
 	 */
-	protected void executeStepSequentially(ProcessingStepIF step, Map<SharedParameterEnum, Object> sharedParameters) throws IllegalStateException {
+	protected void executeStepSequentially(StepIF step, Map<SharedParameterEnum, Object> sharedParameters) throws IllegalStateException {
 		step.preStep(sharedParameters);
 		step.doStep();
 		step.postStep();

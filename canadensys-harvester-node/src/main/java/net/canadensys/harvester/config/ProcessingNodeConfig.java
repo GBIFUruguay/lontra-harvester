@@ -19,7 +19,7 @@ import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.LongRunningTaskIF;
-import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.controller.VersionController;
 import net.canadensys.harvester.jms.JMSConsumer;
 import net.canadensys.harvester.jms.JMSWriter;
@@ -210,7 +210,7 @@ public class ProcessingNodeConfig {
 	}
 
 	@Bean(name = "insertResourceInformationStep")
-	public ProcessingStepIF insertResourceInformationStep() {
+	public StepIF insertResourceInformationStep() {
 		return new InsertResourceInformationStep();
 	}
 
@@ -262,12 +262,12 @@ public class ProcessingNodeConfig {
 	}
 
 	@Bean(name = "processInsertOccurrenceStep")
-	public ProcessingStepIF processInsertOccurrenceStep() {
+	public StepIF processInsertOccurrenceStep() {
 		return new ProcessInsertOccurrenceStep();
 	}
 
 	@Bean (name = "asyncManageOccurrenceExtensionStep")
-	public ProcessingStepIF asyncManageOccurrenceExtensionStep() {
+	public StepIF asyncManageOccurrenceExtensionStep() {
 		return new AsyncManageOccurrenceExtensionStep();
 	}
 
@@ -320,23 +320,23 @@ public class ProcessingNodeConfig {
 	}
 
 	@Bean(name = "streamDwcContentStep")
-	public ProcessingStepIF streamDwcContentStep() {
+	public StepIF streamDwcContentStep() {
 		return null;
 	}
 
 	// ---STEP---
 	@Bean(name = "streamEmlContentStep")
-	public ProcessingStepIF streamEmlContentStep() {
+	public StepIF streamEmlContentStep() {
 		return null;
 	}
 
 	@Bean(name = "streamOccurrenceForStatsStep")
-	public ProcessingStepIF streamOccurrenceForStatsStep() {
+	public StepIF streamOccurrenceForStatsStep() {
 		return null;
 	}
 
 	@Bean(name = "updateResourceInformationStep")
-	public ProcessingStepIF updateResourceInformationStep() {
+	public StepIF updateResourceInformationStep() {
 		return null;
 	}
 

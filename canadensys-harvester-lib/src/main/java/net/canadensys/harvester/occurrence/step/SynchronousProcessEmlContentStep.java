@@ -6,7 +6,7 @@ import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemWriterIF;
-import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author canadensys
  * 
  */
-public class SynchronousProcessEmlContentStep implements ProcessingStepIF {
+public class SynchronousProcessEmlContentStep implements StepIF {
 
 	@Autowired
 	@Qualifier("dwcaEmlReader")

@@ -4,7 +4,7 @@ import java.util.Map;
 
 import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
 import net.canadensys.harvester.ItemWriterIF;
-import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author canadensys
  * 
  */
-public class InsertResourceInformationStep implements ProcessingStepIF, JMSConsumerMessageHandlerIF {
+public class InsertResourceInformationStep implements StepIF, JMSConsumerMessageHandlerIF {
 	
 	@Autowired
 	@Qualifier("resourceInformationWriter")

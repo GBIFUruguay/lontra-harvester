@@ -8,7 +8,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
@@ -26,7 +26,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 public class SynchronousProcessEmlContentStepTest {
 
 	@Autowired
-	private ProcessingStepIF synchronousProcessEmlContentStep;
+	private StepIF synchronousProcessEmlContentStep;
 
 	private JdbcTemplate jdbcTemplate;
 

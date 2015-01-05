@@ -8,7 +8,7 @@ import java.util.Map;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemWriterIF;
-import net.canadensys.harvester.ProcessingStepIF;
+import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 import net.canadensys.harvester.message.ProcessingMessageIF;
@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
  * 
  * @param <T,S>
  */
-public class GenericStreamProcessingStep<T, S> implements ProcessingStepIF {
+public class GenericStreamProcessingStep<T, S> implements StepIF {
 
 	private static final Logger LOGGER = Logger.getLogger(GenericStreamProcessingStep.class);
 	private static final int DEFAULT_FLUSH_INTERVAL = 100;
