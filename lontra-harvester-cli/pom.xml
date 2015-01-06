@@ -4,19 +4,19 @@
 	
 	<parent>
 		<groupId>net.canadensys</groupId>
-		<artifactId>canadensys-harvester-parent</artifactId>
+		<artifactId>lontra-harvester-parent</artifactId>
 		<version>1.0</version>
 	</parent>
 	
 	<groupId>net.canadensys</groupId>
-	<artifactId>canadensys-harvester-cli</artifactId>
+	<artifactId>lontra-harvester-cli</artifactId>
 	<packaging>jar</packaging>
 	<version>0.4-SNAPSHOT</version>
-	<name>canadensys-harvester-cli</name>
+	<name>lontra-harvester-cli</name>
 
 	<properties>
 		<appClass>net.canadensys.Main</appClass>
-		<spring.version>4.0.2.RELEASE</spring.version>
+		<spring.version>4.0.9.RELEASE</spring.version>
 		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
@@ -94,7 +94,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.canadensys</groupId>
-			<artifactId>canadensys-harvester-lib</artifactId>
+			<artifactId>lontra-harvester-lib</artifactId>
 			<version>0.4-SNAPSHOT</version>
 		</dependency>
 		<dependency>

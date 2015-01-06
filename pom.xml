@@ -4,30 +4,30 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>net.canadensys</groupId>
-	<artifactId>canadensys-harvester-parent</artifactId>
+	<artifactId>lontra-harvester-parent</artifactId>
 	<packaging>pom</packaging>
 	<version>1.0</version>
-	<name>Canadensys Harvester Parent Project</name>
+	<name>Lontra Harvester parent project</name>
 
 	<modules>
-		<module>canadensys-harvester-lib</module>
-		<module>canadensys-harvester-ui</module>
-		<module>canadensys-harvester-node</module>
-		<module>canadensys-harvester-cli</module>
+		<module>lontra-harvester-lib</module>
+		<module>lontra-harvester-ui</module>
+		<module>lontra-harvester-node</module>
+		<module>lontra-harvester-cli</module>
 	</modules>
 
 	<properties>
 		<junit.version>4.11</junit.version>
 	</properties>
 	<scm>
-		<connection>scm:git:git@github.com:Canadensys/canadensys-harvester.git</connection>
-		<developerConnection>scm:git:git@github.com:Canadensys/canadensys-harvester.git</developerConnection>
-		<url>scm:git:git@github.com:Canadensys/canadensys-harvester.git</url>
+		<connection>scm:git:git@github.com:WingLongitude/lontra-harvester.git</connection>
+		<developerConnection>scm:git:git@github.com:WingLongitude/lontra-harvester.git</developerConnection>
+		<url>scm:git:git@github.com:WingLongitude/lontra-harvester.git</url>
 	</scm>
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/Canadensys/canadensys-harvester/issues</url>
+		<url>https://github.com/WingLongitude/lontra-harvester/issues</url>
 	</issueManagement>
 
 	<repositories>

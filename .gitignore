@@ -14,3 +14,5 @@ build/**/*
 
 canadensys-harvester-lib/target
 canadensys-harvester-ui/target
+
+.settings/
