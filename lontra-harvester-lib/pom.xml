@@ -4,15 +4,15 @@
 	
 	<parent>
 		<groupId>net.canadensys</groupId>
-		<artifactId>canadensys-harvester-parent</artifactId>
+		<artifactId>lontra-harvester-parent</artifactId>
 		<version>1.0</version>
 	</parent>
 	
 	<groupId>net.canadensys</groupId>
-	<artifactId>canadensys-harvester-lib</artifactId>
+	<artifactId>lontra-harvester-lib</artifactId>
 	<packaging>jar</packaging>
 	<version>0.4-SNAPSHOT</version>
-	<name>canadensys-harvester-lib</name>
+	<name>lontra-harvester-lib</name>
 
 	<properties>
 		<jackson.version>2.2.3</jackson.version>
