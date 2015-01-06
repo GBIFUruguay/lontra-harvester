@@ -42,8 +42,10 @@ public class MoveToPublicSchemaTest {
 
 	@Before
 	public void setupTest() {
-		jdbcTemplate.batchUpdate(new String[] { "DELETE FROM buffer.occurrence", "DELETE FROM occurrence", "DELETE FROM buffer.contact",
-				"DELETE FROM contact",
+		jdbcTemplate.batchUpdate(new String[] {
+				"DELETE FROM buffer.occurrence", "DELETE FROM occurrence",
+				"DELETE FROM buffer.contact", "DELETE FROM contact",
+				"DELETE FROM buffer.resource_metadata", "DELETE FROM resource_metadata",
 				"INSERT INTO buffer.occurrence (auto_id,dwcaid,stateprovince,sourcefileid) VALUES (1,'1','Delaware','qmor-specimens')",
 				"INSERT INTO buffer.occurrence (auto_id,dwcaid,stateprovince,sourcefileid) VALUES (2,'3','Florida','qmor-specimens')", });
 	}
@@ -53,7 +55,7 @@ public class MoveToPublicSchemaTest {
 		JobStatusModel jobStatusModel = new JobStatusModel();
 
 		moveJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
-		moveJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, "1234567890");
+		moveJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, "ada5d0b1-07de-4dc0-83d4-e312f0fb81cb");
 
 		moveJob.doJob(jobStatusModel);
 

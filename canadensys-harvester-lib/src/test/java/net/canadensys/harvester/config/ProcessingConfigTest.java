@@ -5,13 +5,13 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import net.canadensys.dataportal.occurrence.model.ContactModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
-import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.ItemMapperIF;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
@@ -34,14 +34,17 @@ import net.canadensys.harvester.occurrence.reader.DwcaEmlReader;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionInfoReader;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
+import net.canadensys.harvester.occurrence.step.HandleDwcaExtensionsStep;
 import net.canadensys.harvester.occurrence.step.InsertResourceInformationStep;
 import net.canadensys.harvester.occurrence.step.StreamEmlContentStep;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessEmlContentStep;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessOccurrenceExtensionStep;
 import net.canadensys.harvester.occurrence.step.async.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.stream.StreamDwcContentStep;
+import net.canadensys.harvester.occurrence.step.stream.StreamDwcExtensionContentStep;
 import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
 import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
+import net.canadensys.harvester.occurrence.task.ComputeMultimediaDataTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
@@ -113,7 +116,7 @@ public class ProcessingConfigTest {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ContactModel.class,
-				ResourceMetadataModel.class, OccurrenceExtensionModel.class, DwcaResourceModel.class, PublisherModel.class});
+				ResourceMetadataModel.class, OccurrenceExtensionModel.class, DwcaResourceModel.class, PublisherModel.class });
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
@@ -190,6 +193,18 @@ public class ProcessingConfigTest {
 		return new InsertResourceInformationStep();
 	}
 
+	@Bean
+	@Scope("prototype")
+	public StepIF handleDwcaExtensionsStep() {
+		return new HandleDwcaExtensionsStep();
+	}
+
+	@Bean
+	@Scope("prototype")
+	public StepIF streamDwcExtensionContentStep() {
+		return new StreamDwcExtensionContentStep();
+	}
+
 	@Bean(name = "synchronousProcessOccurrenceExtensionStep")
 	public StepIF synchronousProcessOccurrenceExtensionStep() {
 		return new SynchronousProcessOccurrenceExtensionStep();
@@ -214,6 +229,11 @@ public class ProcessingConfigTest {
 	@Bean
 	public ItemTaskIF computeGISDataTask() {
 		return new MockComputeGISDataTask();
+	}
+
+	@Bean
+	public ItemTaskIF computeMultimediaDataTask() {
+		return new ComputeMultimediaDataTask();
 	}
 
 	@Bean

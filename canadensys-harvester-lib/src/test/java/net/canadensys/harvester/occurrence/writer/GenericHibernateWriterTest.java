@@ -10,6 +10,7 @@ import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.exception.WriterException;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,22 +32,19 @@ public class GenericHibernateWriterTest {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
+	@Before
+	public void setupTest() {
+		jdbcTemplate.batchUpdate(new String[] { "DELETE FROM buffer.contact", "DELETE FROM buffer.resource_metadata" });
+	}
+
 	@Test
 	public void testInsertInformationAndContact() {
 		ResourceMetadataModel testMetadata = new ResourceMetadataModel();
+
 		testMetadata.setDwca_resource_id(new Integer(1));
 		testMetadata.set_abstract("Test abstract information");
 		testMetadata.setCitation("please use this format to cite this dataset");
 
-		/**
-		 * Add Contact:
-		 * Set<ResourceContactModel> contacts = new HashSet<ResourceContactModel>();
-		 * ResourceContactModel testContact = new ResourceContactModel();
-		 * testContact.setName("Test Contact");
-		 * testContact.setAddress("Fools street, 0");
-		 * contacts.add(testContact);
-		 * testInformation.setContacts(contacts);
-		 */
 		try {
 			genericResourceInformationWriter.write(testMetadata);
 		}
@@ -58,14 +56,6 @@ public class GenericHibernateWriterTest {
 				"SELECT dwca_resource_id FROM buffer.resource_metadata WHERE _abstract ='Test abstract information'", Number.class);
 		assertNotNull(informationId);
 
-		/**
-		 * Contact assert:
-		 * Number contactId = jdbcTemplate
-		 * .queryForObject(
-		 * "SELECT auto_id FROM buffer.resource_contact WHERE name ='Test Contact'",
-		 * Number.class);
-		 * assertNotNull(contactId);
-		 */
 	}
 
 }

@@ -13,7 +13,7 @@ import org.gbif.metadata.eml.Eml;
 import org.junit.Test;
 
 /**
- * Test OccurrenceProcessor behavior
+ * Test ResourceInformationProcessor behavior.
  * 
  * @author cgendreau
  * 
@@ -26,10 +26,13 @@ public class ResourceInformationProcessorTest {
 	@Test
 	public void testProcessingMechanism() {
 		HashMap<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
-		ResourceInformationProcessor informationProcessor = new ResourceInformationProcessor();
-		Eml eml = new Eml();
 		String uuid = UUID.randomUUID().toString();
 		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID, uuid);
+		sharedParameters.put(SharedParameterEnum.RESOURCE_ID, 1);
+
+		ResourceInformationProcessor informationProcessor = new ResourceInformationProcessor();
+		Eml eml = new Eml();
+
 		eml.setAbstract("This is a generic abstract information");
 		eml.setTitle("This is a generic title");
 		eml.setGuid(uuid);

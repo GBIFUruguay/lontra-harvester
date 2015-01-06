@@ -4,17 +4,18 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
+import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.dao.impl.HibernateDwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.model.ContactModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
-import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
+import net.canadensys.harvester.ItemMapperIF;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
@@ -32,18 +33,24 @@ import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
+import net.canadensys.harvester.occurrence.mapper.OccurrenceExtensionMapper;
 import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceInformationProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaEmlReader;
+import net.canadensys.harvester.occurrence.reader.DwcaExtensionInfoReader;
+import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
+import net.canadensys.harvester.occurrence.step.HandleDwcaExtensionsStep;
 import net.canadensys.harvester.occurrence.step.InsertResourceInformationStep;
 import net.canadensys.harvester.occurrence.step.StreamEmlContentStep;
 import net.canadensys.harvester.occurrence.step.async.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.stream.StreamDwcContentStep;
+import net.canadensys.harvester.occurrence.step.stream.StreamDwcExtensionContentStep;
 import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
 import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
+import net.canadensys.harvester.occurrence.task.ComputeMultimediaDataTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
@@ -105,7 +112,7 @@ public class TestConfig {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ContactModel.class,
-				ResourceMetadataModel.class, OccurrenceExtensionModel.class, DwcaResourceModel.class, PublisherModel.class});
+				ResourceMetadataModel.class, OccurrenceExtensionModel.class, DwcaResourceModel.class, PublisherModel.class });
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
@@ -120,7 +127,7 @@ public class TestConfig {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ContactModel.class,
-				ResourceMetadataModel.class, OccurrenceExtensionModel.class, DwcaResourceModel.class, PublisherModel.class});
+				ResourceMetadataModel.class, OccurrenceExtensionModel.class, DwcaResourceModel.class, PublisherModel.class });
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
@@ -128,14 +135,14 @@ public class TestConfig {
 		sb.setHibernateProperties(hibernateProperties);
 		return sb;
 	}
-	
+
 	@Bean
-	public StepControllerIF stepController(){
+	public StepControllerIF stepController() {
 		return new StepController();
 	}
-	
+
 	@Bean
-	public NodeStatusController nodeStatusController(){
+	public NodeStatusController nodeStatusController() {
 		return new NodeStatusController();
 	}
 
@@ -190,6 +197,30 @@ public class TestConfig {
 		return null;
 	}
 
+	@Bean
+	public ItemReaderIF<String> dwcaExtensionInfoReader() {
+		return new DwcaExtensionInfoReader();
+	}
+
+	/**
+	 * Always return a new instance.
+	 * 
+	 * @return
+	 */
+	@Bean
+	@Scope("prototype")
+	public ItemReaderIF<OccurrenceExtensionModel> dwcaOccurrenceExtensionReader() {
+		DwcaExtensionReader<OccurrenceExtensionModel> dwcaExtReader = new DwcaExtensionReader<OccurrenceExtensionModel>();
+		dwcaExtReader.setMapper(occurrenceExtensionMapper());
+		return dwcaExtReader;
+	}
+
+	// ---MAPPER---
+	@Bean(name = "occurrenceExtensionMapper")
+	public ItemMapperIF<OccurrenceExtensionModel> occurrenceExtensionMapper() {
+		return new OccurrenceExtensionMapper();
+	}
+
 	// ---Config---
 	@Bean
 	public HarvesterConfigIF harvesterConfig() {
@@ -242,9 +273,19 @@ public class TestConfig {
 
 	// ---TASK wiring---
 
+	@Bean
+	public ItemTaskIF prepareDwcaTask() {
+		return new PrepareDwcaTask();
+	}
+
 	@Bean(name = "insertResourceInformationStep")
 	public StepIF insertResourceInformationStep() {
 		return new InsertResourceInformationStep();
+	}
+
+	@Bean
+	public ItemTaskIF computeMultimediaDataTask() {
+		return new ComputeMultimediaDataTask();
 	}
 
 	/**
@@ -282,11 +323,6 @@ public class TestConfig {
 		return new OccurrenceHibernateWriter();
 	}
 
-	@Bean
-	public ItemTaskIF prepareDwcaTask() {
-		return new PrepareDwcaTask();
-	}
-
 	@Bean(name = "processInsertOccurrenceStep")
 	public StepIF processInsertOccurrenceStep() {
 		return new ProcessInsertOccurrenceStep();
@@ -320,20 +356,38 @@ public class TestConfig {
 		return new ResourceMetadataHibernateWriter();
 	}
 
+	// --- PROCESSOR ---
+	@Bean(name = "extLineProcessor")
+	public ItemProcessorIF<OccurrenceExtensionModel, OccurrenceExtensionModel> extLineProcessor() {
+		return null;
+	}
+
 	@Bean(name = "resourceInformationProcessor")
 	public ItemProcessorIF<Eml, ResourceMetadataModel> resourceInformationProcessor() {
 		return new ResourceInformationProcessor();
 	}
 
+	// ---STEP---
 	@Bean(name = "streamDwcContentStep")
 	public StepIF streamDwcContentStep() {
 		return new StreamDwcContentStep();
 	}
 
-	// ---STEP---
 	@Bean(name = "streamEmlContentStep")
 	public StepIF streamEmlContentStep() {
 		return new StreamEmlContentStep();
+	}
+
+	@Bean
+	@Scope("prototype")
+	public StepIF handleDwcaExtensionsStep() {
+		return new HandleDwcaExtensionsStep();
+	}
+
+	@Bean
+	@Scope("prototype")
+	public StepIF streamDwcExtensionContentStep() {
+		return new StreamDwcExtensionContentStep();
 	}
 
 	@Bean

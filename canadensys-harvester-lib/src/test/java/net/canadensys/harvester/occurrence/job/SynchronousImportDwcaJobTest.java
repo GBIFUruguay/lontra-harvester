@@ -4,6 +4,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
+import javax.sql.DataSource;
+
 import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
@@ -12,6 +14,7 @@ import net.canadensys.harvester.occurrence.step.SynchronousProcessEmlContentStep
 import net.canadensys.harvester.occurrence.step.SynchronousProcessOccurrenceStep;
 
 import org.hibernate.SessionFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +23,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
@@ -42,12 +44,20 @@ public class SynchronousImportDwcaJobTest {
 	@Qualifier(value = "bufferSessionFactory")
 	private SessionFactory sessionFactory;
 
+	private JdbcTemplate jdbcTemplate;
+
 	@Autowired
-	@Qualifier(value = "bufferTransactionManager")
-	private HibernateTransactionManager txManager;
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
 
 	@Autowired
 	private ImportDwcaJob importDwcaJob;
+
+	@Before
+	public void setupTest() {
+		jdbcTemplate.batchUpdate(new String[] { "DELETE FROM buffer.contact", "DELETE FROM buffer.resource_metadata" });
+	}
 
 	@Configuration
 	@Import(ProcessingConfigTest.class)
@@ -68,11 +78,10 @@ public class SynchronousImportDwcaJobTest {
 
 	@Test
 	public void testImport() {
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(txManager.getDataSource());
-
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, "ada5d0b1-07de-4dc0-83d4-e312f0fb81cb");
+		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, 1);
 
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		importDwcaJob.doJob(jobStatusModel);
@@ -87,37 +96,10 @@ public class SynchronousImportDwcaJobTest {
 
 		// Test information is being also processed from EML content:
 		String alternateIdentifier = jdbcTemplate.queryForObject(
-				"SELECT alternate_identifier FROM buffer.resource_metadata where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'",
-				String.class);
+				"SELECT alternate_identifier FROM buffer.resource_metadata where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'", String.class);
 		assertTrue("Collection entomologique Ouellet-Robert (QMOR)".equals(alternateIdentifier));
 
 		assertTrue(new Integer(EXPECTED_NUMBER_OF_RESULTS).equals(count));
 	}
-
-	/**
-	 * Test the behavior of a failing import. A common reason for failing is
-	 * when data can not fit into the defined space in the database.
-	 */
-	// @Test
-	// public void testFailedImport(){
-	// importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH,
-	// "src/test/resources/dwca-qmor-specimens-broken");
-	// importDwcaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME,
-	// "qmor-specimens");
-	//
-	// JobStatusModel jobStatusModel = new JobStatusModel();
-	// importDwcaJob.doJob(jobStatusModel);
-	// synchronized (controlMessageReceived) {
-	// try {
-	// controlMessageReceived.wait(MAX_WAIT);
-	// //validate content of the database
-	// if(!controlMessageReceived.get()){
-	// fail();
-	// }
-	// } catch (InterruptedException e) {
-	// fail();
-	// }
-	// }
-	// }
 
 }

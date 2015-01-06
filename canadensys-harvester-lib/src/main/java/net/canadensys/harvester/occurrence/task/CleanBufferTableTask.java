@@ -38,12 +38,13 @@ public class CleanBufferTableTask implements ItemTaskIF {
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
 		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
-		String resourceUuid = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
+		String resourceUUID = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
+		Integer resourceID = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
 
 		Session session = sessionFactory.getCurrentSession();
 
-		if (sourceFileId == null) {
-			LOGGER.fatal("Misconfigured task : needs sourceFileId");
+		if (sourceFileId == null || resourceUUID == null || resourceID == null) {
+			LOGGER.fatal("Misconfigured task : sourceFileId, resourceUUID and resourceID are required");
 			throw new TaskExecutionException("Misconfigured CleanBufferTableTask");
 		}
 		try {
@@ -55,12 +56,16 @@ public class CleanBufferTableTask implements ItemTaskIF {
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
 
-			query = session.createSQLQuery("DELETE FROM buffer.contact WHERE resource_metadata_fkey = (SELECT dwca_resource_id FROM buffer.resource_metadata where resource_uuid = ?)");
-			query.setString(0, resourceUuid);
+			query = session.createSQLQuery("DELETE FROM buffer.occurrence_extension WHERE resource_uuid=?");
+			query.setString(0, resourceUUID);
 			query.executeUpdate();
-			
+
+			query = session.createSQLQuery("DELETE FROM buffer.contact WHERE resource_metadata_fkey = ?");
+			query.setInteger(0, resourceID);
+			query.executeUpdate();
+
 			query = session.createSQLQuery("DELETE FROM buffer.resource_metadata WHERE resource_uuid=?");
-			query.setString(0, resourceUuid);
+			query.setString(0, resourceUUID);
 			query.executeUpdate();
 		}
 		catch (HibernateException hEx) {

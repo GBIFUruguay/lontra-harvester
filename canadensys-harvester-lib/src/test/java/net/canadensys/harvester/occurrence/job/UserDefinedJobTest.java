@@ -3,7 +3,6 @@ package net.canadensys.harvester.occurrence.job;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -13,7 +12,6 @@ import net.canadensys.harvester.ItemMapperIF;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.jms.JMSConsumer;
-import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
 import net.canadensys.harvester.jms.JMSWriter;
 import net.canadensys.harvester.mapper.DefaultBeanMapper;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
@@ -24,6 +22,7 @@ import net.canadensys.harvester.occurrence.mock.writer.MockObjectWriter;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
 import net.canadensys.harvester.occurrence.step.async.GenericAsyncProcessingStep;
 import net.canadensys.harvester.occurrence.step.async.GenericAsyncStep;
+import net.canadensys.harvester.occurrence.step.stream.AbstractStreamStep;
 import net.canadensys.harvester.occurrence.step.stream.GenericStreamStep;
 
 import org.junit.Test;
@@ -83,17 +82,14 @@ public class UserDefinedJobTest {
 		// Create a JMS writer
 		jmsWriter = new JMSWriter(TEST_BROKER_URL);
 
-		// Declare the message handler classes. Which class(es) on the node(s) should handle the messages.
-		// When more than one class is provided, each classes will receive the message.
-		List<Class<? extends JMSConsumerMessageHandlerIF>> msgHandlerClassList = new ArrayList<Class<? extends JMSConsumerMessageHandlerIF>>();
-		msgHandlerClassList.add(GenericAsyncStep.class);
-		msgHandlerClassList.add(GenericAsyncProcessingStep.class);
-
 		// Create and configure the stream step
 		streamStep = new GenericStreamStep<MockHabitObject>();
 		streamStep.setReader(itemReader);
 		streamStep.setWriter(jmsWriter);
-		streamStep.setMessageClasses(msgHandlerClassList);
+		// Declare the message handler classes. Which class(es) on the node(s) should handle the messages.
+		// When more than one class is provided, each classes will receive the message.
+		streamStep.addAsyncReceiverStep(GenericAsyncStep.class);
+		streamStep.addAsyncReceiverStep(GenericAsyncProcessingStep.class);
 
 		// Create our job
 		userDefinedJob = new InnerUserDefinedJob();
@@ -178,7 +174,7 @@ public class UserDefinedJobTest {
 		// wait and validate result of Step 1 (GenericAsyncStep)
 		synchronized (step1Completed) {
 			try {
-				step1Completed.wait();
+				step1Completed.wait(10000);
 
 				if (step1Completed.get()) {
 					List<MockHabitObject> objectWritten = itemWriter.getContent();
@@ -196,7 +192,7 @@ public class UserDefinedJobTest {
 		// wait and validate result of Step 2 (GenericAsyncProcessingStep)
 		synchronized (step2Completed) {
 			try {
-				step2Completed.wait();
+				step2Completed.wait(10000);
 
 				if (step2Completed.get()) {
 					List<MockProcessedHabitObject> objectWritten = processedItemWriter.getContent();
@@ -223,7 +219,7 @@ public class UserDefinedJobTest {
 	 * 
 	 */
 	private class InnerCallback implements FutureCallback<Void> {
-		private AtomicBoolean notifyObject;
+		private final AtomicBoolean notifyObject;
 
 		public InnerCallback(AtomicBoolean notifyObject) {
 			this.notifyObject = notifyObject;
@@ -250,18 +246,20 @@ public class UserDefinedJobTest {
 	 * 
 	 */
 	private class InnerUserDefinedJob extends AbstractProcessingJob {
-		private StepIF genericStreamStep;
+		private AbstractStreamStep genericStreamStep;
 
 		public InnerUserDefinedJob() {
 			sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		}
 
-		public void setGenericStreamStep(StepIF genericStreamStep) {
+		public void setGenericStreamStep(AbstractStreamStep genericStreamStep) {
 			this.genericStreamStep = genericStreamStep;
 		}
 
 		public void doJob() {
-			executeStepSequentially(genericStreamStep, sharedParameters);
+			genericStreamStep.preStep(sharedParameters);
+			genericStreamStep.doStep();
+			genericStreamStep.postStep();
 		}
 
 		@Override

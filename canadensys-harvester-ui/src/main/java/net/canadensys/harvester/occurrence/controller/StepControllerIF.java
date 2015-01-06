@@ -2,8 +2,8 @@ package net.canadensys.harvester.occurrence.controller;
 
 import java.util.List;
 
-import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
+import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 
@@ -11,9 +11,9 @@ public interface StepControllerIF {
 
 	public List<IPTFeedModel> getIPTFeed();
 
-	public List<DwcaResourceModel> getResourceToHarvest();
-
 	public List<DwcaResourceModel> getResourceModelList();
+
+	public List<DwcaResourceModel> getResourceToHarvest();
 
 	public List<ImportLogModel> getSortedImportLogModelList();
 
@@ -28,7 +28,9 @@ public interface StepControllerIF {
 	 */
 	public void importDwcAFromLocalFile(String dwcaPath);
 
-	public void moveToPublicSchema(String datasetShortName, String resource_uuid);
+	public void moveToPublicSchema(String datasetShortName, String resourceUUID);
+
+	public void onNodeError();
 
 	public void registerProgressListener(ItemProgressListenerIF progressListener);
 
@@ -39,6 +41,4 @@ public interface StepControllerIF {
 	 * @return
 	 */
 	public boolean updateResourceModel(DwcaResourceModel resourceModel);
-
-	public void onNodeError();
 }

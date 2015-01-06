@@ -10,6 +10,7 @@ import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.StepIF;
+import net.canadensys.harvester.StepResult;
 import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
@@ -49,7 +50,6 @@ public class SynchronousProcessOccurrenceStep implements StepIF {
 	private ItemWriterIF<OccurrenceRawModel> rawWriter;
 
 	private Map<SharedParameterEnum, Object> sharedParameters;
-	private int numberOfRecords = 0;
 
 	@Override
 	public String getTitle() {
@@ -91,9 +91,10 @@ public class SynchronousProcessOccurrenceStep implements StepIF {
 	}
 
 	@Override
-	public void doStep() {
+	public StepResult doStep() {
 		List<OccurrenceModel> occList = new ArrayList<OccurrenceModel>(DEFAULT_FLUSH_INTERVAL);
 		List<OccurrenceRawModel> occRawList = new ArrayList<OccurrenceRawModel>(DEFAULT_FLUSH_INTERVAL);
+		int numberOfRecords = 0;
 
 		JobStatusModel jobStatus = (JobStatusModel) sharedParameters.get(SharedParameterEnum.JOB_STATUS_MODEL);
 
@@ -130,7 +131,12 @@ public class SynchronousProcessOccurrenceStep implements StepIF {
 		catch (WriterException wEx) {
 			wEx.printStackTrace();
 		}
-		sharedParameters.put(SharedParameterEnum.NUMBER_OF_RECORDS, numberOfRecords);
+		return new StepResult(numberOfRecords);
+	}
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
 	}
 
 }

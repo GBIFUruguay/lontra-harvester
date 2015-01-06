@@ -27,7 +27,7 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 
 	// get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(ResourceInformationProcessor.class);
-	
+
 	private static final String CONTACT = "contact";
 	private static final String AGENT = "agent";
 	private static final String METADATA_PROVIDER = "metadata_provider";
@@ -44,14 +44,15 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 		ResourceMetadataModel metadata = null;
 
 		String resourceUuid = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
-		if (resourceUuid == null) {
-			LOGGER.fatal("Misconfigured processor: needs resource_uuid");
+		Integer resourceId = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
+		if (resourceUuid == null || resourceId == null) {
+			LOGGER.fatal("Misconfigured ResourceInformationProcessor: resource_uuid and resource_id are required");
 			throw new TaskExecutionException("Misconfigured ResourceInformationProcessor");
 		}
 		String guid = eml.getGuid();
 		// Guid is not the UUID, fetch from alternative identifiers:
 		if (eml.getGuid().startsWith("http")) {
-			for (String ai: eml.getAlternateIdentifiers()){
+			for (String ai : eml.getAlternateIdentifiers()) {
 				if (!ai.startsWith("http")) {
 					// Sanity UUID check:
 					UUID uuid = UUID.fromString(ai);
@@ -61,7 +62,7 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 					}
 				}
 			}
-		} // Guid is the UUID: 
+		} // Guid is the UUID:
 		else {
 			UUID uuid = UUID.fromString(guid);
 			if (!uuid.toString().equals(guid)) {
@@ -71,6 +72,7 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 		// Check if the resource_uuid matches the eml field to ensure what is harvested is what is expected:
 		if (guid.equalsIgnoreCase(resourceUuid)) {
 			metadata = new ResourceMetadataModel();
+			metadata.setDwca_resource_id(resourceId);
 
 			/* Set information data from EML file: */
 			metadata.set_abstract(eml.getAbstract());
@@ -96,7 +98,7 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 			metadata.setParent_collection_identifier(eml.getParentCollectionId());
 			metadata.setPublication_date(eml.getPubDate());
 			metadata.setResource_logo_url(eml.getLogoUrl());
-			// TODO: verify what field should relate to this: 
+			// TODO: verify what field should relate to this:
 			metadata.setResource_name("");
 			metadata.setResource_uuid(guid);
 			metadata.setTitle(eml.getTitle());
@@ -107,24 +109,24 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 			// Add contact agent:
 			tempAgent = eml.getContact();
 			if (tempAgent != null) {
-				tempContact = setContactFromAgent(tempAgent, guid, CONTACT);
+				tempContact = buildContactFromAgent(tempAgent, guid, CONTACT);
 				metadata.addContact(tempContact);
-			}	
+			}
 			// Add resource metadata provider information:
 			tempAgent = eml.getMetadataProvider();
 			if (tempAgent != null) {
-				tempContact = setContactFromAgent(tempAgent, guid, METADATA_PROVIDER); 
+				tempContact = buildContactFromAgent(tempAgent, guid, METADATA_PROVIDER);
 				metadata.addContact(tempContact);
 			}
 			// Add resource creator information:
 			tempAgent = eml.getResourceCreator();
 			if (tempAgent != null) {
-				tempContact = setContactFromAgent(tempAgent, guid, RESOURCE_CREATOR);
+				tempContact = buildContactFromAgent(tempAgent, guid, RESOURCE_CREATOR);
 				metadata.addContact(tempContact);
 			}
 			// Add associatedParties information:
 			for (Agent a : eml.getAssociatedParties()) {
-				tempContact = setContactFromAgent(a, guid, AGENT);
+				tempContact = buildContactFromAgent(a, guid, AGENT);
 				metadata.addContact(tempContact);
 			}
 		}
@@ -132,13 +134,14 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 	}
 
 	/**
-	 * Configure each ResourceContactModel based on an EML Agent, setting it's proper resource_uuid and contact_type  
+	 * Configure each ResourceContactModel based on an EML Agent, setting it's proper resource_uuid and contact_type
+	 * 
 	 * @param agent
 	 * @param resource_uuid
-	 * @param contact_type
+	 * @param role
 	 * @return
 	 */
-	private ContactModel setContactFromAgent(Agent agent, String resource_uuid, String contact_type) {
+	private ContactModel buildContactFromAgent(Agent agent, String resource_uuid, String role) {
 		ContactModel contact = new ContactModel();
 		contact.setAddress(agent.getAddress().getAddress());
 		contact.setAdministrative_area(agent.getAddress().getProvince());
@@ -150,8 +153,11 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 		contact.setPhone(agent.getPhone());
 		contact.setPosition_name(agent.getPosition());
 		contact.setPostal_code(agent.getAddress().getPostalCode());
+
+		contact.setRole(role);
 		return contact;
 	}
+
 	@Override
 	public void destroy() {
 	}

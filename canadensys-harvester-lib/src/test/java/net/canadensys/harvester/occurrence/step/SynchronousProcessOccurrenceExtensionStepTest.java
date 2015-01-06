@@ -4,12 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.Map;
 
 import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
+import net.canadensys.harvester.occurrence.mock.MockSharedParameters;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,10 +36,8 @@ public class SynchronousProcessOccurrenceExtensionStepTest {
 	public void testSynchronousProcessOccurrenceExtensionStep() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(txManager.getDataSource());
 		jdbcTemplate.update("DELETE FROM buffer.occurrence_extension");
-		
-		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
-		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
-		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
+
+		Map<SharedParameterEnum, Object> sharedParameters = MockSharedParameters.getQMORSharedParameters();
 
 		synchronousProcessOccurrenceExtensionStep.preStep(sharedParameters);
 		synchronousProcessOccurrenceExtensionStep.doStep();
@@ -48,8 +46,7 @@ public class SynchronousProcessOccurrenceExtensionStepTest {
 		int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.occurrence_extension", BigDecimal.class).intValue();
 		assertTrue(count >= 1);
 
-		Map<String, String> data = (Map<String, String>) jdbcTemplate.queryForObject(
-				"SELECT ext_data FROM buffer.occurrence_extension WHERE dwcaid='1'", Map.class);
+		Map<String, String> data = jdbcTemplate.queryForObject("SELECT ext_data FROM buffer.occurrence_extension WHERE dwcaid='1'", Map.class);
 		assertEquals("images/jpeg", data.get("format"));
 	}
 

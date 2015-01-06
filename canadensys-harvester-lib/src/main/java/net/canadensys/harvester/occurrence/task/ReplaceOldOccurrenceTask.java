@@ -39,11 +39,12 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 		Session session = sessionFactory.getCurrentSession();
 
 		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
-		String resourceUuid = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
+		String resourceUUID = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
+		String resourceID = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
 
-		if (sourceFileId == null) {
-			LOGGER.fatal("Misconfigured task : sourceFileId cannot be null");
-			throw new TaskExecutionException("Misconfigured task");
+		if (sourceFileId == null || resourceUUID == null) {
+			LOGGER.fatal("Misconfigured task : sourceFileId and resourceUUID are required");
+			throw new TaskExecutionException("Misconfigured ReplaceOldOccurrenceTask");
 		}
 
 		/**
@@ -59,13 +60,16 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
 
-			query = session.createSQLQuery("DELETE FROM contact WHERE resource_uuid=?");
-			query.setString(0, resourceUuid);
+			query = session.createSQLQuery("DELETE FROM occurrence_extension WHERE resource_uuid=?");
+			query.setString(0, resourceUUID);
+			query.executeUpdate();
+
+			query = session.createSQLQuery("DELETE FROM contact WHERE resource_metadata_fkey=?");
+			query.setString(0, resourceID);
 			query.executeUpdate();
 
 			query = session.createSQLQuery("DELETE FROM resource_metadata WHERE resource_uuid=?");
-
-			query.setString(0, resourceUuid);
+			query.setString(0, resourceUUID);
 			query.executeUpdate();
 
 			// copy records from buffer
@@ -75,12 +79,16 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query = session.createSQLQuery("INSERT INTO occurrence_raw (SELECT * FROM buffer.occurrence_raw WHERE sourcefileid=?)");
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
-			query = session
-					.createSQLQuery("INSERT INTO resource_metadata (SELECT * FROM buffer.resource_metadata WHERE resource_metadata_fkey = (SELECT dwca_resource_id FROM buffer.resource_metadata where resource_uuid = ?)");
-			query.setString(0, resourceUuid);
+
+			query = session.createSQLQuery("INSERT INTO occurrence_extension (SELECT * FROM buffer.occurrence_extension WHERE resource_uuid=?)");
+			query.setString(0, resourceUUID);
 			query.executeUpdate();
-			query = session.createSQLQuery("INSERT INTO contact (SELECT * FROM buffer.contact WHERE resource_uuid=?)");
-			query.setString(0, resourceUuid);
+
+			query = session.createSQLQuery("INSERT INTO resource_metadata (SELECT * FROM buffer.resource_metadata WHERE resource_uuid = ?)");
+			query.setString(0, resourceUUID);
+			query.executeUpdate();
+			query = session.createSQLQuery("INSERT INTO contact (SELECT * FROM buffer.contact WHERE resource_metadata_fkey=?)");
+			query.setString(0, resourceID);
 			query.executeUpdate();
 
 			// empty buffer schema for this sourcefileid
@@ -90,14 +98,16 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query = session.createSQLQuery("DELETE FROM buffer.occurrence_raw WHERE sourcefileid=?");
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
+			query = session.createSQLQuery("DELETE FROM buffer.occurrence_extension WHERE resource_uuid=?");
+			query.setString(0, resourceUUID);
+			query.executeUpdate();
 
 			// empty buffer schema for resource_uuid
-			query = session
-					.createSQLQuery("DELETE FROM buffer.contact WHERE resource_metadata_fkey = (SELECT dwca_resource_id FROM buffer.resource_metadata where resource_uuid = ?)");
-			query.setString(0, resourceUuid);
+			query = session.createSQLQuery("DELETE FROM buffer.contact WHERE resource_metadata_fkey = ?");
+			query.setString(0, resourceID);
 			query.executeUpdate();
 			query = session.createSQLQuery("DELETE FROM buffer.resource_metadata WHERE resource_uuid=?");
-			query.setString(0, resourceUuid);
+			query.setString(0, resourceUUID);
 			query.executeUpdate();
 
 			sharedParameters.put(SharedParameterEnum.NUMBER_OF_RECORDS, numberOfRecords);

@@ -7,6 +7,7 @@ import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemWriterIF;
 import net.canadensys.harvester.StepIF;
+import net.canadensys.harvester.StepResult;
 import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
@@ -62,7 +63,7 @@ public class SynchronousProcessEmlContentStep implements StepIF {
 	}
 
 	@Override
-	public void doStep() {
+	public StepResult doStep() {
 		Eml emlModel = reader.read();
 		ResourceMetadataModel resourceInformationModel = resourceInformationProcessor.process(emlModel, sharedParameters);
 
@@ -72,10 +73,16 @@ public class SynchronousProcessEmlContentStep implements StepIF {
 		catch (WriterException e) {
 			e.printStackTrace();
 		}
+		return new StepResult(1);
 	}
 
 	@Override
 	public String getTitle() {
 		return "Process EML";
+	}
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
 	}
 }

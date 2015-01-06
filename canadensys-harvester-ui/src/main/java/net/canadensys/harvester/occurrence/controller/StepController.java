@@ -116,9 +116,9 @@ public class StepController implements StepControllerIF {
 	}
 
 	@Override
-	public void moveToPublicSchema(String sourceFileId, String resource_uuid) {
+	public void moveToPublicSchema(String sourceFileId, String resourceUUID) {
 		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, sourceFileId);
-		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, resource_uuid);
+		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, resourceUUID);
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		harvesterViewModel.encapsulateJobStatus(jobStatusModel);
 

@@ -25,14 +25,18 @@ public interface StepIF extends JobAction {
 	public void preStep(Map<SharedParameterEnum, Object> sharedParameters) throws IllegalStateException;
 
 	/**
-	 * The step is executed.
-	 * Clean up phase.
+	 * Clean up phase after the step is executed.
 	 */
 	public void postStep();
 
 	/**
 	 * Execute the step.
 	 */
-	public void doStep();
+	public StepResult doStep();
+
+	/**
+	 * Cancel the running step
+	 */
+	public void cancel();
 
 }
