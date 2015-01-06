@@ -4,15 +4,15 @@
 	
 	<parent>
 		<groupId>net.canadensys</groupId>
-		<artifactId>canadensys-harvester-parent</artifactId>
+		<artifactId>lontra-harvester-parent</artifactId>
 		<version>1.0</version>
 	</parent>
 	
 	<groupId>net.canadensys</groupId>
-	<artifactId>canadensys-harvester-ui</artifactId>
+	<artifactId>lontra-harvester-ui</artifactId>
 	<packaging>jar</packaging>
 	<version>0.4-SNAPSHOT</version>
-	<name>canadensys-harvester-ui</name>
+	<name>lontra-harvester-ui</name>
 
 	<properties>
 		<appClass>net.canadensys.Main</appClass>
@@ -94,7 +94,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.canadensys</groupId>
-			<artifactId>canadensys-harvester-lib</artifactId>
+			<artifactId>lontra-harvester-lib</artifactId>
 			<version>0.4-SNAPSHOT</version>
 		</dependency>
 		<dependency>
