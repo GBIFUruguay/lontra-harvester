@@ -38,17 +38,17 @@ public class ComputeUniqueValueJobTest {
 		jdbcTemplate.batchUpdate(new String[] { "DELETE FROM occurrence", "DELETE FROM unique_values" });
 
 		jdbcTemplate
-				.update("INSERT INTO occurrence (auto_id,dwcaid,country,locality,sourcefileid) VALUES (1,'1','Mexico','Acapulco','uom-occurrence')");
+		.update("INSERT INTO occurrence (auto_id,dwca_id,country,locality,sourcefileid) VALUES (1,'1','Mexico','Acapulco','uom-occurrence')");
 		jdbcTemplate
-				.update("INSERT INTO occurrence (auto_id,dwcaid,country,locality,sourcefileid) VALUES (2,'2','Australia','Sydney','uoa-occurrence')");
+		.update("INSERT INTO occurrence (auto_id,dwca_id,country,locality,sourcefileid) VALUES (2,'2','Australia','Sydney','uoa-occurrence')");
 		jdbcTemplate
-				.update("INSERT INTO occurrence (auto_id,dwcaid,country,locality,sourcefileid) VALUES (3,'3','Côte d''Ivoire','Abidjan','uoic-occurrence')");
+		.update("INSERT INTO occurrence (auto_id,dwca_id,country,locality,sourcefileid) VALUES (3,'3','Côte d''Ivoire','Abidjan','uoic-occurrence')");
 		jdbcTemplate
-				.update("INSERT INTO occurrence (auto_id,dwcaid,country,locality,sourcefileid) VALUES (4,'4','Australia','Melbourne','uoa-occurrence')");
+		.update("INSERT INTO occurrence (auto_id,dwca_id,country,locality,sourcefileid) VALUES (4,'4','Australia','Melbourne','uoa-occurrence')");
 		jdbcTemplate
-				.update("INSERT INTO occurrence (auto_id,dwcaid,scientificname,locality,sourcefileid) VALUES (5,'5',"
-						+ "'scientificname with way too many characters so it is not possible to store it in the unique_value table in the column value because the length of this string is higher than 255 characters. The expected behavior is to not add this value to the unique_value table.','a',"
-						+ "'uoa-occurrence')");
+		.update("INSERT INTO occurrence (auto_id,dwca_id,scientificname,locality,sourcefileid) VALUES (5,'5',"
+				+ "'scientificname with way too many characters so it is not possible to store it in the unique_value table in the column value because the length of this string is higher than 255 characters. The expected behavior is to not add this value to the unique_value table.','a',"
+				+ "'uoa-occurrence')");
 	}
 
 	@Test

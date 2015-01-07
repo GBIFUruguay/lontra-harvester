@@ -46,7 +46,7 @@ public class SynchronousProcessOccurrenceExtensionStepTest {
 		int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.occurrence_extension", BigDecimal.class).intValue();
 		assertTrue(count >= 1);
 
-		Map<String, String> data = jdbcTemplate.queryForObject("SELECT ext_data FROM buffer.occurrence_extension WHERE dwcaid='1'", Map.class);
+		Map<String, String> data = jdbcTemplate.queryForObject("SELECT ext_data FROM buffer.occurrence_extension WHERE dwca_id='1'", Map.class);
 		assertEquals("images/jpeg", data.get("format"));
 	}
 

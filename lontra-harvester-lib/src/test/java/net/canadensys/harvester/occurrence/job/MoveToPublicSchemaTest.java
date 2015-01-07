@@ -46,8 +46,8 @@ public class MoveToPublicSchemaTest {
 				"DELETE FROM buffer.occurrence", "DELETE FROM occurrence",
 				"DELETE FROM buffer.contact", "DELETE FROM contact",
 				"DELETE FROM buffer.resource_metadata", "DELETE FROM resource_metadata",
-				"INSERT INTO buffer.occurrence (auto_id,dwcaid,stateprovince,sourcefileid) VALUES (1,'1','Delaware','qmor-specimens')",
-				"INSERT INTO buffer.occurrence (auto_id,dwcaid,stateprovince,sourcefileid) VALUES (2,'3','Florida','qmor-specimens')", });
+				"INSERT INTO buffer.occurrence (auto_id,dwca_id,stateprovince,sourcefileid) VALUES (1,'1','Delaware','qmor-specimens')",
+				"INSERT INTO buffer.occurrence (auto_id,dwca_id,stateprovince,sourcefileid) VALUES (2,'3','Florida','qmor-specimens')", });
 	}
 
 	@Test
@@ -59,10 +59,10 @@ public class MoveToPublicSchemaTest {
 
 		moveJob.doJob(jobStatusModel);
 
-		String state = jdbcTemplate.queryForObject("SELECT stateprovince FROM occurrence where dwcaid='3'", String.class);
+		String state = jdbcTemplate.queryForObject("SELECT stateprovince FROM occurrence where dwca_id='3'", String.class);
 		assertTrue("Florida".equals(state));
 
-		String source = jdbcTemplate.queryForObject("SELECT sourcefileid FROM occurrence where dwcaid='1'", String.class);
+		String source = jdbcTemplate.queryForObject("SELECT sourcefileid FROM occurrence where dwca_id='1'", String.class);
 		assertTrue("qmor-specimens".equals(source));
 
 		int count = jdbcTemplate.queryForObject("SELECT count(*) FROM occurrence", BigDecimal.class).intValue();

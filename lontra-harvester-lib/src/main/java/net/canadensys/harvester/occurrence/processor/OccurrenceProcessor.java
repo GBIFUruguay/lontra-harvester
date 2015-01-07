@@ -85,6 +85,9 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 
 		// keep the same auto_id
 		processedModel.setAuto_id(rawModel.getAuto_id());
+		processedModel.setDwcaid(rawModel.getDwcaid());
+		processedModel.setSourcefileid(rawModel.getSourcefileid());
+		processedModel.setResource_uuid(rawModel.getResource_uuid());
 
 		processedModel.setBasisofrecord(rawModel.getBasisofrecord());
 
@@ -167,8 +170,6 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 		processedModel.setVerbatimelevation(rawModel.getVerbatimelevation());
 		processedModel.setHabitat(rawModel.getHabitat());
 
-		processedModel.setDwcaid(rawModel.getDwcaid());
-		processedModel.setSourcefileid(rawModel.getSourcefileid());
 		return processedModel;
 	}
 

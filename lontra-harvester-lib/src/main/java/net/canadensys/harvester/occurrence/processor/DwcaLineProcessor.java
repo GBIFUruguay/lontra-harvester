@@ -67,17 +67,19 @@ public class DwcaLineProcessor implements ItemProcessorIF<OccurrenceRawModel, Oc
 	public OccurrenceRawModel process(OccurrenceRawModel occModel, Map<SharedParameterEnum, Object> sharedParameters) {
 		// TODO could be done at init phase?
 		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
+		String resourceUUID = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
 
-		if (sourceFileId == null) {
-			LOGGER.fatal("Misconfigured processor : needs  sourceFileId");
+		if (sourceFileId == null || resourceUUID == null) {
+			LOGGER.fatal("Misconfigured processor : sourceFileId and resourceUUID are required");
 			throw new TaskExecutionException("Misconfigured processor");
 		}
 
 		occModel.setSourcefileid(sourceFileId);
+		occModel.setResource_uuid(resourceUUID);
 
 		if (nextId == null || idPoll.isEmpty()) {
 			try {
-				idPoll = (List<Number>) sqlQuery.list();
+				idPoll = sqlQuery.list();
 			}
 			catch (HibernateException hEx) {
 				LOGGER.fatal("Can't get ID from sequence", hEx);

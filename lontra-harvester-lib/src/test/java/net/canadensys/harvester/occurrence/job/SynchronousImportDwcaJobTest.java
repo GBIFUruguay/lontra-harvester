@@ -88,10 +88,10 @@ public class SynchronousImportDwcaJobTest {
 
 		int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.occurrence", BigDecimal.class).intValue();
 
-		String state = jdbcTemplate.queryForObject("SELECT stateprovince FROM buffer.occurrence where dwcaid='3'", String.class);
+		String state = jdbcTemplate.queryForObject("SELECT stateprovince FROM buffer.occurrence where dwca_id='3'", String.class);
 		assertTrue("Florida".equals(state));
 
-		String source = jdbcTemplate.queryForObject("SELECT sourcefileid FROM buffer.occurrence where dwcaid='1'", String.class);
+		String source = jdbcTemplate.queryForObject("SELECT sourcefileid FROM buffer.occurrence where dwca_id='1'", String.class);
 		assertTrue("qmor-specimens".equals(source));
 
 		// Test information is being also processed from EML content:
