@@ -1,11 +1,14 @@
 package net.canadensys.harvester.occurrence.task;
 
+import java.util.List;
 import java.util.Map;
 
 import net.canadensys.harvester.ItemTaskIF;
+import net.canadensys.harvester.config.DatabaseConfig;
 import net.canadensys.harvester.exception.TaskExecutionException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -24,6 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 	// get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(ReplaceOldOccurrenceTask.class);
+
+	@Autowired
+	private DatabaseConfig databaseConfig;
 
 	@Autowired
 	@Qualifier(value = "publicSessionFactory")
@@ -72,11 +78,20 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query.setString(0, resourceUUID);
 			query.executeUpdate();
 
+			// get public occurrence table columns names
+			String occurrenceTableColumns = StringUtils.join(getColumnListForTable(session, "public", "occurrence"), ",");
 			// copy records from buffer
-			query = session.createSQLQuery("INSERT INTO occurrence (SELECT * FROM buffer.occurrence WHERE sourcefileid=?)");
+			String sqlStr = String.format("INSERT INTO occurrence (%1$s) (SELECT %1$s FROM buffer.occurrence WHERE sourcefileid=?)",
+					occurrenceTableColumns);
+			query = session.createSQLQuery(sqlStr);
 			query.setString(0, sourceFileId);
 			int numberOfRecords = query.executeUpdate();
-			query = session.createSQLQuery("INSERT INTO occurrence_raw (SELECT * FROM buffer.occurrence_raw WHERE sourcefileid=?)");
+
+			// get public occurrence_raw table columns names
+			String occurrenceRawTableColumns = StringUtils.join(getColumnListForTable(session, "public", "occurrence_raw"), ",");
+			sqlStr = String.format("INSERT INTO occurrence_raw (%1$s) (SELECT %1$s FROM buffer.occurrence_raw WHERE sourcefileid=?)",
+					occurrenceRawTableColumns);
+			query = session.createSQLQuery(sqlStr);
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
 
@@ -116,6 +131,25 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			LOGGER.fatal("Can't replace previous records in public schema.", hEx);
 			throw new TaskExecutionException("Can't replace previous records in public schema.");
 		}
+	}
+
+	/**
+	 * Get the name of all columns of a table. The main purpose is to ensure correct colum order when moving
+	 * from buffer to public schema.
+	 * 
+	 * @param session
+	 * @param schema
+	 * @param table
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	private List<String> getColumnListForTable(Session session, String schema, String table) {
+		// get occurrence table columns names
+		SQLQuery query = session.createSQLQuery(databaseConfig.getSelectColumnNamesSQL());
+		query.setString(0, schema);
+		query.setString(1, table);
+
+		return query.list();
 	}
 
 	public void setSessionFactory(SessionFactory sessionFactory) {

@@ -3,6 +3,8 @@ database.username=postgres
 database.password=MYPASSWORD
 database.url=jdbc:postgresql://127.0.0.1/dataportal
 
+database.select_column_names=SELECT column_name FROM information_schema.columns WHERE table_schema = ? AND table_name = ?
+
 hibernate.buffer_schema=buffer
 hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 hibernate.show_sql=false

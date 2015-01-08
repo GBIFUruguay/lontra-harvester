@@ -9,10 +9,12 @@ import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.dao.impl.HibernateDwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.dao.impl.HibernateImportLogDAO;
 import net.canadensys.dataportal.occurrence.model.ContactModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
+import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
 import net.canadensys.harvester.ItemMapperIF;
 import net.canadensys.harvester.ItemProcessorIF;
@@ -109,6 +111,8 @@ public class UIConfig {
 	private String username;
 	@Value("${database.password}")
 	private String password;
+	@Value("${database.select_column_names}")
+	private String selectColumnNamesSQL;
 
 	@Value("${hibernate.dialect}")
 	private String hibernateDialect;
@@ -173,7 +177,8 @@ public class UIConfig {
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] {
 				OccurrenceRawModel.class, OccurrenceModel.class,
-				ImportLogModel.class, ContactModel.class, ResourceMetadataModel.class });
+				ImportLogModel.class, ContactModel.class, ResourceMetadataModel.class,
+				DwcaResourceModel.class, PublisherModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -196,6 +201,13 @@ public class UIConfig {
 		HibernateTransactionManager htmgr = new HibernateTransactionManager();
 		htmgr.setSessionFactory(publicSessionFactory().getObject());
 		return htmgr;
+	}
+
+	@Bean
+	public DatabaseConfig databaseConfig() {
+		DatabaseConfig databaseConfig = new DatabaseConfig();
+		databaseConfig.setSelectColumnNamesSQL(selectColumnNamesSQL);
+		return databaseConfig;
 	}
 
 	// --- Controllers ---

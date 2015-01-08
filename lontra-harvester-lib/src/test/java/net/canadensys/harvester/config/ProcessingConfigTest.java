@@ -85,6 +85,9 @@ public class ProcessingConfigTest {
 	@Value("${database.driver}")
 	private String dbDriverClassName;
 
+	@Value("${database.select_column_names}")
+	private String selectColumnNamesSQL;
+
 	@Value("${hibernate.dialect}")
 	private String hibernateDialect;
 
@@ -153,6 +156,13 @@ public class ProcessingConfigTest {
 		HibernateTransactionManager htmgr = new HibernateTransactionManager();
 		htmgr.setSessionFactory(publicSessionFactory().getObject());
 		return htmgr;
+	}
+
+	@Bean
+	public DatabaseConfig databaseConfig() {
+		DatabaseConfig databaseConfig = new DatabaseConfig();
+		databaseConfig.setSelectColumnNamesSQL(selectColumnNamesSQL);
+		return databaseConfig;
 	}
 
 	// ---JOB---
