@@ -5,11 +5,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import net.canadensys.dataportal.occurrence.dao.OccurrenceExtensionDAO;
-import net.canadensys.dataportal.occurrence.dao.impl.HibernateOccurrenceExtensionDAO;
 import net.canadensys.dataportal.occurrence.model.ContactModel;
-import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
-import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
@@ -87,6 +83,11 @@ public class ProcessingNodeConfig {
 		return ppc;
 	}
 
+	@Bean
+	public ProcessingNodeMain processingNodeMain() {
+		return new ProcessingNodeMain();
+	}
+
 	@Bean(name = "datasource")
 	public DataSource dataSource() {
 		ComboPooledDataSource ds = new ComboPooledDataSource();
@@ -106,8 +107,8 @@ public class ProcessingNodeConfig {
 	public LocalSessionFactoryBean bufferSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class,
-				OccurrenceExtensionModel.class, OccurrenceExtensionModel.class, DwcaResourceModel.class, ContactModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class,
+				OccurrenceExtensionModel.class, ResourceMetadataModel.class, ContactModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -119,45 +120,11 @@ public class ProcessingNodeConfig {
 		return sb;
 	}
 
-	// test
-	@Bean
-	public OccurrenceExtensionDAO occurrenceExtensionDAO() {
-		HibernateOccurrenceExtensionDAO occurrenceExtensionDAO = new HibernateOccurrenceExtensionDAO();
-		// occurrenceExtensionDAO.setSessionFactory(bufferSessionFactory().getObject());
-		return occurrenceExtensionDAO;
-	}
-
 	@Bean(name = "bufferTransactionManager")
 	public HibernateTransactionManager hibernateTransactionManager() {
 		HibernateTransactionManager htmgr = new HibernateTransactionManager();
 		htmgr.setSessionFactory(bufferSessionFactory().getObject());
 		return htmgr;
-	}
-
-	@Bean
-	public ProcessingNodeMain processingNodeMain() {
-		return new ProcessingNodeMain();
-	}
-
-	@Bean(name = "publicTransactionManager")
-	public HibernateTransactionManager publicHibernateTransactionManager() {
-		HibernateTransactionManager htmgr = new HibernateTransactionManager();
-		htmgr.setSessionFactory(publicSessionFactory().getObject());
-		return htmgr;
-	}
-
-	@Bean(name = "publicSessionFactory")
-	public LocalSessionFactoryBean publicSessionFactory() {
-		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
-		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class });
-
-		Properties hibernateProperties = new Properties();
-		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
-		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
-		hibernateProperties.setProperty("javax.persistence.validation.mode", "none");
-		sb.setHibernateProperties(hibernateProperties);
-		return sb;
 	}
 
 	public String getDbUrl() {

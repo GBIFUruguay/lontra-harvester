@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import net.canadensys.dataportal.occurrence.dao.ResourceMetadataDAO;
 import net.canadensys.dataportal.occurrence.model.ContactModel;
 import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
 import net.canadensys.harvester.ItemProcessorIF;
@@ -27,11 +28,6 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 
 	// get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(ResourceInformationProcessor.class);
-
-	private static final String CONTACT = "contact";
-	private static final String AGENT = "agent";
-	private static final String METADATA_PROVIDER = "metadata_provider";
-	private static final String RESOURCE_CREATOR = "resource_creator";
 
 	@Override
 	public void init() {
@@ -99,35 +95,32 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 			metadata.setPublication_date(eml.getPubDate());
 			metadata.setResource_logo_url(eml.getLogoUrl());
 			// TODO: verify what field should relate to this:
+			// C.G. : I think there is none, this is probably 'title'
 			metadata.setResource_name("");
 			metadata.setResource_uuid(guid);
 			metadata.setTitle(eml.getTitle());
 
 			// Add resource contacts information:
 			Agent tempAgent = null;
-			ContactModel tempContact = null;
-			// Add contact agent:
+
+			// Add contact agents
 			tempAgent = eml.getContact();
 			if (tempAgent != null) {
-				tempContact = buildContactFromAgent(tempAgent, guid, CONTACT);
-				metadata.addContact(tempContact);
+				metadata.addContact(buildContactFromAgent(tempAgent, guid, ResourceMetadataDAO.ContactRole.CONTACT));
 			}
 			// Add resource metadata provider information:
 			tempAgent = eml.getMetadataProvider();
 			if (tempAgent != null) {
-				tempContact = buildContactFromAgent(tempAgent, guid, METADATA_PROVIDER);
-				metadata.addContact(tempContact);
+				metadata.addContact(buildContactFromAgent(tempAgent, guid, ResourceMetadataDAO.ContactRole.METADATA_PROVIDER));
 			}
 			// Add resource creator information:
 			tempAgent = eml.getResourceCreator();
 			if (tempAgent != null) {
-				tempContact = buildContactFromAgent(tempAgent, guid, RESOURCE_CREATOR);
-				metadata.addContact(tempContact);
+				metadata.addContact(buildContactFromAgent(tempAgent, guid, ResourceMetadataDAO.ContactRole.RESOURCE_CREATOR));
 			}
 			// Add associatedParties information:
 			for (Agent a : eml.getAssociatedParties()) {
-				tempContact = buildContactFromAgent(a, guid, AGENT);
-				metadata.addContact(tempContact);
+				metadata.addContact(buildContactFromAgent(a, guid, ResourceMetadataDAO.ContactRole.AGENT));
 			}
 		}
 		return metadata;
@@ -141,7 +134,7 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 	 * @param role
 	 * @return
 	 */
-	private ContactModel buildContactFromAgent(Agent agent, String resource_uuid, String role) {
+	private ContactModel buildContactFromAgent(Agent agent, String resource_uuid, ResourceMetadataDAO.ContactRole role) {
 		ContactModel contact = new ContactModel();
 		contact.setAddress(agent.getAddress().getAddress());
 		contact.setAdministrative_area(agent.getAddress().getProvince());
@@ -154,7 +147,7 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 		contact.setPosition_name(agent.getPosition());
 		contact.setPostal_code(agent.getAddress().getPostalCode());
 
-		contact.setRole(role);
+		contact.setRole(role.getKey());
 		return contact;
 	}
 

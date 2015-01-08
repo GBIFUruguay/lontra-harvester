@@ -41,13 +41,16 @@ public class RecordImportTask implements ItemTaskIF {
 		Session session = sessionFactory.getCurrentSession();
 		ImportLogModel importLogModel = new ImportLogModel();
 		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
+		String resourceUUID = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
 		Integer numberOfRecords = (Integer) sharedParameters.get(SharedParameterEnum.NUMBER_OF_RECORDS);
 
-		if (sourceFileId == null || numberOfRecords == null) {
-			LOGGER.fatal("Misconfigured task : needs  sourceFileId and numberOfRecords");
+		if (sourceFileId == null || numberOfRecords == null || resourceUUID == null) {
+			LOGGER.fatal("Misconfigured task : sourceFileId, resourceUUID and numberOfRecords are required");
 			throw new TaskExecutionException("Misconfigured task");
 		}
 		importLogModel.setSourcefileid(sourceFileId);
+		importLogModel.setResource_uuid(resourceUUID);
+		// this is only core records
 		importLogModel.setRecord_quantity(numberOfRecords);
 		importLogModel.setUpdated_by(CURRENT_USER);
 		importLogModel.setEvent_end_date_time(new Date());

@@ -137,6 +137,12 @@ public class TestConfig {
 	}
 
 	@Bean
+	public DatabaseConfig databaseConfig() {
+		DatabaseConfig databaseConfig = new DatabaseConfig();
+		return databaseConfig;
+	}
+
+	@Bean
 	public StepControllerIF stepController() {
 		return new StepController();
 	}
