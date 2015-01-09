@@ -18,6 +18,7 @@
 		<jackson.version>2.2.3</jackson.version>
 		<spring.version>4.0.9.RELEASE</spring.version>
 		<hibernate.version>4.3.2.Final</hibernate.version>
+		<postgresql.version>9.3-1102-jdbc4</postgresql.version>
 		<jsch.version>0.1.51</jsch.version>
 		<activemq.version>5.10.0</activemq.version>
 		<narwhal.version>1.5.1</narwhal.version>
@@ -130,9 +131,9 @@
 
 		<!-- Postgresql -->
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.1-901-1.jdbc4</version>
+			<version>${postgresql.version}</version>
 		</dependency>
 
 		<dependency>
