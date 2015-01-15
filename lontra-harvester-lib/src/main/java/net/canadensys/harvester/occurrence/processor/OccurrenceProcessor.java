@@ -97,6 +97,7 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 		processedModel.setAssociatedsequences(rawModel.getAssociatedsequences());
 
 		processedModel.setCatalognumber(rawModel.getCatalognumber());
+		processedModel.setOthercatalognumbers(rawModel.getOthercatalognumbers());
 		processedModel.setOccurrenceid(rawModel.getOccurrenceid());
 		processedModel.setCollectioncode(rawModel.getCollectioncode());
 		processedModel.set_references(normalizeURLSeparator(rawModel.get_references()));
@@ -164,6 +165,7 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 		processDate(rawModel, processedModel);
 
 		processCoordinates(rawModel, processedModel);
+		processedModel.setDatageneralizations(rawModel.getDatageneralizations());
 
 		processAltitude(rawModel, processedModel);
 
