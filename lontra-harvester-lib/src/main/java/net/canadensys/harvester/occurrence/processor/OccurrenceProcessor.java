@@ -444,22 +444,23 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 
 		// end date
 		if (occModel.getEyear() != null && occModel.getEyear() < MIN_DATE) {
-			occModel.setSyear(null);
+			occModel.setEyear(null);
 		}
 		if (occModel.getEyear() != null && occModel.getEyear() > MAX_DATE) {
-			occModel.setSyear(null);
+			occModel.setEyear(null);
 		}
 
-		// if we have a date interval
-		if (ArrayUtils.containsOnlyNotNull(occModel.getEyear(), occModel.getEmonth(), occModel.getEday())) {
+		// if we have a complete date interval
+		if (ArrayUtils.containsOnlyNotNull(occModel.getSyear(), occModel.getSmonth(), occModel.getSday(),
+				occModel.getEyear(), occModel.getEmonth(), occModel.getEday())) {
 			Calendar startCal = Calendar.getInstance();
 			startCal.setLenient(false);
-			// Calendar month id 0-based
+			// Calendar month is 0-based
 			startCal.set(occModel.getSyear(), occModel.getSmonth() - 1, occModel.getSday());
 
 			Calendar endCal = Calendar.getInstance();
 			endCal.setLenient(false);
-			// Calendar month id 0-based
+			// Calendar month is 0-based
 			endCal.set(occModel.getEyear(), occModel.getEmonth() - 1, occModel.getEday());
 
 			// if start is not before end, clear both dates
