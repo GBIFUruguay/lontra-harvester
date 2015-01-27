@@ -46,10 +46,10 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 
 		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
 		String resourceUUID = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
-		String resourceID = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
+		Integer resourceID = (Integer)sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
 
-		if (sourceFileId == null || resourceUUID == null) {
-			LOGGER.fatal("Misconfigured task : sourceFileId and resourceUUID are required");
+		if (sourceFileId == null || resourceUUID == null || resourceID == null ) {
+			LOGGER.fatal("Misconfigured task : sourceFileId, resourceUUID and resourceID are required");
 			throw new TaskExecutionException("Misconfigured ReplaceOldOccurrenceTask");
 		}
 
@@ -71,7 +71,7 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query.executeUpdate();
 
 			query = session.createSQLQuery("DELETE FROM contact WHERE resource_metadata_fkey=?");
-			query.setString(0, resourceID);
+			query.setInteger(0, resourceID);
 			query.executeUpdate();
 
 			query = session.createSQLQuery("DELETE FROM resource_metadata WHERE resource_uuid=?");
@@ -103,7 +103,7 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query.setString(0, resourceUUID);
 			query.executeUpdate();
 			query = session.createSQLQuery("INSERT INTO contact (SELECT * FROM buffer.contact WHERE resource_metadata_fkey=?)");
-			query.setString(0, resourceID);
+			query.setInteger(0, resourceID);
 			query.executeUpdate();
 
 			// empty buffer schema for this sourcefileid
@@ -119,7 +119,7 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 
 			// empty buffer schema for resource_uuid
 			query = session.createSQLQuery("DELETE FROM buffer.contact WHERE resource_metadata_fkey = ?");
-			query.setString(0, resourceID);
+			query.setInteger(0, resourceID);
 			query.executeUpdate();
 			query = session.createSQLQuery("DELETE FROM buffer.resource_metadata WHERE resource_uuid=?");
 			query.setString(0, resourceUUID);

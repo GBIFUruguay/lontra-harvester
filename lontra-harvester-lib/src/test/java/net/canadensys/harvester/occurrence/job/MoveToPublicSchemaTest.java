@@ -56,7 +56,7 @@ public class MoveToPublicSchemaTest {
 
 		moveJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
 		moveJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, "ada5d0b1-07de-4dc0-83d4-e312f0fb81cb");
-
+		moveJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, "1");
 		moveJob.doJob(jobStatusModel);
 
 		String state = jdbcTemplate.queryForObject("SELECT stateprovince FROM occurrence where dwca_id='3'", String.class);
