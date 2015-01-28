@@ -1,10 +1,11 @@
 package net.canadensys.harvester.occurrence.view;
 
-import java.awt.Dimension;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 
@@ -14,21 +15,19 @@ import net.canadensys.harvester.occurrence.model.IPTFeedModel;
  * @author canadensys
  * 
  */
-public class IPTFeedDialog extends AbstractTableBasedDialog {
+public class IPTFeedDialog extends JPanel {
 
 	private static final long serialVersionUID = -2655708810547434951L;
 
-	public IPTFeedDialog(Vector<String> headers) {
-		super(headers);
-
-		this.setTitle(Messages.getString("iptRssFeed.title"));
-		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		mainPanel.setPreferredSize(new Dimension(800, 400));
+	public IPTFeedDialog(Vector<String> headers, List<IPTFeedModel> iptFeedModelList) {
+		JTable table = new JTable(loadData(iptFeedModelList), headers);
+		this.add(new JScrollPane(table));
+		this.setVisible(true);
 	}
 
-	public void loadData(List<IPTFeedModel> feedList) {
+	public Vector<Vector<Object>> loadData(List<IPTFeedModel> iptFeedModelList) {
 		Vector<Vector<Object>> rowData = new Vector<Vector<Object>>();
-		for (IPTFeedModel currIPTFeedModel : feedList) {
+		for (IPTFeedModel currIPTFeedModel : iptFeedModelList) {
 			Vector<Object> row = new Vector<Object>();
 			row.add(currIPTFeedModel.getTitle());
 			row.add(currIPTFeedModel.getLink());
@@ -36,6 +35,6 @@ public class IPTFeedDialog extends AbstractTableBasedDialog {
 			row.add(currIPTFeedModel.getPublishedDate());
 			rowData.add(row);
 		}
-		internalLoadData(rowData);
+		return rowData;
 	}
 }

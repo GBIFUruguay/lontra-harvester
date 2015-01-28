@@ -1,6 +1,7 @@
 package net.canadensys.harvester.occurrence.view;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -24,14 +25,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
-import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
+import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
@@ -72,6 +74,8 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 	private JButton viewImportLogBtn = null;
 	private JButton viewIPTFeedBtn = null;
+	
+	private JTabbedPane tabbedPane = null;
 
 	@Autowired
 	private HarvesterViewModel harvesterViewModel;
@@ -86,13 +90,16 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		harvesterFrame = new JFrame(Messages.getString("view.title"));
 		harvesterFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainPanel = new JPanel();
+		mainPanel.setPreferredSize(new Dimension(800,600));
 		mainPanel.setLayout(new GridBagLayout());
+		tabbedPane = new JTabbedPane();
+		mainPanel.add(tabbedPane);
 		pathToImportTxt = new JTextField();
 		pathToImportTxt.setColumns(30);
 		pathToImportTxt.setEditable(false);
 		openFileBtn = new JButton(Messages.getString("view.button.openFile"));
 		openResourceBtn = new JButton(Messages.getString("view.button.openResource"));
-		openFileBtn.setEnabled(false);
+		openFileBtn.setVisible(false);
 		openFileBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -262,36 +269,6 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		c.weighty = 1.0;
 		mainPanel.add(new JScrollPane(statuxTxtArea), c);
 
-		// UI line break
-		lineIdx++;
-		viewImportLogBtn = new JButton(Messages.getString("view.button.viewImportLog"));
-		viewImportLogBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				onViewImportLog();
-			}
-		});
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = lineIdx;
-		c.anchor = GridBagConstraints.WEST;
-		mainPanel.add(viewImportLogBtn, c);
-
-		// UI line break
-		lineIdx++;
-		viewIPTFeedBtn = new JButton(Messages.getString("view.button.viewIPTrss"));
-		viewIPTFeedBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				onViewIPTFeed();
-			}
-		});
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = lineIdx;
-		c.anchor = GridBagConstraints.WEST;
-		mainPanel.add(viewIPTFeedBtn, c);
-
 		// inner panel
 		c = new GridBagConstraints();
 		c.gridx = 0;
@@ -301,7 +278,11 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		c.weighty = 1.0;
 
 		harvesterFrame.setLayout(new GridBagLayout());
-		harvesterFrame.add(mainPanel, c);
+		harvesterFrame.add(tabbedPane, c);
+		tabbedPane.add("Resources", mainPanel);
+		tabbedPane.add("Publishers", new JPanel());
+		tabbedPane.add("Import Log", onViewImportLog());
+		tabbedPane.add("IPT RSS Feed", onViewIPTFeed());
 		harvesterFrame.pack();
 		harvesterFrame.setLocationRelativeTo(null);
 		harvesterFrame.setVisible(true);
@@ -445,34 +426,26 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		swingWorker.execute();
 	}
 
-	private void onViewImportLog() {
+	private JPanel onViewImportLog() {
 		Vector<String> headers = new Vector<String>();
 		headers.add(Messages.getString("view.importLog.table.sourceFileId"));
 		headers.add(Messages.getString("view.importLog.table.recordQty"));
 		headers.add(Messages.getString("view.importLog.table.updatedBy"));
 		headers.add(Messages.getString("view.importLog.table.date"));
 
-		ImportLogDialog dlg = new ImportLogDialog(headers);
-
 		List<ImportLogModel> importLogModelList = stepController.getSortedImportLogModelList();
-		dlg.loadData(importLogModelList);
-		dlg.setLocationRelativeTo(null);
-		dlg.setVisible(true);
+		return new ImportLogDialog(headers, importLogModelList); 
 	}
 
-	private void onViewIPTFeed() {
+	private JPanel onViewIPTFeed() {
 		Vector<String> headers = new Vector<String>();
 		headers.add(Messages.getString("view.iptFeed.table.title"));
 		headers.add(Messages.getString("view.iptFeed.table.url"));
 		headers.add(Messages.getString("view.iptFeed.table.key"));
 		headers.add(Messages.getString("view.iptFeed.table.pubDate"));
 
-		IPTFeedDialog dlg = new IPTFeedDialog(headers);
-
 		List<IPTFeedModel> importLogModelList = stepController.getIPTFeed();
-		dlg.loadData(importLogModelList);
-		dlg.setLocationRelativeTo(null);
-		dlg.setVisible(true);
+		return new IPTFeedDialog(headers, importLogModelList);
 	}
 
 	private void onJobStatusChanged(JobStatus newStatus) {

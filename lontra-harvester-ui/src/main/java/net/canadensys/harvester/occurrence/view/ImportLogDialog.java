@@ -1,8 +1,11 @@
 package net.canadensys.harvester.occurrence.view;
 
-import java.awt.Dimension;
 import java.util.List;
 import java.util.Vector;
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 
@@ -12,17 +15,17 @@ import net.canadensys.dataportal.occurrence.model.ImportLogModel;
  * @author canadensys
  * 
  */
-public class ImportLogDialog extends AbstractTableBasedDialog {
+public class ImportLogDialog extends JPanel {
 
 	private static final long serialVersionUID = 5963921652318603960L;
 
-	public ImportLogDialog(Vector<String> headers) {
-		super(headers);
-		this.setTitle(Messages.getString("importLog.title"));
-		mainPanel.setPreferredSize(new Dimension(600, 400));
+	public ImportLogDialog(Vector<String> headers, List<ImportLogModel> importLogModelList) {
+		JTable table = new JTable(loadData(importLogModelList), headers);
+		this.add(new JScrollPane(table));
+		this.setVisible(true);
 	}
 
-	public void loadData(List<ImportLogModel> importLogModelList) {
+	public Vector<Vector<Object>> loadData(List<ImportLogModel> importLogModelList) {
 		Vector<Vector<Object>> rowData = new Vector<Vector<Object>>();
 		for (ImportLogModel currImportLogModel : importLogModelList) {
 			Vector<Object> row = new Vector<Object>();
@@ -32,7 +35,6 @@ public class ImportLogDialog extends AbstractTableBasedDialog {
 			row.add(currImportLogModel.getEvent_end_date_time());
 			rowData.add(row);
 		}
-		internalLoadData(rowData);
+		return rowData;
 	}
-
 }
