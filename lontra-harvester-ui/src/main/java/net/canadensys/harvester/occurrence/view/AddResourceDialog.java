@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author canadensys
  * 
  */
-public class ResourceView extends AbstractDialog {
+public class AddResourceDialog extends AbstractDialog {
 
 	private static final long serialVersionUID = 1L;
 
@@ -33,7 +33,7 @@ public class ResourceView extends AbstractDialog {
 	private JTextField urlTxt;
 	private JTextField sfIdTxt;
 
-	public ResourceView(Component parent) {
+	public AddResourceDialog(Component parent) {
 		super(Messages.getString("resourceView.title"));
 		setLocationRelativeTo(parent);
 	}

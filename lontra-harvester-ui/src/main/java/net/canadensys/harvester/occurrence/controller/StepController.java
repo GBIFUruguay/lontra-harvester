@@ -5,8 +5,10 @@ import java.net.URL;
 import java.util.List;
 
 import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
-import net.canadensys.dataportal.occurrence.model.ImportLogModel;
+import net.canadensys.dataportal.occurrence.dao.PublisherDAO;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
+import net.canadensys.dataportal.occurrence.model.ImportLogModel;
+import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.config.harvester.HarvesterConfigIF;
@@ -54,6 +56,9 @@ public class StepController implements StepControllerIF {
 
 	@Autowired
 	private DwcaResourceDAO resourceDAO;
+	
+	@Autowired 
+	private PublisherDAO publisherDAO;
 
 	@Autowired
 	private ResourceStatusNotifierIF notifier;
@@ -134,6 +139,12 @@ public class StepController implements StepControllerIF {
 	@Transactional("publicTransactionManager")
 	public List<DwcaResourceModel> getResourceModelList() {
 		return resourceDAO.loadResources();
+	}
+	
+	@Override
+	@Transactional("publicTransactionManager")
+	public List<PublisherModel> getPublisherModelList() {
+		return publisherDAO.loadPublishers();
 	}
 
 	@Transactional("publicTransactionManager")

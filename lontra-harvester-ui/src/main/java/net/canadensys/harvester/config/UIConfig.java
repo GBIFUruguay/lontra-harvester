@@ -6,8 +6,10 @@ import javax.sql.DataSource;
 
 import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
+import net.canadensys.dataportal.occurrence.dao.PublisherDAO;
 import net.canadensys.dataportal.occurrence.dao.impl.HibernateDwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.dao.impl.HibernateImportLogDAO;
+import net.canadensys.dataportal.occurrence.dao.impl.HibernatePublisherDAO;
 import net.canadensys.dataportal.occurrence.model.ContactModel;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
@@ -425,6 +427,11 @@ public class UIConfig {
 	@Bean
 	public DwcaResourceDAO resourceDAO() {
 		return new HibernateDwcaResourceDAO();
+	}
+	
+	@Bean
+	public PublisherDAO publisherDAO() {
+		return new HibernatePublisherDAO();
 	}
 
 	@Bean

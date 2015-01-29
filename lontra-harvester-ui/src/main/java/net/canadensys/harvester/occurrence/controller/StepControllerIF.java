@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
+import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 
@@ -12,6 +13,8 @@ public interface StepControllerIF {
 	public List<IPTFeedModel> getIPTFeed();
 
 	public List<DwcaResourceModel> getResourceModelList();
+	
+	public List<PublisherModel> getPublisherModelList();
 
 	public List<DwcaResourceModel> getResourceToHarvest();
 

@@ -1,5 +1,8 @@
 package net.canadensys.harvester.occurrence.view;
 
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.List;
 import java.util.Vector;
 
@@ -15,12 +18,27 @@ import net.canadensys.dataportal.occurrence.model.ImportLogModel;
  * @author canadensys
  * 
  */
-public class ImportLogDialog extends JPanel {
+public class ImportLogPanel extends JPanel {
 
 	private static final long serialVersionUID = 5963921652318603960L;
 
-	public ImportLogDialog(Vector<String> headers, List<ImportLogModel> importLogModelList) {
-		JTable table = new JTable(loadData(importLogModelList), headers);
+	public ImportLogPanel(Vector<String> headers, List<ImportLogModel> importLogModelList) {
+		this.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.CENTER;
+		JTable table = new JTable(loadData(importLogModelList), headers) {
+            // Remove table edition:
+            public boolean isCellEditable(int rowIndex, int vColIndex) {
+                    return false;
+            }
+            @Override
+			public Dimension getPreferredScrollableViewportSize() 
+			{
+			    int width = 750;
+			    int height = 480;
+			    return new Dimension(width, height);
+			}
+		};
 		this.add(new JScrollPane(table));
 		this.setVisible(true);
 	}

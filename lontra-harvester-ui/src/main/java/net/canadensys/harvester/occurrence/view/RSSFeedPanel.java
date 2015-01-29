@@ -1,5 +1,8 @@
 package net.canadensys.harvester.occurrence.view;
 
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.List;
 import java.util.Vector;
 
@@ -15,13 +18,30 @@ import net.canadensys.harvester.occurrence.model.IPTFeedModel;
  * @author canadensys
  * 
  */
-public class IPTFeedDialog extends JPanel {
+public class RSSFeedPanel extends JPanel {
 
 	private static final long serialVersionUID = -2655708810547434951L;
 
-	public IPTFeedDialog(Vector<String> headers, List<IPTFeedModel> iptFeedModelList) {
-		JTable table = new JTable(loadData(iptFeedModelList), headers);
-		this.add(new JScrollPane(table));
+	public RSSFeedPanel(Vector<String> headers, List<IPTFeedModel> iptFeedModelList) {
+		
+		// Vertical alignment reference index:
+		this.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.CENTER;
+		JTable table = new JTable(loadData(iptFeedModelList), headers) {
+            // Remove table edition:
+            public boolean isCellEditable(int rowIndex, int vColIndex) {
+                    return false;
+            }
+            @Override
+			public Dimension getPreferredScrollableViewportSize() 
+			{
+			    int width = 750;
+			    int height = 480;
+			    return new Dimension(width, height);
+			}
+		};
+		this.add(new JScrollPane(table), c);
 		this.setVisible(true);
 	}
 
