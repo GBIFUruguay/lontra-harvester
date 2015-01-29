@@ -232,6 +232,7 @@ public class ResourcesPanel extends JPanel {
 					JOptionPane.INFORMATION_MESSAGE);
 			bufferSchemaTxt.setText("");
 			loadingLbl.setText(Messages.getString("view.info.status.moveDone"));
+			loadingLbl.setForeground(Color.BLUE);
 		} else {
 			JOptionPane.showMessageDialog(this,
 					Messages.getString("view.info.status.error.details"),
@@ -303,35 +304,47 @@ public class ResourcesPanel extends JPanel {
 	 * Import a resource (asynchronously) using a SwingWorker.
 	 */
 	private void onImportResource() {
-		importBtn.setEnabled(false);
-		moveToPublicBtn.setEnabled(false);
-		addResourceBtn.setEnabled(false);
-		loadingLbl.setIcon(loadingImg);
-
-		final SwingWorker<Void, Object> swingWorker = new SwingWorker<Void, Object>() {
-			@Override
-			public Void doInBackground() {
-				try {
-					if (resourceToImport != null) {
-						stepController.importDwcA(resourceToImport.getId());
-					} else {
-						stepController
-								.importDwcAFromLocalFile((String) (resourcesCmbBox
-										.getSelectedItem()));
+		// Check there is a valid item selected 
+		if (resourcesCmbBox.getSelectedItem() != null) {
+			// Avoid first entry (void):
+			if (resourcesCmbBox.getSelectedIndex() > 0) {
+				String selectedResource = (String) resourcesCmbBox.getSelectedItem();
+				// Update resource to be imported based on selected item:
+				for (DwcaResourceModel resource: stepController.getResourceModelList()) {
+					if (resource.getName().equalsIgnoreCase(selectedResource))
+						resourceToImport = resource;
+				}	
+				importBtn.setEnabled(false);
+				moveToPublicBtn.setEnabled(false);
+				addResourceBtn.setEnabled(false);
+				loadingLbl.setIcon(loadingImg);
+		
+				final SwingWorker<Void, Object> swingWorker = new SwingWorker<Void, Object>() {
+					@Override
+					public Void doInBackground() {
+						try {
+							if (resourceToImport != null) {
+								stepController.importDwcA(resourceToImport.getId());
+							} else {
+								stepController
+										.importDwcAFromLocalFile((String) (resourcesCmbBox
+												.getSelectedItem()));
+							}
+						} catch (Exception e) {
+							// should not get there but just in case
+							e.printStackTrace();
+						}
+						// async call, propertyChange(...) will be called once done
+						return null;
 					}
-				} catch (Exception e) {
-					// should not get there but just in case
-					e.printStackTrace();
-				}
-				// async call, propertyChange(...) will be called once done
-				return null;
+		
+					@Override
+					protected void done() {
+					}
+				};
+				swingWorker.execute();
 			}
-
-			@Override
-			protected void done() {
-			}
-		};
-		swingWorker.execute();
+		}	
 	}
 
 	/**

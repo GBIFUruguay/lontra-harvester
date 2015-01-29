@@ -293,7 +293,11 @@ public class AddPublisherDialog extends AbstractDialog {
 				}
 				publisherModel.setDecimallongitude(decimalLongitude);
 			}
+			// This is the first time, default counts to 0 records.
+			publisherModel.setRecord_count(0);
+			
 			exitValue = JOptionPane.OK_OPTION;
+			// Dispose of dialog
 			dispose();
 		}
 		else {
@@ -305,6 +309,7 @@ public class AddPublisherDialog extends AbstractDialog {
 	@Override
 	protected void onCancel() {
 		exitValue = JOptionPane.CANCEL_OPTION;
+		// Dispose of dialog
 		dispose();
 	}
 
