@@ -11,14 +11,22 @@ import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 
+/**
+ * Publihsers panel for tabbed pane
+ * 
+ * @author Pedro Guimarães
+ * 
+ */
 public class PublishersPanel extends JPanel {
 
 	private static final long serialVersionUID = 983475983470237450L;
@@ -57,25 +65,7 @@ public class PublishersPanel extends JPanel {
 
 		// Publishers table:
 		c.gridy = lineIdx++;
-		JTable table = new JTable(loadData(publishers), publishersTableHeaders) {
-			/**
-			 * Remove table edition
-			 * @see javax.swing.JTable#isCellEditable(int, int)
-			 */
-			public boolean isCellEditable(int rowIndex, int vColIndex) {
-				return false;
-			}
-			/**
-			 * Defines the table's preferred size:
-			 */
-			@Override
-			public Dimension getPreferredScrollableViewportSize() 
-			{
-			    int width = 750;
-			    int height = 200;
-			    return new Dimension(width, height);
-			}
-		};
+		JTable table = initTable();
 		// Set preferred column sizes:
 		//table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.getColumnModel().getColumn(0).setPreferredWidth(30);
@@ -101,7 +91,7 @@ public class PublishersPanel extends JPanel {
 		addPublisherBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-//				onAddPublisher();
+				onAddPublisher();
 			}
 		});
 		this.add(addPublisherBtn, c);
@@ -182,24 +172,55 @@ public class PublishersPanel extends JPanel {
 	}
 	
 	/**
+	 * Creates a table based on the publishers available in the publishers' list
+	 * @return
+	 */
+	private JTable initTable() {
+		JTable table = new JTable(loadData(publishers), publishersTableHeaders) {
+			/**
+			 * Remove table edition
+			 * @see javax.swing.JTable#isCellEditable(int, int)
+			 */
+			public boolean isCellEditable(int rowIndex, int vColIndex) {
+				return false;
+			}
+			/**
+			 * Defines the table's preferred size:
+			 */
+			@Override
+			public Dimension getPreferredScrollableViewportSize() 
+			{
+			    int width = 750;
+			    int height = 200;
+			    return new Dimension(width, height);
+			}
+		};
+		return table;
+	}
+	/**
 	 * Add publisher button action
-
+    */
 	private void onAddPublisher() {
-		ResourceView rmv = new ResourceView(this);
+		AddPublisherDialog apd = new AddPublisherDialog(this);
 		PublisherModel publisherModel = new PublisherModel();
-		publisherModel = rmv.displayResource(publisherModel);
-		if (rmv.getExitValue() == JOptionPane.OK_OPTION) {
+		publisherModel = apd.displayPublisher(publisherModel);
+		// Case the user hit OK:
+		if (apd.getExitValue() == JOptionPane.OK_OPTION) {
+			// Save or upload publisher:
 			if (!stepController.updatePublisherModel(publisherModel)) {
 				JOptionPane.showMessageDialog(this, Messages.getString("resourceView.resource.error.save.msg"),
 						Messages.getString("resourceView.resource.error.title"), JOptionPane.ERROR_MESSAGE);
 			}
-
 			// reload data to ensure we have the latest changes
 			publishers = stepController.getPublisherModelList();
-			
-			// TODO: adapt to publishers' table:
-			updateResourceComboBox();
 		}
 	}
-    */
+
+
+	/**
+	 * Rebuild the publishers' table if the list of available publishers is changed.
+	 */
+	public void updatePublishersTable() {
+		publishersList = initTable();
+	}
 }

@@ -44,4 +44,11 @@ public interface StepControllerIF {
 	 * @return
 	 */
 	public boolean updateResourceModel(DwcaResourceModel resourceModel);
+	
+	/**
+	 * Insert or update a PublisherModel
+	 * @param publisherModel
+	 * @return
+	 */
+	public boolean updatePublisherModel(PublisherModel publisherModel);
 }

@@ -153,6 +153,11 @@ public class StepController implements StepControllerIF {
 		return resourceDAO.save(resourceModel);
 	}
 
+	@Transactional("publicTransactionManager")
+	@Override
+	public boolean updatePublisherModel(PublisherModel publisherModel) {
+		return publisherDAO.save(publisherModel);
+	}
 	/**
 	 * Get the sorted ImportLogModel list using our own session. Sorted by desc
 	 * event_date

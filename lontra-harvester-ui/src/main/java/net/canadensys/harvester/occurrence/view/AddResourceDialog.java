@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class AddResourceDialog extends AbstractDialog {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 672869826178689726L;
 
 	private DwcaResourceModel resourceModel = null;
 	private static final int TXT_FIELD_LENGTH = 50;
@@ -35,7 +35,7 @@ public class AddResourceDialog extends AbstractDialog {
 
 	public AddResourceDialog(Component parent) {
 		super(Messages.getString("resourceView.title"));
-		setLocationRelativeTo(parent);
+		setLocationRelativeTo(parent);		
 	}
 
 	@Override
