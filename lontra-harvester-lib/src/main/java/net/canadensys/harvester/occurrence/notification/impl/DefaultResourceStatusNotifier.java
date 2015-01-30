@@ -59,7 +59,6 @@ public class DefaultResourceStatusNotifier implements ResourceStatusNotifierIF {
 		URL iptURL;
 
 		for (DwcaResourceModel currResource : resourcesList) {
-			currResource.getResource_uuid();
 			// we deduce the RSS feed address from the archive URL. This may become a problem in the future.
 			iptAddress = StringUtils.substringBeforeLast(currResource.getArchive_url(), "/") + IPT_RSS_SUFFIX;
 			if (!feedModelByIPTAddress.containsKey(iptAddress)) {

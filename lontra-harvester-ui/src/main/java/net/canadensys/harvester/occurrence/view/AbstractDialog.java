@@ -6,9 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 
 /**
  * Abstract dialog display with select, cancel buttons.
@@ -24,13 +27,18 @@ public abstract class AbstractDialog extends JDialog {
 
 	protected JButton selectBtn = null;
 	protected JButton cancelBtn = null;
-
+	
+	protected StepControllerIF stepController;
+	
+	protected JComboBox publishersCmbBox = null;
+	
 	// initialize with CANCEL_OPTION to handle the case when the dialog is
 	// closed with the 'X'
 	protected int exitValue = JOptionPane.CANCEL_OPTION;
-
-	public AbstractDialog(String title) {
-
+	
+	public AbstractDialog(String title, StepControllerIF stpCtl) {
+		// Set stepController:
+		this.stepController = stpCtl;
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		this.setTitle(title);
 		this.setModal(true);

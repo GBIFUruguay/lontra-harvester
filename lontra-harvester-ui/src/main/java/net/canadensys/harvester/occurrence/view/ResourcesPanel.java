@@ -26,9 +26,6 @@ import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.event.internal.OnReplicateVisitor;
-
 /**
  * Resources panel for tabbed pane
  * 
@@ -385,7 +382,7 @@ public class ResourcesPanel extends JPanel {
 	 * Add resource button action
 	 */
 	private void onAddResource() {
-		AddResourceDialog rmv = new AddResourceDialog(this);
+		AddResourceDialog rmv = new AddResourceDialog(this, stepController);
 		DwcaResourceModel resourceModel = new DwcaResourceModel();
 		resourceModel = rmv.displayResource(resourceModel);
 		if (rmv.getExitValue() == JOptionPane.OK_OPTION) {

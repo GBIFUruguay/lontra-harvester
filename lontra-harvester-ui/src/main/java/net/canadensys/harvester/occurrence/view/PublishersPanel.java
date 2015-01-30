@@ -6,8 +6,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -53,6 +51,10 @@ public class PublishersPanel extends JPanel {
 	public Vector<String> publishersTableHeaders = null; 
 	public Vector<String> resourcesTableHeaders = null;
 
+	/**
+	 * Main constructor, receives StepController and builds panel components
+	 * @param stepController
+	 */
 	public PublishersPanel(StepControllerIF stepController) {
 		this.stepController = stepController;
 		// Fetch list of available publishers from the database:
@@ -218,7 +220,7 @@ public class PublishersPanel extends JPanel {
 						Messages.getString("publisherView.publisher.error.title"), JOptionPane.ERROR_MESSAGE);
 			} else {
 				JOptionPane.showMessageDialog(this, Messages.getString("publisherView.publisher.success.save.msg"),
-						Messages.getString("publisherView.publisher.success.title"), JOptionPane.OK_MESSAGE);
+						Messages.getString("publisherView.publisher.success.title"), JOptionPane.INFORMATION_MESSAGE);
 			}
 			// reload data to ensure we have the latest changes:
 			publishers = stepController.getPublisherModelList();
@@ -277,7 +279,7 @@ public class PublishersPanel extends JPanel {
 	}
 	
 	/**
-	 * Creates a table based on the publishers available in the publishers' list
+	 * Creates a table based on the resources available in the publishers' list
 	 * @return
 	 */
 	private void initResourcesTable() {
@@ -314,14 +316,18 @@ public class PublishersPanel extends JPanel {
 				Vector<String> aux = new Vector<String>();
 				aux.add(r.getId().toString());
 				aux.add(r.getName());
-				aux.add(r.getRecord_count().toString());
+				if (r.getRecord_count() == null) {
+					aux.add("");
+				} else {
+					aux.add(r.getRecord_count().toString());
+				}	
 				resourcesTableModel.addRow(aux);
 			}
 		}
 	}
 	
 	/**
-	 * Initialize the TableModel, cleaning the table items.
+	 * Initialize the resources TableModel.
 	 */
 	public void initResourcesTableModel() {
 		// Init tableModel:

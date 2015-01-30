@@ -44,7 +44,7 @@ public class AddPublisherDialog extends AbstractDialog {
 	private JTextField longTxt;
 	
 	public AddPublisherDialog(Component parent) {
-		super(Messages.getString("publisherView.title"));
+		super(Messages.getString("publisherView.title"), null);
 		setLocationRelativeTo(parent);
 	}
 
