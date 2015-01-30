@@ -276,7 +276,6 @@ public class ResourcesPanel extends JPanel {
 	 */
 	private void initResourceComboBox() {
 		resourcesCmbBox = new JComboBox();
-
 		resourcesCmbBox.addItem("");
 		resourcesCmbBox.addActionListener(new ActionListener() {
 			@Override
@@ -344,7 +343,7 @@ public class ResourcesPanel extends JPanel {
 				};
 				swingWorker.execute();
 			}
-		}	
+		}
 	}
 
 	/**
