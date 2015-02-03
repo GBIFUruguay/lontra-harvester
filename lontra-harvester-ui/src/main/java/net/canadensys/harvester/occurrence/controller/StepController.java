@@ -121,7 +121,7 @@ public class StepController implements StepControllerIF {
 	}
 
 	@Override
-	public void moveToPublicSchema(String sourceFileId, String resourceUUID, Integer resourceID) {
+	public void moveToPublicSchema(String sourceFileId, String resourceUUID, Integer resourceID, boolean computeUniqueValues) {
 		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, sourceFileId);
 		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, resourceUUID);
 		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceID);
@@ -130,9 +130,10 @@ public class StepController implements StepControllerIF {
 
 		moveToPublicSchemaJob.doJob(jobStatusModel);
 		currentJob = moveToPublicSchemaJob;
-
-		computeUniqueValueJob.doJob(jobStatusModel);
-		currentJob = computeUniqueValueJob;
+		if (computeUniqueValues) {
+			computeUniqueValueJob.doJob(jobStatusModel);
+			currentJob = computeUniqueValueJob;
+		}	
 	}
 
 	@Override

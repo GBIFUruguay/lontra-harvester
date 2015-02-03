@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -45,6 +46,8 @@ public class ResourcesPanel extends JPanel {
 	public JTextField bufferSchemaTxt = null;
 	public JTextArea statuxTxtArea = null;
 	public JComboBox resourcesCmbBox = null;
+	public JCheckBox moveChkBox = null;
+	public JCheckBox uniqueValuesChkBox = null;
 
 	// Inherited from OccurrenceHarvesterMainView:
 	private StepControllerIF stepController;
@@ -158,6 +161,25 @@ public class ResourcesPanel extends JPanel {
 		c.fill = GridBagConstraints.NONE;
 		this.add(moveToPublicBtn, c);
 		
+		// Auto move checkbox:
+		moveChkBox = new JCheckBox();
+		moveChkBox.setText(Messages.getString("view.button.automove"));
+		moveChkBox.setToolTipText(Messages.getString("view.button.automove.tip"));
+		moveChkBox.setEnabled(true);
+		c.gridwidth = 1;
+		c.gridy = ++lineIdx;
+		c.gridx = 0;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		this.add(moveChkBox, c);
+		
+		// Compute unique values checkbox:
+		uniqueValuesChkBox = new JCheckBox();
+		uniqueValuesChkBox.setText(Messages.getString("view.button.unique.values"));
+		uniqueValuesChkBox.setToolTipText(Messages.getString("view.button.unique.values.tip"));
+		uniqueValuesChkBox.setEnabled(true);
+		c.gridy = ++lineIdx;
+		this.add(uniqueValuesChkBox, c);
+		
 		// UI separator
 		c.gridx = 0;
 		c.gridy = ++lineIdx;
@@ -245,8 +267,13 @@ public class ResourcesPanel extends JPanel {
 		case DONE:
 			loadingLbl.setIcon(null);
 			bufferSchemaTxt.setText(resourceToImport.getSourcefileid());
-			moveToPublicBtn.setEnabled(true);
 			updateStatusLabel(Messages.getString("view.info.status.importDone"));
+			// If auto move is set, start move:
+			if (moveChkBox.getSelectedObjects() != null) {
+				onMoveToPublic();
+			} else {
+				moveToPublicBtn.setEnabled(true);
+			}				
 			break;
 		case ERROR:
 			loadingLbl.setIcon(null);
@@ -335,7 +362,7 @@ public class ResourcesPanel extends JPanel {
 					}
 		
 					@Override
-					protected void done() {
+					protected void done() {						
 					}
 				};
 				swingWorker.execute();
@@ -349,14 +376,20 @@ public class ResourcesPanel extends JPanel {
 	 */
 	private void onMoveToPublic() {
 		moveToPublicBtn.setEnabled(false);
+		updateStatusLabel(Messages.getString("view.info.status.moving"));
 		loadingLbl.setIcon(loadingImg);
-
 		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
 			@Override
 			public Boolean doInBackground() {
+				if (uniqueValuesChkBox.getSelectedObjects() != null) {
 				stepController.moveToPublicSchema(bufferSchemaTxt.getText(),
 						resourceToImport.getResource_uuid(),
-						resourceToImport.getId());
+						resourceToImport.getId(), true);
+				} else {
+					stepController.moveToPublicSchema(bufferSchemaTxt.getText(),
+							resourceToImport.getResource_uuid(),
+							resourceToImport.getId(), false);
+				}
 				return true;
 			}
 
