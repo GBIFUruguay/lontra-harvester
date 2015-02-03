@@ -46,7 +46,7 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 
 		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
 		String resourceUUID = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
-		Integer resourceID = (Integer)sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
+		Integer resourceID = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
 
 		if (sourceFileId == null || resourceUUID == null || resourceID == null ) {
 			LOGGER.fatal("Misconfigured task : sourceFileId, resourceUUID and resourceID are required");

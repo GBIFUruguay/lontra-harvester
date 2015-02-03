@@ -6,7 +6,9 @@ import javax.sql.DataSource;
 
 import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
+import net.canadensys.dataportal.occurrence.dao.PublisherDAO;
 import net.canadensys.dataportal.occurrence.dao.impl.HibernateDwcaResourceDAO;
+import net.canadensys.dataportal.occurrence.dao.impl.HibernatePublisherDAO;
 import net.canadensys.dataportal.occurrence.model.ContactModel;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
@@ -112,7 +114,7 @@ public class TestConfig {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ContactModel.class,
-				ResourceMetadataModel.class, OccurrenceExtensionModel.class, DwcaResourceModel.class, PublisherModel.class });
+				ResourceMetadataModel.class, OccurrenceExtensionModel.class, DwcaResourceModel.class, PublisherModel.class});
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
@@ -254,6 +256,11 @@ public class TestConfig {
 	@Bean
 	public ResourceStatusNotifierIF resourceStatusNotifierIF() {
 		return null;
+	}
+	
+	@Bean
+	public PublisherDAO publisherDAO() {
+		return new HibernatePublisherDAO();
 	}
 
 	// ---VIEW MODEL---

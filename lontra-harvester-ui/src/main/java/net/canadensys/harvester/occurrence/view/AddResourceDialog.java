@@ -190,8 +190,8 @@ public class AddResourceDialog extends AbstractDialog {
 			resourceModel.setResource_uuid(resourceUuid);
 			// Check if it has been set a valid publisher:
 			
-//			if (!publisherName.equalsIgnoreCase(""))
-//				resourceModel.setPublisher(getPublisherFromName(publisherName));
+			if (!publisherName.equalsIgnoreCase(""))
+				resourceModel.setPublisher(getPublisherFromName(publisherName));
 				
 			// Set record_count to 0 by default:
 			resourceModel.setRecord_count(0);
