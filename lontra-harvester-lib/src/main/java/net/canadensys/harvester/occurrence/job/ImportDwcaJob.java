@@ -55,7 +55,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 
 	@Autowired
 	private LongRunningTaskIF checkProcessingCompletenessTask;
-
+	
 	private JobStatusModel jobStatusModel;
 
 	public ImportDwcaJob() {

@@ -63,6 +63,7 @@ import net.canadensys.harvester.occurrence.task.ComputeGISDataTask;
 import net.canadensys.harvester.occurrence.task.ComputeMultimediaDataTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
 import net.canadensys.harvester.occurrence.task.GetResourceInfoTask;
+import net.canadensys.harvester.occurrence.task.PostProcessOccurrenceTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
@@ -333,7 +334,12 @@ public class UIConfig {
 	public ItemTaskIF computeUniqueValueTask() {
 		return new ComputeUniqueValueTask();
 	}
-
+	
+	@Bean
+	public ItemTaskIF postProcessOccurrenceTask() {
+		return new PostProcessOccurrenceTask();
+	}
+	
 	// ---PROCESSOR wiring---
 	@Bean(name = "lineProcessor")
 	public ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> lineProcessor() {

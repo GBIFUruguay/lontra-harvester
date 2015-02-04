@@ -24,6 +24,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
+import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 
@@ -381,18 +382,25 @@ public class ResourcesPanel extends JPanel {
 		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
 			@Override
 			public Boolean doInBackground() {
+				// Avoid cases when a publisher is not associated to the resource:
+				PublisherModel publisher = resourceToImport.getPublisher();
+				String publisherName = null;
+				if (publisher != null) {
+					publisherName = publisher.getName();
+				}
+				// Check if the indexing is supposed to process unique values or not:
 				if (uniqueValuesChkBox.getSelectedObjects() != null) {
-				stepController.moveToPublicSchema(bufferSchemaTxt.getText(),
-						resourceToImport.getResource_uuid(),
-						resourceToImport.getId(), true);
-				} else {
 					stepController.moveToPublicSchema(bufferSchemaTxt.getText(),
 							resourceToImport.getResource_uuid(),
-							resourceToImport.getId(), false);
-				}
+							resourceToImport.getId(), resourceToImport.getName(), publisherName, true);
+					} else {
+						stepController.moveToPublicSchema(bufferSchemaTxt.getText(),
+								resourceToImport.getResource_uuid(),
+								resourceToImport.getId(), resourceToImport.getName(), publisherName, false);
+					}
 				return true;
 			}
-
+			
 			@Override
 			protected void done() {
 				try {
