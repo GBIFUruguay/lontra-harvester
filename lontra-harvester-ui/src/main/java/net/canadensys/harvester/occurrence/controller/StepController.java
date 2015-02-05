@@ -131,9 +131,8 @@ public class StepController implements StepControllerIF {
 		moveToPublicSchemaJob.doJob(jobStatusModel);
 		currentJob = moveToPublicSchemaJob;
 		if (computeUniqueValues) {
-			computeUniqueValueJob.doJob(jobStatusModel);
-			currentJob = computeUniqueValueJob;
-		}	
+			computeUniqueValues(jobStatusModel);
+		}
 	}
 
 	@Override
@@ -198,5 +197,14 @@ public class StepController implements StepControllerIF {
 	@Override
 	public List<DwcaResourceModel> getResourceToHarvest() {
 		return notifier.getHarvestRequiredList();
+	}
+	
+	public void computeUniqueValues(JobStatusModel jobStatusModel) {
+		if (jobStatusModel == null) {
+			jobStatusModel = new JobStatusModel();
+			harvesterViewModel.encapsulateJobStatus(jobStatusModel);
+		}
+		computeUniqueValueJob.doJob(jobStatusModel);
+		currentJob = computeUniqueValueJob;
 	}
 }

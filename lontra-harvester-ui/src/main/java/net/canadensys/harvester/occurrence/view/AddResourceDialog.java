@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * View component to display and edit a resource.
  * 
- * @author canadensys
+ * @author canadensys, Pedro Guimarães
  * 
  */
 public class AddResourceDialog extends AbstractDialog {
@@ -175,6 +175,9 @@ public class AddResourceDialog extends AbstractDialog {
 		return resourceModel;
 	}
 
+	/**
+	 * Actions executed when the user presses the Ok button
+	 */
 	@Override
 	protected void onSelect() {
 		String nameValue = nameTxt.getText();
@@ -234,6 +237,11 @@ public class AddResourceDialog extends AbstractDialog {
 		}
 	}
 	
+	/**
+	 * Fetch a PublisherModel from database from its name
+	 * @param publisherName the name field of the publisher table
+	 * @return
+	 */
 	private PublisherModel getPublisherFromName(String publisherName) {
 		List<PublisherModel> publishers = stepController.getPublisherModelList();
 		PublisherModel publisher = null;

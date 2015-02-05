@@ -42,6 +42,7 @@ public class ResourcesPanel extends JPanel {
 	public JButton importBtn = null;
 	public JButton moveToPublicBtn = null;
 	public JButton addResourceBtn = null;
+	public JButton computeUniqueValuesBtn = null;
 	public JLabel loadingLbl = null;
 	public JTextField bufferSchemaTxt = null;
 	public JTextArea statuxTxtArea = null;
@@ -160,6 +161,24 @@ public class ResourcesPanel extends JPanel {
 		c.anchor = GridBagConstraints.NORTHEAST;
 		c.fill = GridBagConstraints.NONE;
 		this.add(moveToPublicBtn, c);
+		
+		// Compute unique values to public schema button:
+		computeUniqueValuesBtn = new JButton(Messages.getString("view.button.compute.unique.values"));
+		computeUniqueValuesBtn.setToolTipText(Messages
+				.getString("view.button.compute.unique.values.tooltip"));
+		computeUniqueValuesBtn.setEnabled(true);
+		computeUniqueValuesBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onComputeUniqueValues();
+			}
+		});
+		c.gridwidth = 1;
+		c.gridx = 3;
+		c.gridy = ++lineIdx;
+		c.anchor = GridBagConstraints.NORTHEAST;
+		c.fill = GridBagConstraints.NONE;
+		this.add(computeUniqueValuesBtn, c);
 		
 		// Auto move checkbox:
 		moveChkBox = new JCheckBox();
@@ -444,5 +463,31 @@ public class ResourcesPanel extends JPanel {
 			resourcesCmbBox.addItem(resourceModel.getName() + "-"
 					+ resourceModel.getSourcefileid());
 		}
+	}
+	
+	public void onComputeUniqueValues() {
+		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
+			@Override
+			public Boolean doInBackground() {
+				// Update status:
+				computeUniqueValuesBtn.setEnabled(false);
+				loadingLbl.setIcon(loadingImg);
+				loadingLbl.setForeground(Color.ORANGE);
+				updateStatusLabel(Messages.getString("view.info.status.compute.unique.values"));
+				// Call compute unique values task:
+				stepController.computeUniqueValues(null);
+				return true;
+			}
+
+			@Override
+			protected void done() {
+				// Update status:
+				loadingLbl.setIcon(null);
+				loadingLbl.setForeground(Color.BLUE);
+				updateStatusLabel(Messages.getString("view.info.status.compute.unique.values.done"));
+				computeUniqueValuesBtn.setEnabled(true);
+			}
+		};
+		swingWorker.execute();
 	}
 }

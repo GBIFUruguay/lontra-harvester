@@ -7,6 +7,7 @@ import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
+import net.canadensys.harvester.occurrence.model.JobStatusModel;
 
 public interface StepControllerIF {
 
@@ -51,4 +52,6 @@ public interface StepControllerIF {
 	 * @return
 	 */
 	public boolean updatePublisherModel(PublisherModel publisherModel);
+	
+	public void computeUniqueValues(JobStatusModel jobStatusModel);
 }
