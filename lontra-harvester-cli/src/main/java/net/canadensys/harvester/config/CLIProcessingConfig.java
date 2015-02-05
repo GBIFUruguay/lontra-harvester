@@ -4,16 +4,16 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
-import net.canadensys.dataportal.occurrence.dao.impl.HibernateImportLogDAO;
+import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.dao.impl.HibernateDwcaResourceDAO;
+import net.canadensys.dataportal.occurrence.dao.impl.HibernateImportLogDAO;
+import net.canadensys.dataportal.occurrence.model.ContactModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
-import net.canadensys.dataportal.occurrence.model.ContactModel;
 import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
-import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
@@ -40,6 +40,7 @@ import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
 import net.canadensys.harvester.occurrence.task.ComputeGISDataTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
 import net.canadensys.harvester.occurrence.task.GetResourceInfoTask;
+import net.canadensys.harvester.occurrence.task.PostProcessOccurrenceTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
@@ -236,12 +237,17 @@ public class CLIProcessingConfig {
 	public ItemTaskIF recordImportTask() {
 		return new RecordImportTask();
 	}
-
+	
 	@Bean
 	public ItemTaskIF computeUniqueValueTask() {
 		return new ComputeUniqueValueTask();
 	}
-
+	
+	@Bean
+	public ItemTaskIF postProcessOccurrenceTask() {
+		return new PostProcessOccurrenceTask();
+	}
+		
 	// ---PROCESSOR wiring---
 	@Bean(name = "lineProcessor")
 	public ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> lineProcessor() {

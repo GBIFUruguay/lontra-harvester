@@ -32,7 +32,7 @@ public interface StepControllerIF {
 	 */
 	public void importDwcAFromLocalFile(String dwcaPath);
 
-	public void moveToPublicSchema(String datasetShortName, String resourceUUID, Integer resourceID, boolean computeUniqueValues);
+	public void moveToPublicSchema(String datasetShortName, String resourceUUID, Integer resourceID, String resourceName, String publisherName, boolean computeUniqueValues);
 
 	public void onNodeError();
 
