@@ -27,7 +27,7 @@ import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 
 /**
- * Publihsers panel for tabbed pane
+ * Publishers panel for tabbed pane
  * 
  * @author Pedro Guimarães
  * 
@@ -40,19 +40,20 @@ public class PublishersPanel extends JPanel {
 	private List<DwcaResourceModel> resources = null;
 
 	// Inherited from OccurrenceHarvesterMainView:
-	private StepControllerIF stepController;
+	private final StepControllerIF stepController;
 
-	public JButton addPublisherBtn = null;
-	public JTable publishersList = null;
-	public JTable resourcesList = null;
-	DefaultTableModel publishersTableModel = null;
-	DefaultTableModel resourcesTableModel = null;
-	
-	public Vector<String> publishersTableHeaders = null; 
+	private JButton addPublisherBtn = null;
+	private JTable publishersList = null;
+	private JTable resourcesList = null;
+	private DefaultTableModel publishersTableModel = null;
+	private DefaultTableModel resourcesTableModel = null;
+
+	public Vector<String> publishersTableHeaders = null;
 	public Vector<String> resourcesTableHeaders = null;
 
 	/**
 	 * Main constructor, receives StepController and builds panel components
+	 * 
 	 * @param stepController
 	 */
 	public PublishersPanel(StepControllerIF stepController) {
@@ -60,11 +61,11 @@ public class PublishersPanel extends JPanel {
 		// Fetch list of available publishers from the database:
 		publishers = stepController.getPublisherModelList();
 		this.setLayout(new GridBagLayout());
-		
+
 		// Initialize table headers:
 		initPublishersTableHeader();
 		initResourcesTableHeader();
-		
+
 		// Vertical alignment reference index:
 		int lineIdx = 0;
 		GridBagConstraints c = null;
@@ -83,7 +84,7 @@ public class PublishersPanel extends JPanel {
 		c.gridy = lineIdx++;
 		initPublishersTable();
 		this.add(new JScrollPane(publishersList), c);
-				
+
 		// Add publisher button:
 		c.gridx = 2;
 		c.gridy = lineIdx++;
@@ -99,18 +100,17 @@ public class PublishersPanel extends JPanel {
 			}
 		});
 		this.add(addPublisherBtn, c);
-		
+
 		// Resources label:
 		c.gridy = lineIdx++;
 		c.anchor = GridBagConstraints.NORTHWEST;
 		this.add(new JLabel(Messages.getString("view.info.publishers.resources")), c);
 
-		
 		// Resources table, used to display a selected publishers' resources:
 		c.gridy = lineIdx++;
 		initResourcesTable();
 		this.add(new JScrollPane(resourcesList), c);
-		
+
 		// Habilitate the panel:
 		this.setVisible(true);
 	}
@@ -134,7 +134,7 @@ public class PublishersPanel extends JPanel {
 		}
 		return rowData;
 	}
-	
+
 	/**
 	 * Initializes the vector with header information for publishers table
 	 */
@@ -144,7 +144,7 @@ public class PublishersPanel extends JPanel {
 		publishersTableHeaders.add(Messages.getString("view.publishers.name"));
 		publishersTableHeaders.add(Messages.getString("view.publishers.record.count"));
 	}
-	
+
 	/**
 	 * Initializes the vector with header information for publishers table
 	 */
@@ -154,9 +154,10 @@ public class PublishersPanel extends JPanel {
 		resourcesTableHeaders.add(Messages.getString("view.publishers.resources.name"));
 		resourcesTableHeaders.add(Messages.getString("view.publishers.resources.record.count"));
 	}
-	
+
 	/**
 	 * Creates a table based on the publishers available in the publishers' list
+	 * 
 	 * @return
 	 */
 	private void initPublishersTable() {
@@ -164,25 +165,28 @@ public class PublishersPanel extends JPanel {
 			publishersList = new JTable() {
 				/**
 				 * Remove table edition
+				 * 
 				 * @see javax.swing.JTable#isCellEditable(int, int)
 				 */
+				@Override
 				public boolean isCellEditable(int rowIndex, int vColIndex) {
 					return false;
 				}
+
 				/**
 				 * Defines the table's preferred size:
 				 */
 				@Override
-				public Dimension getPreferredScrollableViewportSize() 
+				public Dimension getPreferredScrollableViewportSize()
 				{
-				    int width = 750;
-				    int height = 200;
-				    return new Dimension(width, height);
+					int width = 750;
+					int height = 200;
+					return new Dimension(width, height);
 				}
 			};
 			// Set single selection mode only:
 			publishersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			
+
 			publishersList.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
@@ -191,12 +195,12 @@ public class PublishersPanel extends JPanel {
 				}
 			});
 		}
-		
+
 		// Initialize TableModel:
 		initPublishersTableModel();
-			
-		// Add rows in the table model for each publisher: 
-		for (PublisherModel p: publishers) {
+
+		// Add rows in the table model for each publisher:
+		for (PublisherModel p : publishers) {
 			Vector<String> aux = new Vector<String>();
 			aux.add(p.getAuto_id().toString());
 			aux.add(p.getName());
@@ -204,10 +208,10 @@ public class PublishersPanel extends JPanel {
 			publishersTableModel.addRow(aux);
 		}
 	}
-	
+
 	/**
 	 * Add publisher button action
-    */
+	 */
 	private void onAddPublisher() {
 		AddPublisherDialog apd = new AddPublisherDialog(this);
 		PublisherModel publisherModel = new PublisherModel();
@@ -218,7 +222,8 @@ public class PublishersPanel extends JPanel {
 			if (!stepController.updatePublisherModel(publisherModel)) {
 				JOptionPane.showMessageDialog(this, Messages.getString("publisherView.publisher.error.save.msg"),
 						Messages.getString("publisherView.publisher.error.title"), JOptionPane.ERROR_MESSAGE);
-			} else {
+			}
+			else {
 				JOptionPane.showMessageDialog(this, Messages.getString("publisherView.publisher.success.save.msg"),
 						Messages.getString("publisherView.publisher.success.title"), JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -229,14 +234,13 @@ public class PublishersPanel extends JPanel {
 		}
 	}
 
-
 	/**
 	 * Rebuild the publishers' table if the list of available publishers is changed.
 	 */
 	public void updatePublishersTable() {
 		initPublishersTable();
 	}
-	
+
 	/**
 	 * Initialize the TableModel, cleaning the table items.
 	 */
@@ -244,24 +248,25 @@ public class PublishersPanel extends JPanel {
 		// Init tableModel:
 		publishersTableModel = new DefaultTableModel();
 		publishersTableModel.setColumnIdentifiers(publishersTableHeaders);
-		
+
 		publishersList.setModel(publishersTableModel);
-		
+
 		// Set preferred column sizes:
 		publishersList.getColumnModel().getColumn(0).setPreferredWidth(30);
 		publishersList.getColumnModel().getColumn(1).setPreferredWidth(620);
 		publishersList.getColumnModel().getColumn(2).setPreferredWidth(100);
-		
+
 		// Center string contents for columns id and record count:
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
-		publishersList.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
-		publishersList.getColumnModel().getColumn(2).setCellRenderer( centerRenderer );
+		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+		publishersList.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+		publishersList.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
 	}
-	
+
 	/**
-	 * Display a publisher's available resources on the resources table when the 
-	 * publisher is selected on the publishers list. 
+	 * Display a publisher's available resources on the resources table when the
+	 * publisher is selected on the publishers list.
+	 * 
 	 * @param row
 	 * @param column
 	 */
@@ -269,17 +274,18 @@ public class PublishersPanel extends JPanel {
 		int id = Integer.parseInt((String) publishersList.getValueAt(row, 0));
 		List<DwcaResourceModel> resources = stepController.getResourceModelList();
 		this.resources = new ArrayList<DwcaResourceModel>();
-		for (DwcaResourceModel r: resources) {
+		for (DwcaResourceModel r : resources) {
 			if (r.getPublisher() != null) {
-				if (r.getPublisher().getAuto_id() == id) 
+				if (r.getPublisher().getAuto_id() == id)
 					this.resources.add(r);
 			}
 		}
 		initResourcesTable();
 	}
-	
+
 	/**
 	 * Creates a table based on the resources available in the publishers' list
+	 * 
 	 * @return
 	 */
 	private void initResourcesTable() {
@@ -287,45 +293,49 @@ public class PublishersPanel extends JPanel {
 			resourcesList = new JTable() {
 				/**
 				 * Remove table edition
+				 * 
 				 * @see javax.swing.JTable#isCellEditable(int, int)
 				 */
+				@Override
 				public boolean isCellEditable(int rowIndex, int vColIndex) {
 					return false;
 				}
+
 				/**
 				 * Defines the table's preferred size:
 				 */
 				@Override
-				public Dimension getPreferredScrollableViewportSize() 
+				public Dimension getPreferredScrollableViewportSize()
 				{
-				    int width = 750;
-				    int height = 200;
-				    return new Dimension(width, height);
+					int width = 750;
+					int height = 200;
+					return new Dimension(width, height);
 				}
 			};
 			// Set single selection mode only:
 			resourcesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		}
-		
+
 		// Initialize TableModel:
 		initResourcesTableModel();
-			
+
 		if (resources != null && resources.size() > 0) {
-			// Add rows in the table model for each resource: 
-			for (DwcaResourceModel r: resources) {
+			// Add rows in the table model for each resource:
+			for (DwcaResourceModel r : resources) {
 				Vector<String> aux = new Vector<String>();
 				aux.add(r.getId().toString());
 				aux.add(r.getName());
 				if (r.getRecord_count() == null) {
 					aux.add("");
-				} else {
+				}
+				else {
 					aux.add(r.getRecord_count().toString());
-				}	
+				}
 				resourcesTableModel.addRow(aux);
 			}
 		}
 	}
-	
+
 	/**
 	 * Initialize the resources TableModel.
 	 */
@@ -333,18 +343,18 @@ public class PublishersPanel extends JPanel {
 		// Init tableModel:
 		resourcesTableModel = new DefaultTableModel();
 		resourcesTableModel.setColumnIdentifiers(resourcesTableHeaders);
-		
+
 		resourcesList.setModel(resourcesTableModel);
-		
+
 		// Set preferred column sizes:
 		resourcesList.getColumnModel().getColumn(0).setPreferredWidth(30);
 		resourcesList.getColumnModel().getColumn(1).setPreferredWidth(620);
 		resourcesList.getColumnModel().getColumn(2).setPreferredWidth(100);
-		
+
 		// Center string contents for columns id and record count:
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
-		resourcesList.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
-		resourcesList.getColumnModel().getColumn(2).setCellRenderer( centerRenderer );
+		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+		resourcesList.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+		resourcesList.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
 	}
 }

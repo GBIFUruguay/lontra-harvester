@@ -38,21 +38,21 @@ public class ResourcesPanel extends JPanel {
 
 	private static final long serialVersionUID = 1093812890375L;
 
-	public DwcaResourceModel resourceToImport = null;
-	public ImageIcon loadingImg = null;
-	public JButton importBtn = null;
-	public JButton moveToPublicBtn = null;
-	public JButton addResourceBtn = null;
-	public JButton computeUniqueValuesBtn = null;
-	public JLabel loadingLbl = null;
-	public JTextField bufferSchemaTxt = null;
-	public JTextArea statuxTxtArea = null;
-	public JComboBox resourcesCmbBox = null;
-	public JCheckBox moveChkBox = null;
-	public JCheckBox uniqueValuesChkBox = null;
+	private DwcaResourceModel resourceToImport = null;
+	private ImageIcon loadingImg = null;
+	private JButton importBtn = null;
+	private JButton moveToPublicBtn = null;
+	private JButton addResourceBtn = null;
+	private JButton computeUniqueValuesBtn = null;
+	private JLabel statusLbl = null;
+	private JTextField bufferSchemaTxt = null;
+	private JTextArea consoleTxtArea = null;
+	private JComboBox<String> resourcesCmbBox = null;
+	private JCheckBox moveChkBox = null;
+	private JCheckBox uniqueValuesChkBox = null;
 
 	// Inherited from OccurrenceHarvesterMainView:
-	private StepControllerIF stepController;
+	private final StepControllerIF stepController;
 
 	private List<DwcaResourceModel> knownResources;
 
@@ -83,7 +83,7 @@ public class ResourcesPanel extends JPanel {
 		c.gridy = ++lineIdx;
 		c.gridwidth = 4;
 		c.fill = GridBagConstraints.HORIZONTAL;
-//		c.anchor = GridBagConstraints.NORTH;
+		// c.anchor = GridBagConstraints.NORTH;
 		this.add(resourcesCmbBox, c);
 
 		// Import button:
@@ -162,7 +162,7 @@ public class ResourcesPanel extends JPanel {
 		c.anchor = GridBagConstraints.NORTHEAST;
 		c.fill = GridBagConstraints.NONE;
 		this.add(moveToPublicBtn, c);
-		
+
 		// Compute unique values to public schema button:
 		computeUniqueValuesBtn = new JButton(Messages.getString("view.button.compute.unique.values"));
 		computeUniqueValuesBtn.setToolTipText(Messages
@@ -180,7 +180,7 @@ public class ResourcesPanel extends JPanel {
 		c.anchor = GridBagConstraints.NORTHEAST;
 		c.fill = GridBagConstraints.NONE;
 		this.add(computeUniqueValuesBtn, c);
-		
+
 		// Auto move checkbox:
 		moveChkBox = new JCheckBox();
 		moveChkBox.setText(Messages.getString("view.button.automove"));
@@ -191,7 +191,7 @@ public class ResourcesPanel extends JPanel {
 		c.gridx = 0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add(moveChkBox, c);
-		
+
 		// Compute unique values checkbox:
 		uniqueValuesChkBox = new JCheckBox();
 		uniqueValuesChkBox.setText(Messages.getString("view.button.unique.values"));
@@ -199,7 +199,7 @@ public class ResourcesPanel extends JPanel {
 		uniqueValuesChkBox.setEnabled(true);
 		c.gridy = ++lineIdx;
 		this.add(uniqueValuesChkBox, c);
-		
+
 		// UI separator
 		c.gridx = 0;
 		c.gridy = ++lineIdx;
@@ -216,10 +216,10 @@ public class ResourcesPanel extends JPanel {
 		// UI line break
 		c.gridy = ++lineIdx;
 		c.anchor = GridBagConstraints.WEST;
-		loadingLbl = new JLabel(Messages.getString("view.info.status.waiting"),
+		statusLbl = new JLabel(Messages.getString("view.info.status.waiting"),
 				null, JLabel.CENTER);
-		loadingLbl.setForeground(Color.RED);
-		this.add(loadingLbl, c);
+		statusLbl.setForeground(Color.RED);
+		this.add(statusLbl, c);
 
 		// UI line break
 		c.gridy = ++lineIdx;
@@ -235,14 +235,14 @@ public class ResourcesPanel extends JPanel {
 		this.add(new JLabel(Messages.getString("view.info.console")), c);
 
 		// UI line break
-		statuxTxtArea = new JTextArea();
-		statuxTxtArea.setRows(15);
+		consoleTxtArea = new JTextArea();
+		consoleTxtArea.setRows(15);
 		c.gridy = ++lineIdx;
 		c.gridwidth = 4;
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-		this.add(new JScrollPane(statuxTxtArea), c);
+		this.add(new JScrollPane(consoleTxtArea), c);
 
 		// inner panel
 		c = new GridBagConstraints();
@@ -253,63 +253,79 @@ public class ResourcesPanel extends JPanel {
 		c.weighty = 1.0;
 	}
 
+	/**
+	 * Safely update the content of the status label.
+	 * 
+	 * @param status
+	 */
 	public void updateStatusLabel(final String status) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				loadingLbl.setText(status);
+				statusLbl.setText(status);
+			}
+		});
+	}
+
+	public void appendConsoleText(final String text) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				consoleTxtArea.append(text);
 			}
 		});
 	}
 
 	public void onMoveDone(JobStatus status) {
-		loadingLbl.setIcon(null);
+		statusLbl.setIcon(null);
 		if (JobStatus.DONE == status) {
 			JOptionPane.showMessageDialog(this,
 					Messages.getString("view.info.status.moveCompleted"),
 					Messages.getString("view.info.status.info"),
 					JOptionPane.INFORMATION_MESSAGE);
 			bufferSchemaTxt.setText("");
-			loadingLbl.setText(Messages.getString("view.info.status.moveDone"));
-			loadingLbl.setForeground(Color.BLUE);
-		} else {
+			statusLbl.setText(Messages.getString("view.info.status.moveDone"));
+			statusLbl.setForeground(Color.BLUE);
+		}
+		else {
 			JOptionPane.showMessageDialog(this,
 					Messages.getString("view.info.status.error.details"),
 					Messages.getString("view.info.status.error"),
 					JOptionPane.ERROR_MESSAGE);
-			loadingLbl.setText(Messages
+			statusLbl.setText(Messages
 					.getString("view.info.status.error.moveError"));
 		}
 	}
 
 	public void onJobStatusChanged(JobStatus newStatus) {
 		switch (newStatus) {
-		case DONE:
-			loadingLbl.setIcon(null);
-			bufferSchemaTxt.setText(resourceToImport.getSourcefileid());
-			updateStatusLabel(Messages.getString("view.info.status.importDone"));
-			// If auto move is set, start move:
-			if (moveChkBox.getSelectedObjects() != null) {
-				onMoveToPublic();
-			} else {
-				moveToPublicBtn.setEnabled(true);
-			}				
-			break;
-		case ERROR:
-			loadingLbl.setIcon(null);
-			updateStatusLabel(Messages
-					.getString("view.info.status.error.importError"));
-			JOptionPane.showMessageDialog(this,
-					Messages.getString("view.info.status.error.details"),
-					Messages.getString("view.info.status.error"),
-					JOptionPane.ERROR_MESSAGE);
-			break;
-		case CANCEL:
-			loadingLbl.setIcon(null);
-			updateStatusLabel(Messages.getString("view.info.status.canceled"));
-			break;
-		default:
-			break;
+			case DONE:
+				statusLbl.setIcon(null);
+				bufferSchemaTxt.setText(resourceToImport.getSourcefileid());
+				updateStatusLabel(Messages.getString("view.info.status.importDone"));
+				// If auto move is set, start move:
+				if (moveChkBox.getSelectedObjects() != null) {
+					onMoveToPublic();
+				}
+				else {
+					moveToPublicBtn.setEnabled(true);
+				}
+				break;
+			case ERROR:
+				statusLbl.setIcon(null);
+				updateStatusLabel(Messages
+						.getString("view.info.status.error.importError"));
+				JOptionPane.showMessageDialog(this,
+						Messages.getString("view.info.status.error.details"),
+						Messages.getString("view.info.status.error"),
+						JOptionPane.ERROR_MESSAGE);
+				break;
+			case CANCEL:
+				statusLbl.setIcon(null);
+				updateStatusLabel(Messages.getString("view.info.status.canceled"));
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -319,7 +335,7 @@ public class ResourcesPanel extends JPanel {
 	 * 
 	 */
 	private void initResourceComboBox() {
-		resourcesCmbBox = new JComboBox();
+		resourcesCmbBox = new JComboBox<String>();
 		resourcesCmbBox.addItem("");
 		resourcesCmbBox.addActionListener(new ActionListener() {
 			@Override
@@ -347,42 +363,44 @@ public class ResourcesPanel extends JPanel {
 	 * Import a resource (asynchronously) using a SwingWorker.
 	 */
 	private void onImportResource() {
-		// Check there is a valid item selected 
+		// Check there is a valid item selected
 		if (resourcesCmbBox.getSelectedItem() != null) {
 			// Avoid first entry (void):
 			if (resourcesCmbBox.getSelectedIndex() > 0) {
 				String selectedResource = (String) resourcesCmbBox.getSelectedItem();
 				// Update resource to be imported based on selected item:
-				for (DwcaResourceModel resource: stepController.getResourceModelList()) {
+				for (DwcaResourceModel resource : stepController.getResourceModelList()) {
 					if (resource.getName().equalsIgnoreCase(selectedResource))
 						resourceToImport = resource;
-				}	
+				}
 				importBtn.setEnabled(false);
 				moveToPublicBtn.setEnabled(false);
 				addResourceBtn.setEnabled(false);
-				loadingLbl.setIcon(loadingImg);
-		
+				statusLbl.setIcon(loadingImg);
+
 				final SwingWorker<Void, Object> swingWorker = new SwingWorker<Void, Object>() {
 					@Override
 					public Void doInBackground() {
 						try {
 							if (resourceToImport != null) {
 								stepController.importDwcA(resourceToImport.getId());
-							} else {
+							}
+							else {
 								stepController
 										.importDwcAFromLocalFile((String) (resourcesCmbBox
 												.getSelectedItem()));
 							}
-						} catch (Exception e) {
+						}
+						catch (Exception e) {
 							// should not get there but just in case
 							e.printStackTrace();
 						}
 						// async call, propertyChange(...) will be called once done
 						return null;
 					}
-		
+
 					@Override
-					protected void done() {						
+					protected void done() {
 					}
 				};
 				swingWorker.execute();
@@ -397,7 +415,7 @@ public class ResourcesPanel extends JPanel {
 	private void onMoveToPublic() {
 		moveToPublicBtn.setEnabled(false);
 		updateStatusLabel(Messages.getString("view.info.status.moving"));
-		loadingLbl.setIcon(loadingImg);
+		statusLbl.setIcon(loadingImg);
 		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
 			@Override
 			public Boolean doInBackground() {
@@ -412,25 +430,29 @@ public class ResourcesPanel extends JPanel {
 					stepController.moveToPublicSchema(bufferSchemaTxt.getText(),
 							resourceToImport.getResource_uuid(),
 							resourceToImport.getId(), resourceToImport.getName(), publisherName, true);
-					} else {
-						stepController.moveToPublicSchema(bufferSchemaTxt.getText(),
-								resourceToImport.getResource_uuid(),
-								resourceToImport.getId(), resourceToImport.getName(), publisherName, false);
-					}
+				}
+				else {
+					stepController.moveToPublicSchema(bufferSchemaTxt.getText(),
+							resourceToImport.getResource_uuid(),
+							resourceToImport.getId(), resourceToImport.getName(), publisherName, false);
+				}
 				return true;
 			}
-			
+
 			@Override
 			protected void done() {
 				try {
 					if (get()) {
 						onMoveDone(JobStatus.DONE);
-					} else {
+					}
+					else {
 						onMoveDone(JobStatus.ERROR);
 					}
-				} catch (InterruptedException e) {
+				}
+				catch (InterruptedException e) {
 					onMoveDone(JobStatus.ERROR);
-				} catch (ExecutionException e) {
+				}
+				catch (ExecutionException e) {
 					onMoveDone(JobStatus.ERROR);
 				}
 			}
@@ -464,7 +486,7 @@ public class ResourcesPanel extends JPanel {
 	/**
 	 * Update knownCbx if the variable knownResource has changed.
 	 */
-	public void updateResourceComboBox() {
+	private void updateResourceComboBox() {
 		resourcesCmbBox.removeAllItems();
 		resourcesCmbBox.addItem(null);
 		for (DwcaResourceModel resourceModel : knownResources) {
@@ -472,15 +494,15 @@ public class ResourcesPanel extends JPanel {
 					+ resourceModel.getSourcefileid());
 		}
 	}
-	
+
 	public void onComputeUniqueValues() {
 		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
 			@Override
 			public Boolean doInBackground() {
 				// Update status:
 				computeUniqueValuesBtn.setEnabled(false);
-				loadingLbl.setIcon(loadingImg);
-				loadingLbl.setForeground(Color.ORANGE);
+				statusLbl.setIcon(loadingImg);
+				statusLbl.setForeground(Color.ORANGE);
 				updateStatusLabel(Messages.getString("view.info.status.compute.unique.values"));
 				// Call compute unique values task:
 				stepController.computeUniqueValues(null);
@@ -490,8 +512,8 @@ public class ResourcesPanel extends JPanel {
 			@Override
 			protected void done() {
 				// Update status:
-				loadingLbl.setIcon(null);
-				loadingLbl.setForeground(Color.BLUE);
+				statusLbl.setIcon(null);
+				statusLbl.setForeground(Color.BLUE);
 				updateStatusLabel(Messages.getString("view.info.status.compute.unique.values.done"));
 				computeUniqueValuesBtn.setEnabled(true);
 			}
