@@ -25,15 +25,15 @@ public class ComputeMultimediaDataTask implements ItemTaskIF{
 	//get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(ComputeMultimediaDataTask.class);
 
-	//we work with public sessionFactory but we update the buffer schema
 	@Autowired
-	@Qualifier(value="publicSessionFactory")
+	@Qualifier(value = "bufferSessionFactory")
 	private SessionFactory sessionFactory;
 
 	/**
-	 * @param @param sharedParameters SharedParameterEnum.RESOURCE_UUID required
+	 * @param sharedParameters
+	 *            SharedParameterEnum.SOURCE_FILE_ID and RESOURCE_UUID required
 	 */
-	@Transactional("publicTransactionManager")
+	@Transactional("bufferTransactionManager")
 	@Override
 	public void execute(Map<SharedParameterEnum,Object> sharedParameters){
 		String sourceFileId = (String)sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);

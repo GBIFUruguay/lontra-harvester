@@ -26,50 +26,53 @@ public class PostProcessOccurrenceTask implements ItemTaskIF {
 
 	// get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(PostProcessOccurrenceTask.class);
-	
+
 	@Autowired
-	@Qualifier(value = "publicSessionFactory")
+	@Qualifier(value = "bufferSessionFactory")
 	private SessionFactory sessionFactory;
-	
-	@Transactional("publicTransactionManager")
+
+	@Transactional("bufferTransactionManager")
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters)
 			throws TaskExecutionException {
 		String resourceName = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_NAME);
 		String publisherName = (String) sharedParameters.get(SharedParameterEnum.PUBLISHER_NAME);
 		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
-		
+
 		if (resourceName == null || sourceFileId == null) {
 			LOGGER.fatal("Misconfigured task : resourceName and sourceFileId are required.");
 			throw new TaskExecutionException("Misconfigured PostProcessOccurrenceTask");
 		}
-		
+
 		Session session = sessionFactory.getCurrentSession();
-		
+
 		try {
-			// Update resource name for this dataset's occurrence records: 
-			SQLQuery query = session.createSQLQuery("update occurrence set resourcename = ? where sourcefileid = ?;");
+			// Update resource name for this dataset's occurrence records:
+			SQLQuery query = session.createSQLQuery("update buffer.occurrence set resourcename = ? where sourcefileid = ?");
 			query.setString(0, resourceName);
 			query.setString(1, sourceFileId);
 			query.executeUpdate();
 
+			// TODO update after record_count is move to resource_metadata table
 			// Update dwca_resource record_count for this dataset:
-			query = session.createSQLQuery("update dwca_resource dr set record_count = (select count(occ.auto_id) from occurrence occ where occ.sourcefileid = dr.sourcefileid) where dr.sourcefileid = ?;");
+			query = session
+					.createSQLQuery("update dwca_resource dr set record_count = (select count(occ.auto_id) from buffer.occurrence occ where occ.sourcefileid = dr.sourcefileid) where dr.sourcefileid = ?");
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
 
 			// In case the dataset is related to a publisher in the GUI:
 			if (publisherName != null) {
 				// Update publisher name for this dataset's occurrence records:
-				query = session.createSQLQuery("update occurrence set publishername = ? where sourcefileid = ?;");
+				query = session.createSQLQuery("update buffer.occurrence set publishername = ? where sourcefileid = ?");
 				query.setString(0, publisherName);
 				query.setString(1, sourceFileId);
 				query.executeUpdate();
-		
+
 				/* Updating publisher record counts */
-			
+
 				// Get dataset's publisher pk:
-				query = session.createSQLQuery("select pu.auto_id from publisher pu inner join dwca_resource dr on (dr.publisher_fkey=pu.auto_id) where dr.sourcefileid = ? ;");
+				query = session
+						.createSQLQuery("select pu.auto_id from publisher pu inner join dwca_resource dr on (dr.publisher_fkey=pu.auto_id) where dr.sourcefileid = ?");
 				query.setString(0, sourceFileId);
 				Integer publisherFkey = (Integer)query.uniqueResult();
 				// Get record count for all the publishers' dwca_resources:
@@ -92,7 +95,7 @@ public class PostProcessOccurrenceTask implements ItemTaskIF {
 			throw new TaskExecutionException("Can't remove previous records from the database.");
 		}
 	}
-	
+
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
