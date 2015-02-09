@@ -96,7 +96,7 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 			metadata.setResource_logo_url(eml.getLogoUrl());
 			// TODO: verify what field should relate to this:
 			// C.G. : I think there is none, this is probably 'title'
-			metadata.setResource_name("");
+			//metadata.setResource_name("");
 			metadata.setResource_uuid(guid);
 			metadata.setTitle(eml.getTitle());
 

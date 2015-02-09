@@ -26,7 +26,6 @@ public class ComputeGISDataTask implements ItemTaskIF {
 	// get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(ComputeGISDataTask.class);
 
-	// we work with public sessionFactory but we update the buffer schema
 	@Autowired
 	@Qualifier(value = "bufferSessionFactory")
 	private SessionFactory sessionFactory;

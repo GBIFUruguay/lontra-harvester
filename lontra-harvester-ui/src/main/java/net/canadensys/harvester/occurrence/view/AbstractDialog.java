@@ -22,19 +22,21 @@ import net.canadensys.harvester.occurrence.controller.StepControllerIF;
  */
 public abstract class AbstractDialog extends JDialog {
 
+	private static final long serialVersionUID = -1880715071077984208L;
+
 	// UI components
 	private JPanel mainPanel;
 	protected JPanel contentPanel;
 
 	protected JButton selectBtn = null;
 	protected JButton cancelBtn = null;
-	
+
 	protected DwcaResourceModel resourceModel = null;
 	
 	protected StepControllerIF stepController;
-	
-	protected JComboBox publishersCmbBox = null;
-	
+
+	protected JComboBox<String> publishersCmbBox = null;
+
 	// initialize with CANCEL_OPTION to handle the case when the dialog is
 	// closed with the 'X'
 	protected int exitValue = JOptionPane.CANCEL_OPTION;

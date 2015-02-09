@@ -33,10 +33,10 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 
 	@Autowired
 	private ItemTaskIF recordImportTask;
-	
+
 	@Autowired
 	private ItemTaskIF postProcessOccurrenceTask;
-	
+
 	public MoveToPublicSchemaJob() {
 		sharedParameters = new HashMap<SharedParameterEnum, Object>();
 	}
@@ -47,6 +47,10 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 
 		jobStatusModel.setCurrentStatusExplanation("Compute multimedia data");
 		computeMultimediaDataTask.execute(sharedParameters);
+
+		// This task updates record counts and sets resource and publisher names in the occurrences:
+		jobStatusModel.setCurrentStatusExplanation("Update occurrence fields and record count");
+		postProcessOccurrenceTask.execute(sharedParameters);
 
 		jobStatusModel.setCurrentStatusExplanation("Replace previous records");
 		replaceOldOccurrenceTask.execute(sharedParameters);
@@ -67,7 +71,7 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 	public void setRecordImportTask(RecordImportTask recordImportTask) {
 		this.recordImportTask = recordImportTask;
 	}
-	
+
 	public void setPostProcessOccurrenceTask(PostProcessOccurrenceTask postProcessOccurrenceTask) {
 		this.postProcessOccurrenceTask = postProcessOccurrenceTask;
 	}

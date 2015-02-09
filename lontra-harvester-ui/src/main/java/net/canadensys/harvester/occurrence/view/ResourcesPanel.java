@@ -274,6 +274,11 @@ public class ResourcesPanel extends JPanel {
 		c.weighty = 1.0;
 	}
 
+	/**
+	 * Safely update the content of the status label.
+	 * 
+	 * @param status
+	 */
 	public void updateStatusLabel(final String status) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -282,16 +287,16 @@ public class ResourcesPanel extends JPanel {
 			}
 		});
 	}
-	
-	public void appendConsoleText(final String text) {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						consoleTxtArea.append(text);
-		 			}
-		 		});
-					}	
 
+	public void appendConsoleText(final String text) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				consoleTxtArea.append(text);
+			}
+		});
+	}
+	
 	public void onMoveDone(JobStatus status) {
 		statusLbl.setIcon(null);
 		if (JobStatus.DONE == status) {
@@ -404,8 +409,7 @@ public class ResourcesPanel extends JPanel {
 				String selectedResource = (String) resourcesCmbBox
 						.getSelectedItem();
 				// Update resource to be imported based on selected item:
-				for (DwcaResourceModel resource : stepController
-						.getResourceModelList()) {
+				for (DwcaResourceModel resource : stepController.getResourceModelList()) {
 					if (resource.getName().equalsIgnoreCase(selectedResource))
 						resourceToImport = resource;
 				}
@@ -421,14 +425,14 @@ public class ResourcesPanel extends JPanel {
 					public Void doInBackground() {
 						try {
 							if (resourceToImport != null) {
-								stepController.importDwcA(resourceToImport
-										.getId());
+								stepController.importDwcA(resourceToImport.getId());
 							} else {
 								stepController
 										.importDwcAFromLocalFile((String) (resourcesCmbBox
 												.getSelectedItem()));
 							}
-						} catch (Exception e) {
+						}
+						catch (Exception e) {
 							// should not get there but just in case
 							e.printStackTrace();
 						}
@@ -475,13 +479,14 @@ public class ResourcesPanel extends JPanel {
 				// Check if the indexing is supposed to process unique values or
 				// not:
 				if (uniqueValuesChkBox.getSelectedObjects() != null) {
-					stepController.moveToPublicSchema(
-							bufferSchemaTxt.getText(), resourceUuid,
-							resourceId, resourceName, publisherName, true);
-				} else {
-					stepController.moveToPublicSchema(
-							bufferSchemaTxt.getText(), resourceUuid,
-							resourceId, resourceName, publisherName, false);
+					stepController.moveToPublicSchema(bufferSchemaTxt.getText(),
+							resourceToImport.getResource_uuid(),
+							resourceToImport.getId(), resourceToImport.getName(), publisherName, true);
+				}
+				else {
+					stepController.moveToPublicSchema(bufferSchemaTxt.getText(),
+							resourceToImport.getResource_uuid(),
+							resourceToImport.getId(), resourceToImport.getName(), publisherName, false);
 				}
 				return true;
 			}
@@ -491,12 +496,15 @@ public class ResourcesPanel extends JPanel {
 				try {
 					if (get()) {
 						onMoveDone(JobStatus.DONE);
-					} else {
+					}
+					else {
 						onMoveDone(JobStatus.ERROR);
 					}
-				} catch (InterruptedException e) {
+				}
+				catch (InterruptedException e) {
 					onMoveDone(JobStatus.ERROR);
-				} catch (ExecutionException e) {
+				}
+				catch (ExecutionException e) {
 					onMoveDone(JobStatus.ERROR);
 				}
 			}
@@ -611,7 +619,7 @@ public class ResourcesPanel extends JPanel {
 	/**
 	 * Update knownCbx if the variable knownResource has changed.
 	 */
-	public void updateResourceComboBox() {
+	private void updateResourceComboBox() {
 		resourcesCmbBox.removeAllItems();
 		resourcesCmbBox.addItem(null);
 		for (DwcaResourceModel resourceModel : knownResources) {
@@ -627,8 +635,7 @@ public class ResourcesPanel extends JPanel {
 				computeUniqueValuesBtn.setEnabled(false);
 				statusLbl.setIcon(loadingImg);
 				statusLbl.setForeground(Color.ORANGE);
-				updateStatusLabel(Messages
-						.getString("view.info.status.compute.unique.values"));
+				updateStatusLabel(Messages.getString("view.info.status.compute.unique.values"));
 				// Call compute unique values task:
 				stepController.computeUniqueValues(null);
 				return true;
@@ -639,8 +646,7 @@ public class ResourcesPanel extends JPanel {
 				// Update status:
 				statusLbl.setIcon(null);
 				statusLbl.setForeground(Color.BLUE);
-				updateStatusLabel(Messages
-						.getString("view.info.status.compute.unique.values.done"));
+				updateStatusLabel(Messages.getString("view.info.status.compute.unique.values.done"));
 				computeUniqueValuesBtn.setEnabled(true);
 			}
 		};

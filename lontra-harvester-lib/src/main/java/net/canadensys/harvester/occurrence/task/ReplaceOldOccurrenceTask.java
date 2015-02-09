@@ -62,6 +62,7 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			SQLQuery query = session.createSQLQuery("DELETE FROM occurrence WHERE sourcefileid=?");
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
+
 			query = session.createSQLQuery("DELETE FROM occurrence_raw WHERE sourcefileid=?");
 			query.setString(0, sourceFileId);
 			query.executeUpdate();

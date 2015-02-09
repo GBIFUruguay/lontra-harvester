@@ -55,10 +55,10 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 		// Initialize the resources panel:
 		resourcesPanel = new ResourcesPanel(stepController);
-		
+
 		// Initialize the publishers panel:
 		publishersPanel = new PublishersPanel(stepController);
-		
+
 		// Initialize main frame:
 		harvesterFrame = new JFrame(Messages.getString("view.title"));
 		harvesterFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -66,36 +66,36 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 		// Initialize main panel:
 		mainPanel = new JPanel(new GridBagLayout());
-		
+
 		// Vertical index:
 		int lineIdx = 0;
-		
+
 		GridBagConstraints c = new GridBagConstraints();
-		
+
 		// Add header with database details to the main frame:
 		c.gridy = lineIdx++;
 		c.anchor = GridBagConstraints.NORTH;
 		c.gridwidth = 3;
 		JLabel lbl = new JLabel(Messages.getString("view.info.currentDatabase")
-		+ harvesterViewModel.getDatabaseLocation());
+				+ harvesterViewModel.getDatabaseLocation());
 		lbl.setForeground(Color.BLUE);
 		mainPanel.add(lbl, c);
-		
+
 		// Add tabbed panes to the frame in the second level of vertical alignment, right bellow database information:
 		tabbedPane = new JTabbedPane();
-		tabbedPane.setPreferredSize(new Dimension (800, 600));
+		tabbedPane.setPreferredSize(new Dimension(800, 600));
 		c.gridx = 0;
 		c.gridy = lineIdx;
 		c.anchor = GridBagConstraints.WEST;
-				
+
 		// Add all tabbed pane panels:
 		tabbedPane.add("Resources", resourcesPanel);
 		tabbedPane.add("Publishers", publishersPanel);
 		tabbedPane.add("Import Log", importLogPanel());
 		tabbedPane.add("IPT RSS Feed", RSSFeedPanel());
-				
+
 		mainPanel.add(tabbedPane, c);
-		
+
 		// Pack frame and set visible:
 		harvesterFrame.add(mainPanel);
 		harvesterFrame.pack();
@@ -151,13 +151,14 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				resourcesPanel.loadingLbl.setText(text);
+				resourcesPanel.updateStatusLabel(text);
 			}
 		});
 	}
 
 	/**
 	 * Returns a initialized panel with import log information
+	 * 
 	 * @return
 	 */
 	private JPanel importLogPanel() {
@@ -174,6 +175,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 	/**
 	 * Returns a initialized panel with IPT RSS feed information
+	 * 
 	 * @return
 	 */
 	private JPanel RSSFeedPanel() {
@@ -186,19 +188,19 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		List<IPTFeedModel> importLogModelList = stepController.getIPTFeed();
 		return new RSSFeedPanel(headers, importLogModelList);
 	}
-	
+
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (JobStatusModel.CURRENT_STATUS_EXPLANATION_PROPERTY.equals(evt
 				.getPropertyName())) {
 			resourcesPanel.appendConsoleText(">" + (String) evt.getNewValue() + END_LINE);
-		} else if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt
-				.getPropertyName())) {
+		} else if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt.getPropertyName())) {
 			resourcesPanel.appendConsoleText("STATUS:" + evt.getNewValue() + END_LINE);
 			resourcesPanel.onJobStatusChanged((JobStatus) evt.getNewValue());
-		} else if (JobStatusModel.CURRENT_JOB_PROGRESS_PROPERTY.equals(evt
+		}
+		else if (JobStatusModel.CURRENT_JOB_PROGRESS_PROPERTY.equals(evt
 				.getPropertyName())) {
 			updateProgressText((String) evt.getNewValue());
 		}
-	}	
+	}
 }
