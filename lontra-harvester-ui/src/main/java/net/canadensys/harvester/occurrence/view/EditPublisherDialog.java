@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author canadensys
  * 
  */
-public class AddPublisherDialog extends AbstractDialog {
+public class EditPublisherDialog extends AbstractDialog {
 
 	private static final long serialVersionUID = 1188349656123737L;
 
@@ -43,8 +43,9 @@ public class AddPublisherDialog extends AbstractDialog {
 	private JTextField latTxt;
 	private JTextField longTxt;
 	
-	public AddPublisherDialog(Component parent) {
+	public EditPublisherDialog(Component parent, PublisherModel publisherToEdit) {
 		super(Messages.getString("publisherView.title"), null, null);
+		this.publisherModel = publisherToEdit;
 		setLocationRelativeTo(parent);
 	}
 
@@ -224,14 +225,27 @@ public class AddPublisherDialog extends AbstractDialog {
 	 * @return updated publisherModel or null if publisherModel in parameter was
 	 *         null
 	 */
-	public PublisherModel displayPublisher(PublisherModel publisherModel) {
-		this.publisherModel = publisherModel;
-
+	public PublisherModel displayPublisher() {
 		if (publisherModel != null) {
 			if (publisherModel.getAuto_id() != null) {
-				// TODO
+				nameTxt.setText(publisherModel.getName());
+				nameTxt.setEditable(false);
+				descriptionTxtArea.setText(publisherModel.getDescription());
+				addressTxt.setText(publisherModel.getAddress());
+				cityTxt.setText(publisherModel.getCity());
+				admAreaTxt.setText(publisherModel.getAdministrative_area());
+				postalCodeTxt.setText(publisherModel.getPostal_code());
+				homepageTxt.setText(publisherModel.getHomepage());
+				emailTxt.setText(publisherModel.getEmail());
+				phoneTxt.setText(publisherModel.getPhone());
+				logoUrlTxt.setText(publisherModel.getLogo_url());
+				Double latitude = publisherModel.getDecimallatitude();
+				if (latitude != null)
+					latTxt.setText(latitude.toString());
+				Double wingLongitude = publisherModel.getDecimallongitude();
+				if (wingLongitude != null)
+					longTxt.setText(wingLongitude.toString());
 			}
-			nameTxt.setText(publisherModel.getName());
 			// modal dialog, blocking function until dispose() is called
 			setVisible(true);
 		}
@@ -292,10 +306,7 @@ public class AddPublisherDialog extends AbstractDialog {
 					decimalLongitude = 0.0d;
 				}
 				publisherModel.setDecimallongitude(decimalLongitude);
-			}
-			// This is the first time, default counts to 0 records.
-			publisherModel.setRecord_count(0);
-			
+			}			
 			exitValue = JOptionPane.OK_OPTION;
 			// Dispose of dialog
 			dispose();

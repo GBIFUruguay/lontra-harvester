@@ -34,7 +34,7 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 	@Autowired
 	private ItemTaskIF recordImportTask;
 	
-	@Autowired 
+	@Autowired
 	private ItemTaskIF postProcessOccurrenceTask;
 	
 	public MoveToPublicSchemaJob() {
@@ -54,10 +54,6 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 		// log the import event
 		jobStatusModel.setCurrentStatusExplanation("Log import event");
 		recordImportTask.execute(sharedParameters);
-		
-		// This task updates record counts and sets resource and publisher names in the occurrences:
-		jobStatusModel.setCurrentStatusExplanation("Update occurrence fields and record count");
-		postProcessOccurrenceTask.execute(sharedParameters);
 	}
 
 	public void setComputeGISDataTask(ComputeGISDataTask computeGISDataTask) {

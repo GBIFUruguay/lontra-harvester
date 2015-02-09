@@ -82,10 +82,4 @@ public class CleanBufferTableTask implements ItemTaskIF {
 	public String getTitle() {
 		return "Cleaning buffer tables";
 	}
-
-	// @Transactional("bufferTransactionManager")
-	// @Override
-	// public void accept(JobActionVisitor visitor) {
-	// visitor.visit(this);
-	// }
 }

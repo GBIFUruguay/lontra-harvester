@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -43,6 +44,7 @@ public class PublishersPanel extends JPanel {
 	private StepControllerIF stepController;
 
 	public JButton addPublisherBtn = null;
+	public JButton editPublisherBtn = null;
 	public JTable publishersList = null;
 	public JTable resourcesList = null;
 	DefaultTableModel publishersTableModel = null;
@@ -73,7 +75,7 @@ public class PublishersPanel extends JPanel {
 		// Define padding:
 		c.insets = new Insets(5, 5, 5, 5);
 		// Define grid width:
-		c.gridwidth = 3;
+		c.gridwidth = 4;
 		c.gridx = 0;
 		c.gridy = lineIdx++;
 		c.anchor = GridBagConstraints.NORTHWEST;
@@ -83,11 +85,28 @@ public class PublishersPanel extends JPanel {
 		c.gridy = lineIdx++;
 		initPublishersTable();
 		this.add(new JScrollPane(publishersList), c);
-				
-		// Add publisher button:
+
+		// Edit publisher button:
 		c.gridx = 2;
 		c.gridy = lineIdx++;
-		c.anchor = GridBagConstraints.EAST;
+		c.gridwidth = 1;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.NORTHEAST;
+		editPublisherBtn = new JButton(Messages.getString("view.button.edit.publisher"));
+		editPublisherBtn.setToolTipText(Messages.getString("view.button.edit.publisher.tooltip"));
+		editPublisherBtn.setEnabled(true);
+		editPublisherBtn.setVisible(true);
+		editPublisherBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onEditPublisher();
+			}
+		});
+		this.add(editPublisherBtn, c);
+		
+		// Add publisher button:
+		c.gridx = 3;
+		c.gridwidth = 1;
 		addPublisherBtn = new JButton(Messages.getString("view.button.add.publisher"));
 		addPublisherBtn.setToolTipText(Messages.getString("view.button.add.publisher.tooltip"));
 		addPublisherBtn.setEnabled(true);
@@ -99,10 +118,13 @@ public class PublishersPanel extends JPanel {
 			}
 		});
 		this.add(addPublisherBtn, c);
-		
+
 		// Resources label:
+		c.gridwidth = 4;
+		c.gridx = 0;
 		c.gridy = lineIdx++;
 		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add(new JLabel(Messages.getString("view.info.publishers.resources")), c);
 
 		
@@ -175,8 +197,8 @@ public class PublishersPanel extends JPanel {
 				@Override
 				public Dimension getPreferredScrollableViewportSize() 
 				{
-				    int width = 750;
-				    int height = 200;
+				    int width = 700;
+				    int height = 150;
 				    return new Dimension(width, height);
 				}
 			};
@@ -229,7 +251,59 @@ public class PublishersPanel extends JPanel {
 		}
 	}
 
-
+	/**
+	 * Add publisher button action, triggers parallel execution of tasks, releasing GUI interface.
+    */
+	private void onEditPublisher() {
+		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
+			@Override
+			public Boolean doInBackground() {
+				addPublisherBtn.setEnabled(false);
+				editPublisher();
+				return true;
+			}
+			
+			@Override
+			public void done() {
+				// Only if the name has changed
+				addPublisherBtn.setEnabled(true);
+			}
+		};
+		swingWorker.execute();
+	}
+	
+	private void  editPublisher() {
+		// Get publisher from selected item in publisher table:
+		// Ensure there is a selected publisher:
+		PublisherModel publisherToEdit = null;
+		if (publishersList.getSelectedRow() != -1) {
+			int id = Integer.parseInt((String) publishersList.getValueAt(publishersList.getSelectedRow(), 0));
+			for (PublisherModel publisher: publishers) {
+				if (publisher.getAuto_id() == id) {
+					publisherToEdit = publisher;
+					break;
+				}
+			}
+			EditPublisherDialog epd = new EditPublisherDialog(this, publisherToEdit);
+			epd.displayPublisher();
+			// Case the user hit OK:
+			if (epd.getExitValue() == JOptionPane.OK_OPTION) {
+				// Save or upload publisher:
+				if (!stepController.updatePublisherModel(publisherToEdit)) {
+					JOptionPane.showMessageDialog(this, Messages.getString("publisherView.publisher.error.update.msg"),
+							Messages.getString("publisherView.publisher.error.title"), JOptionPane.ERROR_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(this, Messages.getString("publisherView.publisher.success.update.msg"),
+							Messages.getString("publisherView.publisher.success.title"), JOptionPane.INFORMATION_MESSAGE);
+				}
+				// reload data to ensure we have the latest changes:
+				publishers = stepController.getPublisherModelList();
+				// refresh publisher table to display new publisher:
+				updatePublishersTable();				
+			}
+		}
+	}
+	
 	/**
 	 * Rebuild the publishers' table if the list of available publishers is changed.
 	 */
@@ -249,7 +323,7 @@ public class PublishersPanel extends JPanel {
 		
 		// Set preferred column sizes:
 		publishersList.getColumnModel().getColumn(0).setPreferredWidth(30);
-		publishersList.getColumnModel().getColumn(1).setPreferredWidth(620);
+		publishersList.getColumnModel().getColumn(1).setPreferredWidth(570);
 		publishersList.getColumnModel().getColumn(2).setPreferredWidth(100);
 		
 		// Center string contents for columns id and record count:
@@ -298,8 +372,8 @@ public class PublishersPanel extends JPanel {
 				@Override
 				public Dimension getPreferredScrollableViewportSize() 
 				{
-				    int width = 750;
-				    int height = 200;
+				    int width = 700;
+				    int height = 150;
 				    return new Dimension(width, height);
 				}
 			};
@@ -338,7 +412,7 @@ public class PublishersPanel extends JPanel {
 		
 		// Set preferred column sizes:
 		resourcesList.getColumnModel().getColumn(0).setPreferredWidth(30);
-		resourcesList.getColumnModel().getColumn(1).setPreferredWidth(620);
+		resourcesList.getColumnModel().getColumn(1).setPreferredWidth(570);
 		resourcesList.getColumnModel().getColumn(2).setPreferredWidth(100);
 		
 		// Center string contents for columns id and record count:

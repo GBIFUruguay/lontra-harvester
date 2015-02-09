@@ -28,13 +28,13 @@ public class ComputeGISDataTask implements ItemTaskIF {
 
 	// we work with public sessionFactory but we update the buffer schema
 	@Autowired
-	@Qualifier(value = "publicSessionFactory")
+	@Qualifier(value = "bufferSessionFactory")
 	private SessionFactory sessionFactory;
 
 	/**
 	 * @param @param sharedParameters SharedParameterEnum.SOURCE_FILE_ID required
 	 */
-	@Transactional("publicTransactionManager")
+	@Transactional("bufferTransactionManager")
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
 		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);

@@ -19,6 +19,7 @@ import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
+import net.canadensys.harvester.occurrence.job.UpdateJob;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
@@ -68,6 +69,9 @@ public class StepController implements StepControllerIF {
 
 	@Autowired
 	private MoveToPublicSchemaJob moveToPublicSchemaJob;
+	
+	@Autowired
+	private UpdateJob updateJob;
 
 	@Autowired
 	private ComputeUniqueValueJob computeUniqueValueJob;
@@ -129,12 +133,26 @@ public class StepController implements StepControllerIF {
 		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.PUBLISHER_NAME, publisherName);
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		harvesterViewModel.encapsulateJobStatus(jobStatusModel);
-
 		moveToPublicSchemaJob.doJob(jobStatusModel);
 		currentJob = moveToPublicSchemaJob;
 		if (computeUniqueValues) {
 			computeUniqueValues(jobStatusModel);
 		}
+	}
+	
+	/**
+	 * Updates database after indexing or record changes.
+	 */
+	@Override
+	@Transactional("bufferTransactionManager")
+	public void updateStep(String resourceUuid, String resourceName, String publisherName) {
+		updateJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, resourceUuid);
+		updateJob.addToSharedParameters(SharedParameterEnum.RESOURCE_NAME, resourceName);
+		updateJob.addToSharedParameters(SharedParameterEnum.PUBLISHER_NAME, publisherName);
+		JobStatusModel jobStatusModel = new JobStatusModel();
+		harvesterViewModel.encapsulateJobStatus(jobStatusModel);
+		updateJob.doJob(jobStatusModel);
+		currentJob = updateJob;
 	}
 
 	@Override

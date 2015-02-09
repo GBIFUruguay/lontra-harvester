@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  */
 public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
-	private String END_LINE = System.getProperty("line.separator");
+	private final String END_LINE = System.getProperty("line.separator");
 	private JFrame harvesterFrame = null;
 	private JTabbedPane tabbedPane = null;
 	private JPanel mainPanel = null;
@@ -117,18 +117,9 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		List<DwcaResourceModel> outdatedResources = stepController
 				.getResourceToHarvest();
 		for (DwcaResourceModel currResourceModel : outdatedResources) {
-			appendToTextArea(Messages.getString("view.info.harvestRequired")
+			resourcesPanel.appendConsoleText(Messages.getString("view.info.harvestRequired")
 					+ currResourceModel.getSourcefileid() + "\n");
 		}
-	}
-	
-	private void appendToTextArea(final String text) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				resourcesPanel.statuxTxtArea.append(text);
-			}
-		});
 	}
 
 	/**
@@ -138,12 +129,12 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		OutputStream out = new OutputStream() {
 			@Override
 			public void write(int b) throws IOException {
-				appendToTextArea(String.valueOf((char) b));
+				resourcesPanel.appendConsoleText(String.valueOf((char) b));
 			}
 
 			@Override
 			public void write(byte[] b, int off, int len) throws IOException {
-				appendToTextArea(new String(b, off, len));
+				resourcesPanel.appendConsoleText(new String(b, off, len));
 			}
 
 			@Override
@@ -200,10 +191,10 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (JobStatusModel.CURRENT_STATUS_EXPLANATION_PROPERTY.equals(evt
 				.getPropertyName())) {
-			appendToTextArea(">" + (String) evt.getNewValue() + END_LINE);
+			resourcesPanel.appendConsoleText(">" + (String) evt.getNewValue() + END_LINE);
 		} else if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt
 				.getPropertyName())) {
-			appendToTextArea("STATUS:" + evt.getNewValue() + END_LINE);
+			resourcesPanel.appendConsoleText("STATUS:" + evt.getNewValue() + END_LINE);
 			resourcesPanel.onJobStatusChanged((JobStatus) evt.getNewValue());
 		} else if (JobStatusModel.CURRENT_JOB_PROGRESS_PROPERTY.equals(evt
 				.getPropertyName())) {
