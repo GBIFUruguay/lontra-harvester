@@ -11,6 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 
 /**
@@ -30,6 +31,8 @@ public abstract class AbstractDialog extends JDialog {
 	protected JButton selectBtn = null;
 	protected JButton cancelBtn = null;
 
+	protected DwcaResourceModel resourceModel = null;
+	
 	protected StepControllerIF stepController;
 
 	protected JComboBox<String> publishersCmbBox = null;
@@ -37,10 +40,11 @@ public abstract class AbstractDialog extends JDialog {
 	// initialize with CANCEL_OPTION to handle the case when the dialog is
 	// closed with the 'X'
 	protected int exitValue = JOptionPane.CANCEL_OPTION;
-
-	public AbstractDialog(String title, StepControllerIF stpCtl) {
+	
+	public AbstractDialog(String title, StepControllerIF stpCtl, DwcaResourceModel resourceModel) {
 		// Set stepController:
 		this.stepController = stpCtl;
+		this.resourceModel = resourceModel;
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		this.setTitle(title);
 		this.setModal(true);

@@ -194,9 +194,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		if (JobStatusModel.CURRENT_STATUS_EXPLANATION_PROPERTY.equals(evt
 				.getPropertyName())) {
 			resourcesPanel.appendConsoleText(">" + (String) evt.getNewValue() + END_LINE);
-		}
-		else if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt
-				.getPropertyName())) {
+		} else if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt.getPropertyName())) {
 			resourcesPanel.appendConsoleText("STATUS:" + evt.getNewValue() + END_LINE);
 			resourcesPanel.onJobStatusChanged((JobStatus) evt.getNewValue());
 		}

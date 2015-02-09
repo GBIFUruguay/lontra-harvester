@@ -23,11 +23,10 @@ import org.apache.commons.lang3.StringUtils;
  * @author canadensys, Pedro Guimarães
  * 
  */
-public class AddResourceDialog extends AbstractDialog {
+public class EditResourceDialog extends AbstractDialog {
 
 	private static final long serialVersionUID = 672869826178689726L;
 
-	private DwcaResourceModel resourceModel = null;
 	private static final int TXT_FIELD_LENGTH = 50;
 
 	private JLabel idLbl;
@@ -38,9 +37,10 @@ public class AddResourceDialog extends AbstractDialog {
 	private JTextField sfIdTxt;
 	private JTextField resourceUuidTxt;
 
-	public AddResourceDialog(Component parent, StepControllerIF stepController) {
-		super(Messages.getString("resourceView.title"), stepController, null);
+	public EditResourceDialog(Component parent, StepControllerIF stepController, DwcaResourceModel selectedResource) {
+		super(Messages.getString("resourceView.title"), stepController, selectedResource);
 		setLocationRelativeTo(parent);
+		displayResource();
 	}
 
 	@Override
@@ -117,6 +117,7 @@ public class AddResourceDialog extends AbstractDialog {
 		c.gridy = 3;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		sfIdTxt = new JTextField(TXT_FIELD_LENGTH);
+		sfIdTxt.setEditable(false);
 		contentPanel.add(sfIdTxt, c);
 		
 		/* Resource UUID */
@@ -134,6 +135,7 @@ public class AddResourceDialog extends AbstractDialog {
 		c.gridy = 4;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		resourceUuidTxt = new JTextField(TXT_FIELD_LENGTH);
+		resourceUuidTxt.setEditable(false);
 		contentPanel.add(resourceUuidTxt, c);
 
 		/* Init publishers combo box and add it to the dialog */
@@ -154,25 +156,14 @@ public class AddResourceDialog extends AbstractDialog {
 	 * @return updated ResourceModel or null if resourceModel in parameter was
 	 *         null
 	 */
-	public DwcaResourceModel displayResource(DwcaResourceModel resourceModel) {
-		this.resourceModel = resourceModel;
-
+	public void displayResource() {
 		if (resourceModel != null) {
-			if (resourceModel.getId() != null) {
-				idValueLbl.setText(resourceModel.getId().toString());
-				idLbl.setVisible(true);
-				idValueLbl.setVisible(true);
-			}
-
 			nameTxt.setText(resourceModel.getName());
 			urlTxt.setText(resourceModel.getArchive_url());
 			sfIdTxt.setText(resourceModel.getSourcefileid());
-			// TODO test that URL is reachable
-
-			// modal dialog, blocking function until dispose() is called
+			resourceUuidTxt.setText((resourceModel.getResource_uuid()));
 			setVisible(true);
 		}
-		return resourceModel;
 	}
 
 	/**
@@ -192,12 +183,8 @@ public class AddResourceDialog extends AbstractDialog {
 			resourceModel.setSourcefileid(sourceFileIdValue);
 			resourceModel.setResource_uuid(resourceUuid);
 			// Check if it has been set a valid publisher:
-			
 			if (!publisherName.equalsIgnoreCase(""))
 				resourceModel.setPublisher(getPublisherFromName(publisherName));
-				
-			// Set record_count to 0 by default:
-			resourceModel.setRecord_count(0);
 			exitValue = JOptionPane.OK_OPTION;
 			dispose();
 		}
@@ -235,6 +222,7 @@ public class AddResourceDialog extends AbstractDialog {
 		for (PublisherModel publisher: publishers) {
 			publishersCmbBox.addItem(publisher.getName());
 		}
+		publishersCmbBox.setSelectedItem(resourceModel.getPublisher().getName());
 	}
 	
 	/**
@@ -252,5 +240,9 @@ public class AddResourceDialog extends AbstractDialog {
 			}
 		}
 		return publisher;
+	}
+	
+	public DwcaResourceModel getResourceModel() {
+		return this.resourceModel;
 	}
 }

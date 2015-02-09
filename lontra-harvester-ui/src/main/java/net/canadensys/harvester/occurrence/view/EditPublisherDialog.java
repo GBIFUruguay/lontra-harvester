@@ -2,6 +2,7 @@ package net.canadensys.harvester.occurrence.view;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
@@ -22,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author canadensys
  * 
  */
-public class AddPublisherDialog extends AbstractDialog {
+public class EditPublisherDialog extends AbstractDialog {
 
 	private static final long serialVersionUID = 1188349656123737L;
 
@@ -41,9 +42,10 @@ public class AddPublisherDialog extends AbstractDialog {
 	private JTextField logoUrlTxt;
 	private JTextField latTxt;
 	private JTextField longTxt;
-
-	public AddPublisherDialog(Component parent) {
+	
+	public EditPublisherDialog(Component parent, PublisherModel publisherToEdit) {
 		super(Messages.getString("publisherView.title"), null, null);
+		this.publisherModel = publisherToEdit;
 		setLocationRelativeTo(parent);
 	}
 
@@ -85,7 +87,7 @@ public class AddPublisherDialog extends AbstractDialog {
 		descriptionTxtArea.setWrapStyleWord(true);
 		contentPanel.add(new JScrollPane(descriptionTxtArea), c);
 
-		/* Address */
+		/* Address */ 
 		label = new JLabel(Messages.getString("publisherView.publisher.address"));
 		label.setToolTipText(Messages.getString("publisherView.publisher.address.tooltip"));
 		c.gridx = 0;
@@ -94,10 +96,10 @@ public class AddPublisherDialog extends AbstractDialog {
 		contentPanel.add(label, c);
 
 		c.gridx = 2;
-		c.gridy = ++yIndex;
+		c.gridy = ++yIndex;;
 		addressTxt = new JTextField(TXT_FIELD_LENGTH);
 		contentPanel.add(addressTxt, c);
-
+		
 		/* City */
 		label = new JLabel(Messages.getString("publisherView.publisher.city"));
 		label.setToolTipText(Messages.getString("publisherView.publisher.city.tooltip"));
@@ -106,10 +108,10 @@ public class AddPublisherDialog extends AbstractDialog {
 		contentPanel.add(label, c);
 
 		c.gridx = 2;
-		c.gridy = ++yIndex;
+		c.gridy = ++yIndex;;
 		cityTxt = new JTextField(TXT_FIELD_LENGTH);
 		contentPanel.add(cityTxt, c);
-
+		
 		/* Adm. area */
 		label = new JLabel(Messages.getString("publisherView.publisher.adm.area"));
 		label.setToolTipText(Messages.getString("publisherView.publisher.adm.area.tooltip"));
@@ -118,10 +120,10 @@ public class AddPublisherDialog extends AbstractDialog {
 		contentPanel.add(label, c);
 
 		c.gridx = 2;
-		c.gridy = ++yIndex;
+		c.gridy = ++yIndex;;
 		admAreaTxt = new JTextField(TXT_FIELD_LENGTH);
 		contentPanel.add(admAreaTxt, c);
-
+		
 		/* Postal Code */
 		label = new JLabel(Messages.getString("publisherView.publisher.postal.code"));
 		label.setToolTipText(Messages.getString("publisherView.publisher.postal.code.tooltip"));
@@ -130,10 +132,10 @@ public class AddPublisherDialog extends AbstractDialog {
 		contentPanel.add(label, c);
 
 		c.gridx = 2;
-		c.gridy = ++yIndex;
+		c.gridy = ++yIndex;;
 		postalCodeTxt = new JTextField(TXT_FIELD_LENGTH);
 		contentPanel.add(postalCodeTxt, c);
-
+		
 		/* Homepage */
 		label = new JLabel(Messages.getString("publisherView.publisher.homepage"));
 		label.setToolTipText(Messages.getString("publisherView.publisher.homepage.tooltip"));
@@ -142,10 +144,10 @@ public class AddPublisherDialog extends AbstractDialog {
 		contentPanel.add(label, c);
 
 		c.gridx = 2;
-		c.gridy = ++yIndex;
+		c.gridy = ++yIndex;;
 		homepageTxt = new JTextField(TXT_FIELD_LENGTH);
 		contentPanel.add(homepageTxt, c);
-
+		
 		/* Email */
 		label = new JLabel(Messages.getString("publisherView.publisher.email"));
 		label.setToolTipText(Messages.getString("publisherView.publisher.email.tooltip"));
@@ -154,10 +156,10 @@ public class AddPublisherDialog extends AbstractDialog {
 		contentPanel.add(label, c);
 
 		c.gridx = 2;
-		c.gridy = ++yIndex;
+		c.gridy = ++yIndex;;
 		emailTxt = new JTextField(TXT_FIELD_LENGTH);
 		contentPanel.add(emailTxt, c);
-
+		
 		/* Phone */
 		label = new JLabel(Messages.getString("publisherView.publisher.phone"));
 		label.setToolTipText(Messages.getString("publisherView.publisher.phone.tooltip"));
@@ -166,10 +168,10 @@ public class AddPublisherDialog extends AbstractDialog {
 		contentPanel.add(label, c);
 
 		c.gridx = 2;
-		c.gridy = ++yIndex;
+		c.gridy = ++yIndex;;
 		phoneTxt = new JTextField(TXT_FIELD_LENGTH);
 		contentPanel.add(phoneTxt, c);
-
+		
 		/* Logo url */
 		label = new JLabel(Messages.getString("publisherView.publisher.logo.url"));
 		label.setToolTipText(Messages.getString("publisherView.publisher.logo.url.tooltip"));
@@ -178,10 +180,10 @@ public class AddPublisherDialog extends AbstractDialog {
 		contentPanel.add(label, c);
 
 		c.gridx = 2;
-		c.gridy = ++yIndex;
+		c.gridy = ++yIndex;;
 		logoUrlTxt = new JTextField(TXT_FIELD_LENGTH);
 		contentPanel.add(logoUrlTxt, c);
-
+		
 		/* Latitude */
 		label = new JLabel(Messages.getString("publisherView.publisher.lat"));
 		label.setToolTipText(Messages.getString("publisherView.publisher.lat.tooltip"));
@@ -190,11 +192,10 @@ public class AddPublisherDialog extends AbstractDialog {
 		contentPanel.add(label, c);
 
 		c.gridx = 2;
-		c.gridy = ++yIndex;
-		;
+		c.gridy = ++yIndex;;
 		latTxt = new JTextField(TXT_FIELD_LENGTH);
 		contentPanel.add(latTxt, c);
-
+		
 		/* Longitude */
 		label = new JLabel(Messages.getString("publisherView.publisher.long"));
 		label.setToolTipText(Messages.getString("publisherView.publisher.long.tooltip"));
@@ -203,10 +204,10 @@ public class AddPublisherDialog extends AbstractDialog {
 		contentPanel.add(label, c);
 
 		c.gridx = 2;
-		c.gridy = ++yIndex;
+		c.gridy = ++yIndex;;
 		longTxt = new JTextField(TXT_FIELD_LENGTH);
 		contentPanel.add(longTxt, c);
-
+		
 		/* Longitude */
 		label = new JLabel(Messages.getString("publisherView.publisher.mandatory"));
 		label.setForeground(Color.RED);
@@ -224,14 +225,27 @@ public class AddPublisherDialog extends AbstractDialog {
 	 * @return updated publisherModel or null if publisherModel in parameter was
 	 *         null
 	 */
-	public PublisherModel displayPublisher(PublisherModel publisherModel) {
-		this.publisherModel = publisherModel;
-
+	public PublisherModel displayPublisher() {
 		if (publisherModel != null) {
 			if (publisherModel.getAuto_id() != null) {
-				// TODO
+				nameTxt.setText(publisherModel.getName());
+				nameTxt.setEditable(false);
+				descriptionTxtArea.setText(publisherModel.getDescription());
+				addressTxt.setText(publisherModel.getAddress());
+				cityTxt.setText(publisherModel.getCity());
+				admAreaTxt.setText(publisherModel.getAdministrative_area());
+				postalCodeTxt.setText(publisherModel.getPostal_code());
+				homepageTxt.setText(publisherModel.getHomepage());
+				emailTxt.setText(publisherModel.getEmail());
+				phoneTxt.setText(publisherModel.getPhone());
+				logoUrlTxt.setText(publisherModel.getLogo_url());
+				Double latitude = publisherModel.getDecimallatitude();
+				if (latitude != null)
+					latTxt.setText(latitude.toString());
+				Double wingLongitude = publisherModel.getDecimallongitude();
+				if (wingLongitude != null)
+					longTxt.setText(wingLongitude.toString());
 			}
-			nameTxt.setText(publisherModel.getName());
 			// modal dialog, blocking function until dispose() is called
 			setVisible(true);
 		}
@@ -253,8 +267,7 @@ public class AddPublisherDialog extends AbstractDialog {
 		String lat = latTxt.getText();
 		String lon = longTxt.getText();
 		// Check for mandatory fields:
-		if (StringUtils.isNotBlank(name) && StringUtils.isNotBlank(description) && StringUtils.isNotBlank(homepage) && StringUtils.isNotBlank(email)
-				&& StringUtils.isNotBlank(logoUrl)) {
+		if (StringUtils.isNotBlank(name) && StringUtils.isNotBlank(description) && StringUtils.isNotBlank(homepage) && StringUtils.isNotBlank(email) && StringUtils.isNotBlank(logoUrl)) {
 			publisherModel.setName(name);
 			publisherModel.setDescription(description);
 			publisherModel.setHomepage(homepage);
@@ -276,10 +289,9 @@ public class AddPublisherDialog extends AbstractDialog {
 				Double decimalLatitude = 0.0d;
 				try {
 					decimalLatitude = Double.parseDouble(lat);
-				}
-				catch (NumberFormatException n) {
+				} catch (NumberFormatException n) {
 					JOptionPane.showMessageDialog(this, n.getMessage(),
-							Messages.getString("publisherView.publisher.error.title"), JOptionPane.ERROR_MESSAGE);
+									Messages.getString("publisherView.publisher.error.title"), JOptionPane.ERROR_MESSAGE);		
 					decimalLatitude = 0.0d;
 				}
 				publisherModel.setDecimallatitude(decimalLatitude);
@@ -288,17 +300,13 @@ public class AddPublisherDialog extends AbstractDialog {
 				Double decimalLongitude = 0.0d;
 				try {
 					decimalLongitude = Double.parseDouble(lon);
-				}
-				catch (NumberFormatException n) {
+				} catch (NumberFormatException n) {
 					JOptionPane.showMessageDialog(this, n.getMessage(),
-							Messages.getString("publisherView.publisher.error.title"), JOptionPane.ERROR_MESSAGE);
+									Messages.getString("publisherView.publisher.error.title"), JOptionPane.ERROR_MESSAGE);		
 					decimalLongitude = 0.0d;
 				}
 				publisherModel.setDecimallongitude(decimalLongitude);
-			}
-			// This is the first time, default counts to 0 records.
-			publisherModel.setRecord_count(0);
-
+			}			
 			exitValue = JOptionPane.OK_OPTION;
 			// Dispose of dialog
 			dispose();

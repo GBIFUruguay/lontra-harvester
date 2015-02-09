@@ -43,6 +43,7 @@ public class ResourcesPanel extends JPanel {
 	private JButton importBtn = null;
 	private JButton moveToPublicBtn = null;
 	private JButton addResourceBtn = null;
+	private JButton editResourceBtn = null;
 	private JButton computeUniqueValuesBtn = null;
 	private JLabel statusLbl = null;
 	private JTextField bufferSchemaTxt = null;
@@ -87,10 +88,10 @@ public class ResourcesPanel extends JPanel {
 		this.add(resourcesCmbBox, c);
 
 		// Import button:
-		c.gridx = 3;
+		c.gridx = 1;
 		c.gridy = ++lineIdx;
 		c.gridwidth = 1;
-		c.fill = GridBagConstraints.NONE;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.NORTHEAST;
 		importBtn = new JButton(Messages.getString("view.button.import"));
 		importBtn.setToolTipText(Messages
@@ -105,8 +106,24 @@ public class ResourcesPanel extends JPanel {
 		});
 		this.add(importBtn, c);
 
+		// View/edit resource button:
+		c.gridx = 2;
+		editResourceBtn = new JButton(
+				Messages.getString("view.button.edit.resource"));
+		editResourceBtn.setToolTipText(Messages
+				.getString("view.button.edit.resource.tooltip"));
+		editResourceBtn.setEnabled(true);
+		editResourceBtn.setVisible(true);
+		editResourceBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onEditResource();
+			}
+		});
+		this.add(editResourceBtn, c);
+
 		// Add resource button:
-		c.gridy = ++lineIdx;
+		// c.gridy = ++lineIdx;
 		c.gridx = 3;
 		addResourceBtn = new JButton(
 				Messages.getString("view.button.add.resource"));
@@ -164,7 +181,8 @@ public class ResourcesPanel extends JPanel {
 		this.add(moveToPublicBtn, c);
 
 		// Compute unique values to public schema button:
-		computeUniqueValuesBtn = new JButton(Messages.getString("view.button.compute.unique.values"));
+		computeUniqueValuesBtn = new JButton(
+				Messages.getString("view.button.compute.unique.values"));
 		computeUniqueValuesBtn.setToolTipText(Messages
 				.getString("view.button.compute.unique.values.tooltip"));
 		computeUniqueValuesBtn.setEnabled(true);
@@ -184,7 +202,8 @@ public class ResourcesPanel extends JPanel {
 		// Auto move checkbox:
 		moveChkBox = new JCheckBox();
 		moveChkBox.setText(Messages.getString("view.button.automove"));
-		moveChkBox.setToolTipText(Messages.getString("view.button.automove.tip"));
+		moveChkBox.setToolTipText(Messages
+				.getString("view.button.automove.tip"));
 		moveChkBox.setEnabled(true);
 		c.gridwidth = 1;
 		c.gridy = ++lineIdx;
@@ -194,8 +213,10 @@ public class ResourcesPanel extends JPanel {
 
 		// Compute unique values checkbox:
 		uniqueValuesChkBox = new JCheckBox();
-		uniqueValuesChkBox.setText(Messages.getString("view.button.unique.values"));
-		uniqueValuesChkBox.setToolTipText(Messages.getString("view.button.unique.values.tip"));
+		uniqueValuesChkBox.setText(Messages
+				.getString("view.button.unique.values"));
+		uniqueValuesChkBox.setToolTipText(Messages
+				.getString("view.button.unique.values.tip"));
 		uniqueValuesChkBox.setEnabled(true);
 		c.gridy = ++lineIdx;
 		this.add(uniqueValuesChkBox, c);
@@ -275,7 +296,7 @@ public class ResourcesPanel extends JPanel {
 			}
 		});
 	}
-
+	
 	public void onMoveDone(JobStatus status) {
 		statusLbl.setIcon(null);
 		if (JobStatus.DONE == status) {
@@ -286,8 +307,7 @@ public class ResourcesPanel extends JPanel {
 			bufferSchemaTxt.setText("");
 			statusLbl.setText(Messages.getString("view.info.status.moveDone"));
 			statusLbl.setForeground(Color.BLUE);
-		}
-		else {
+		} else {
 			JOptionPane.showMessageDialog(this,
 					Messages.getString("view.info.status.error.details"),
 					Messages.getString("view.info.status.error"),
@@ -296,36 +316,55 @@ public class ResourcesPanel extends JPanel {
 					.getString("view.info.status.error.moveError"));
 		}
 	}
+	
+	public void onUpdateDone(JobStatus status) {
+		statusLbl.setIcon(null);
+		if (JobStatus.DONE == status) {
+			JOptionPane.showMessageDialog(this,
+					Messages.getString("view.info.status.updateDone"),
+					Messages.getString("view.info.status.info"),
+					JOptionPane.INFORMATION_MESSAGE);
+			bufferSchemaTxt.setText("");
+			statusLbl.setText(Messages.getString("view.info.status.updateDone"));
+			statusLbl.setForeground(Color.BLUE);
+		} else {
+			JOptionPane.showMessageDialog(this,
+					Messages.getString("view.info.status.error.details"),
+					Messages.getString("view.info.status.error"),
+					JOptionPane.ERROR_MESSAGE);
+			statusLbl.setText(Messages
+					.getString("view.info.status.error.updateError"));
+		}
+	}
 
 	public void onJobStatusChanged(JobStatus newStatus) {
 		switch (newStatus) {
-			case DONE:
-				statusLbl.setIcon(null);
-				bufferSchemaTxt.setText(resourceToImport.getSourcefileid());
-				updateStatusLabel(Messages.getString("view.info.status.importDone"));
-				// If auto move is set, start move:
-				if (moveChkBox.getSelectedObjects() != null) {
-					onMoveToPublic();
-				}
-				else {
-					moveToPublicBtn.setEnabled(true);
-				}
-				break;
-			case ERROR:
-				statusLbl.setIcon(null);
-				updateStatusLabel(Messages
-						.getString("view.info.status.error.importError"));
-				JOptionPane.showMessageDialog(this,
-						Messages.getString("view.info.status.error.details"),
-						Messages.getString("view.info.status.error"),
-						JOptionPane.ERROR_MESSAGE);
-				break;
-			case CANCEL:
-				statusLbl.setIcon(null);
-				updateStatusLabel(Messages.getString("view.info.status.canceled"));
-				break;
-			default:
-				break;
+		case DONE:
+			statusLbl.setIcon(null);
+			bufferSchemaTxt.setText(resourceToImport.getSourcefileid());
+			updateStatusLabel(Messages.getString("view.info.status.importDone"));
+			// If auto move is set, start move:
+			if (moveChkBox.getSelectedObjects() != null) {
+				onMoveToPublic();
+			} else {
+				moveToPublicBtn.setEnabled(true);
+			}
+			break;
+		case ERROR:
+			statusLbl.setIcon(null);
+			updateStatusLabel(Messages
+					.getString("view.info.status.error.importError"));
+			JOptionPane.showMessageDialog(this,
+					Messages.getString("view.info.status.error.details"),
+					Messages.getString("view.info.status.error"),
+					JOptionPane.ERROR_MESSAGE);
+			break;
+		case CANCEL:
+			statusLbl.setIcon(null);
+			updateStatusLabel(Messages.getString("view.info.status.canceled"));
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -367,7 +406,8 @@ public class ResourcesPanel extends JPanel {
 		if (resourcesCmbBox.getSelectedItem() != null) {
 			// Avoid first entry (void):
 			if (resourcesCmbBox.getSelectedIndex() > 0) {
-				String selectedResource = (String) resourcesCmbBox.getSelectedItem();
+				String selectedResource = (String) resourcesCmbBox
+						.getSelectedItem();
 				// Update resource to be imported based on selected item:
 				for (DwcaResourceModel resource : stepController.getResourceModelList()) {
 					if (resource.getName().equalsIgnoreCase(selectedResource))
@@ -376,6 +416,8 @@ public class ResourcesPanel extends JPanel {
 				importBtn.setEnabled(false);
 				moveToPublicBtn.setEnabled(false);
 				addResourceBtn.setEnabled(false);
+				editResourceBtn.setEnabled(false);
+				computeUniqueValuesBtn.setEnabled(false);
 				statusLbl.setIcon(loadingImg);
 
 				final SwingWorker<Void, Object> swingWorker = new SwingWorker<Void, Object>() {
@@ -384,8 +426,7 @@ public class ResourcesPanel extends JPanel {
 						try {
 							if (resourceToImport != null) {
 								stepController.importDwcA(resourceToImport.getId());
-							}
-							else {
+							} else {
 								stepController
 										.importDwcAFromLocalFile((String) (resourcesCmbBox
 												.getSelectedItem()));
@@ -395,7 +436,8 @@ public class ResourcesPanel extends JPanel {
 							// should not get there but just in case
 							e.printStackTrace();
 						}
-						// async call, propertyChange(...) will be called once done
+						// async call, propertyChange(...) will be called once
+						// done
 						return null;
 					}
 
@@ -419,13 +461,23 @@ public class ResourcesPanel extends JPanel {
 		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
 			@Override
 			public Boolean doInBackground() {
-				// Avoid cases when a publisher is not associated to the resource:
+				// Resource information:
+				String resourceUuid = resourceToImport.getResource_uuid();
+				Integer resourceId = resourceToImport.getId();
+				String resourceName = resourceToImport.getName();
+				String publisherName = "";
+				// Publisher information:
+				// Avoid cases when a publisher is not associated to the
+				// resource:
 				PublisherModel publisher = resourceToImport.getPublisher();
-				String publisherName = null;
 				if (publisher != null) {
 					publisherName = publisher.getName();
 				}
-				// Check if the indexing is supposed to process unique values or not:
+				// Update database:
+				stepController.updateStep(resourceUuid, resourceName,
+						publisherName);
+				// Check if the indexing is supposed to process unique values or
+				// not:
 				if (uniqueValuesChkBox.getSelectedObjects() != null) {
 					stepController.moveToPublicSchema(resourceToImport.getId(), resourceToImport.getName(), publisherName, true);
 				}
@@ -454,6 +506,87 @@ public class ResourcesPanel extends JPanel {
 			}
 		};
 		swingWorker.execute();
+	}
+
+	/**
+	 * Edit resource button action, triggers parallel execution of tasks releasing the GUI back to use.
+	 */
+	private void onEditResource() {
+		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
+			
+			@Override
+			public Boolean doInBackground() {
+				importBtn.setEnabled(false);
+				moveToPublicBtn.setEnabled(false);
+				addResourceBtn.setEnabled(false);
+				editResourceBtn.setEnabled(false);
+				computeUniqueValuesBtn.setEnabled(false);
+				editResourceDialog();
+				return true;
+			}
+			@Override
+			protected void done() {
+				// reload data to ensure we have the latest changes
+				knownResources = stepController.getResourceModelList();
+				updateResourceComboBox();
+				// Change back status and buttons display:
+				addResourceBtn.setEnabled(true);
+				computeUniqueValuesBtn.setEnabled(true);
+				updateStatusLabel(Messages.getString("view.info.status.updateDone"));
+				statusLbl.setIcon(null);
+				statusLbl.setForeground(Color.BLUE);
+			}
+		};
+		swingWorker.execute();
+	}
+
+	private void editResourceDialog() {
+		DwcaResourceModel resourceToEdit = null;
+		// Check there is a valid item selected
+		if (resourcesCmbBox.getSelectedItem() != null) {
+			// Avoid first entry (void):
+			if (resourcesCmbBox.getSelectedIndex() > 0) {
+				String selectedResource = (String) resourcesCmbBox
+						.getSelectedItem();
+				// Get resource to be edited based on selected item:
+				for (DwcaResourceModel resource : stepController
+						.getResourceModelList()) {
+					if (resource.getName().equalsIgnoreCase(selectedResource))
+						resourceToEdit = resource;
+				}
+			}
+			// Start resource edition panel
+			EditResourceDialog erd = new EditResourceDialog(this,
+					stepController, resourceToEdit);
+			String resourceUuid = resourceToEdit.getResource_uuid();
+			String resourceName = resourceToEdit.getName();
+			String publisherName = "";
+			// Publisher information:
+			// Avoid cases when a publisher is not associated to the
+			// resource:
+			PublisherModel publisher = resourceToEdit.getPublisher();
+			if (publisher != null) {
+				publisherName = publisher.getName();
+			}
+
+			if (erd.getExitValue() == JOptionPane.OK_OPTION) {
+				updateStatusLabel(Messages.getString("view.info.status.updating"));
+				statusLbl.setIcon(loadingImg);
+				if (!stepController.updateResourceModel(erd.getResourceModel())) {
+					JOptionPane
+							.showMessageDialog(
+									this,
+									Messages.getString("resourceView.resource.error.save.msg"),
+									Messages.getString("resourceView.resource.error.title"),
+									JOptionPane.ERROR_MESSAGE);
+				} else {
+					// Resource has been changed successfully, update database:
+					// Update database after move 
+					stepController.updateStep(resourceUuid, resourceName,
+							publisherName);
+				}
+			}	
+		}
 	}
 
 	/**
@@ -486,8 +619,7 @@ public class ResourcesPanel extends JPanel {
 		resourcesCmbBox.removeAllItems();
 		resourcesCmbBox.addItem(null);
 		for (DwcaResourceModel resourceModel : knownResources) {
-			resourcesCmbBox.addItem(resourceModel.getName() + "-"
-					+ resourceModel.getSourcefileid());
+			resourcesCmbBox.addItem(resourceModel.getName());
 		}
 	}
 

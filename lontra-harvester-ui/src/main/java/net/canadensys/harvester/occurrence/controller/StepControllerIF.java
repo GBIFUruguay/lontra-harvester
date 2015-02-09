@@ -55,4 +55,6 @@ public interface StepControllerIF {
 	public boolean updatePublisherModel(PublisherModel publisherModel);
 
 	public void computeUniqueValues(JobStatusModel jobStatusModel);
+	
+	public void updateStep(String resourceUuid, String resourceName, String publisherName);
 }

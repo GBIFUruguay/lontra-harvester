@@ -40,6 +40,7 @@ import net.canadensys.harvester.occurrence.dao.impl.HibernateIPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
+import net.canadensys.harvester.occurrence.job.UpdateJob;
 import net.canadensys.harvester.occurrence.mapper.OccurrenceExtensionMapper;
 import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
 import net.canadensys.harvester.occurrence.notification.impl.DefaultResourceStatusNotifier;
@@ -252,6 +253,11 @@ public class UIConfig {
 	@Bean
 	public ComputeUniqueValueJob computeUniqueValueJob() {
 		return new ComputeUniqueValueJob();
+	}
+	
+	@Bean
+	public UpdateJob updateJob() {
+		return new UpdateJob();
 	}
 
 	// ---STEP---
