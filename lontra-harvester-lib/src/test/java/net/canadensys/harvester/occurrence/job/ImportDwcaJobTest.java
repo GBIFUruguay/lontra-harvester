@@ -8,7 +8,10 @@ import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.sql.DataSource;
+
 import net.canadensys.harvester.StepIF;
+import net.canadensys.harvester.TestDataHelper;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.jms.JMSConsumer;
 import net.canadensys.harvester.jms.JMSConsumerMessageHandlerIF;
@@ -20,13 +23,13 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 
-import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.test.context.ContextConfiguration;
@@ -57,8 +60,9 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 	private static final int MAX_NUMBER_OF_ATTEMP = 5;
 
 	@Autowired
-	@Qualifier(value = "bufferSessionFactory")
-	private SessionFactory sessionFactory;
+	private ApplicationContext appContext;
+
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	@Qualifier(value = "publicTransactionManager")
@@ -78,12 +82,20 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 	@Qualifier("insertResourceInformationStep")
 	private JMSConsumerMessageHandlerIF insertResourceInformationStep;
 
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
 	/**
 	 * Setup Test Consumer This consumer will write to the database specified by
 	 * the sessionFactory bean.
 	 */
 	@Before
 	public void setup() {
+
+		TestDataHelper.loadTestData(appContext, jdbcTemplate);
+
 		reader = new JMSConsumer(TEST_BROKER_URL);
 		reader.registerHandler(processInsertOccurrenceStep);
 		reader.registerHandler(insertResourceInformationStep);
@@ -117,8 +129,6 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 		jdbcTemplate.update("DELETE FROM buffer.occurrence");
 
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, "ada5d0b1-07de-4dc0-83d4-e312f0fb81cb");
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, 1);
 
 		JobStatusModel jobStatusModel = new JobStatusModel();

@@ -46,6 +46,7 @@ import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
 import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
 import net.canadensys.harvester.occurrence.task.ComputeMultimediaDataTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
+import net.canadensys.harvester.occurrence.task.GetResourceInfoTask;
 import net.canadensys.harvester.occurrence.task.PostProcessOccurrenceTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
@@ -254,7 +255,7 @@ public class ProcessingConfigTest {
 
 	@Bean
 	public ItemTaskIF getResourceInfoTask() {
-		return null;
+		return new GetResourceInfoTask();
 	}
 
 	@Bean
@@ -271,7 +272,7 @@ public class ProcessingConfigTest {
 	public ItemTaskIF recordImportTask() {
 		return new RecordImportTask();
 	}
-	
+
 	@Bean
 	public ItemTaskIF postProcessOccurrenceTask() {
 		return new PostProcessOccurrenceTask();

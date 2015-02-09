@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 
 import javax.sql.DataSource;
 
+import net.canadensys.harvester.TestDataHelper;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
@@ -14,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,6 +32,10 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ProcessingConfigTest.class, loader = AnnotationConfigContextLoader.class)
 public class MoveToPublicSchemaTest {
+
+	@Autowired
+	private ApplicationContext appContext;
+
 	@Autowired
 	private MoveToPublicSchemaJob moveJob;
 
@@ -42,6 +48,9 @@ public class MoveToPublicSchemaTest {
 
 	@Before
 	public void setupTest() {
+
+		TestDataHelper.loadTestData(appContext, jdbcTemplate);
+
 		jdbcTemplate.batchUpdate(new String[] {
 				"DELETE FROM buffer.occurrence", "DELETE FROM occurrence",
 				"DELETE FROM buffer.contact", "DELETE FROM contact",
@@ -54,8 +63,6 @@ public class MoveToPublicSchemaTest {
 	public void testMoveToPublicSchema() {
 		JobStatusModel jobStatusModel = new JobStatusModel();
 
-		moveJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
-		moveJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, "ada5d0b1-07de-4dc0-83d4-e312f0fb81cb");
 		moveJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, 1);
 		moveJob.addToSharedParameters(SharedParameterEnum.RESOURCE_NAME, "resource");
 		moveJob.addToSharedParameters(SharedParameterEnum.PUBLISHER_NAME, "publisher");
