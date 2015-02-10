@@ -23,6 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 
 	@Autowired
+	private ItemTaskIF getResourceInfoTask;
+
+	@Autowired
 	private ItemTaskIF computeGISDataTask;
 
 	@Autowired
@@ -42,6 +45,9 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 	}
 
 	public void doJob(JobStatusModel jobStatusModel) {
+
+		getResourceInfoTask.execute(sharedParameters);
+
 		jobStatusModel.setCurrentStatusExplanation("Compute GIS data");
 		computeGISDataTask.execute(sharedParameters);
 

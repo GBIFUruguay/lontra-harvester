@@ -57,8 +57,8 @@ public class StepController implements StepControllerIF {
 
 	@Autowired
 	private DwcaResourceDAO resourceDAO;
-	
-	@Autowired 
+
+	@Autowired
 	private PublisherDAO publisherDAO;
 
 	@Autowired
@@ -125,9 +125,7 @@ public class StepController implements StepControllerIF {
 	}
 
 	@Override
-	public void moveToPublicSchema(String sourceFileId, String resourceUUID, Integer resourceID, String resourceName, String publisherName, boolean computeUniqueValues) {
-		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, sourceFileId);
-		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, resourceUUID);
+	public void moveToPublicSchema(Integer resourceID, String resourceName, String publisherName, boolean computeUniqueValues) {
 		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceID);
 		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_NAME, resourceName);
 		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.PUBLISHER_NAME, publisherName);
@@ -160,7 +158,7 @@ public class StepController implements StepControllerIF {
 	public List<DwcaResourceModel> getResourceModelList() {
 		return resourceDAO.loadResources();
 	}
-	
+
 	@Override
 	@Transactional("publicTransactionManager")
 	public List<PublisherModel> getPublisherModelList() {
@@ -178,6 +176,7 @@ public class StepController implements StepControllerIF {
 	public boolean updatePublisherModel(PublisherModel publisherModel) {
 		return publisherDAO.save(publisherModel);
 	}
+
 	/**
 	 * Get the sorted ImportLogModel list using our own session. Sorted by desc
 	 * event_date
@@ -218,7 +217,8 @@ public class StepController implements StepControllerIF {
 	public List<DwcaResourceModel> getResourceToHarvest() {
 		return notifier.getHarvestRequiredList();
 	}
-	
+
+	@Override
 	public void computeUniqueValues(JobStatusModel jobStatusModel) {
 		if (jobStatusModel == null) {
 			jobStatusModel = new JobStatusModel();

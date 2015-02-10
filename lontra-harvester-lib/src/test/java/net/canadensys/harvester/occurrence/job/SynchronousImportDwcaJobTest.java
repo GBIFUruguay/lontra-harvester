@@ -7,18 +7,18 @@ import java.math.BigDecimal;
 import javax.sql.DataSource;
 
 import net.canadensys.harvester.StepIF;
+import net.canadensys.harvester.TestDataHelper;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessEmlContentStep;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessOccurrenceStep;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -41,8 +41,7 @@ public class SynchronousImportDwcaJobTest {
 	private static final int EXPECTED_NUMBER_OF_RESULTS = 11;
 
 	@Autowired
-	@Qualifier(value = "bufferSessionFactory")
-	private SessionFactory sessionFactory;
+	private ApplicationContext appContext;
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -56,6 +55,9 @@ public class SynchronousImportDwcaJobTest {
 
 	@Before
 	public void setupTest() {
+
+		TestDataHelper.loadTestData(appContext, jdbcTemplate);
+
 		jdbcTemplate.batchUpdate(new String[] { "DELETE FROM buffer.contact", "DELETE FROM buffer.resource_metadata" });
 	}
 
@@ -79,8 +81,6 @@ public class SynchronousImportDwcaJobTest {
 	@Test
 	public void testImport() {
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, "ada5d0b1-07de-4dc0-83d4-e312f0fb81cb");
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, 1);
 
 		JobStatusModel jobStatusModel = new JobStatusModel();

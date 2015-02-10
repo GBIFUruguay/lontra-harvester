@@ -14,7 +14,7 @@ public interface StepControllerIF {
 	public List<IPTFeedModel> getIPTFeed();
 
 	public List<DwcaResourceModel> getResourceModelList();
-	
+
 	public List<PublisherModel> getPublisherModelList();
 
 	public List<DwcaResourceModel> getResourceToHarvest();
@@ -32,7 +32,7 @@ public interface StepControllerIF {
 	 */
 	public void importDwcAFromLocalFile(String dwcaPath);
 
-	public void moveToPublicSchema(String datasetShortName, String resourceUUID, Integer resourceID, String resourceName, String publisherName, boolean computeUniqueValues);
+	public void moveToPublicSchema(Integer resourceID, String resourceName, String publisherName, boolean computeUniqueValues);
 
 	public void onNodeError();
 
@@ -45,14 +45,15 @@ public interface StepControllerIF {
 	 * @return
 	 */
 	public boolean updateResourceModel(DwcaResourceModel resourceModel);
-	
+
 	/**
 	 * Insert or update a PublisherModel
+	 * 
 	 * @param publisherModel
 	 * @return
 	 */
 	public boolean updatePublisherModel(PublisherModel publisherModel);
-	
+
 	public void computeUniqueValues(JobStatusModel jobStatusModel);
 	
 	public void updateStep(String resourceUuid, String resourceName, String publisherName);

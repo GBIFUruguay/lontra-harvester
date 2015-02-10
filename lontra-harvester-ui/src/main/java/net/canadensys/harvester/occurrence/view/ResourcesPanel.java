@@ -481,14 +481,10 @@ public class ResourcesPanel extends JPanel {
 				// Check if the indexing is supposed to process unique values or
 				// not:
 				if (uniqueValuesChkBox.getSelectedObjects() != null) {
-					stepController.moveToPublicSchema(bufferSchemaTxt.getText(),
-							resourceToImport.getResource_uuid(),
-							resourceToImport.getId(), resourceToImport.getName(), publisherName, true);
+					stepController.moveToPublicSchema(resourceToImport.getId(), resourceToImport.getName(), publisherName, true);
 				}
 				else {
-					stepController.moveToPublicSchema(bufferSchemaTxt.getText(),
-							resourceToImport.getResource_uuid(),
-							resourceToImport.getId(), resourceToImport.getName(), publisherName, false);
+					stepController.moveToPublicSchema(resourceToImport.getId(), resourceToImport.getName(), publisherName, false);
 				}
 				return true;
 			}
