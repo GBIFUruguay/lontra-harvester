@@ -31,20 +31,21 @@ public abstract class AbstractDialog extends JDialog {
 	protected JButton selectBtn = null;
 	protected JButton cancelBtn = null;
 
-	protected DwcaResourceModel resourceModel = null;
-	
 	protected StepControllerIF stepController;
 
 	protected JComboBox<String> publishersCmbBox = null;
+	
+	// If this is true, this is a resource edition dialog. If not, it is a resource addition dialog.
+	protected boolean isEdition = false;
 
 	// initialize with CANCEL_OPTION to handle the case when the dialog is
 	// closed with the 'X'
 	protected int exitValue = JOptionPane.CANCEL_OPTION;
 	
-	public AbstractDialog(String title, StepControllerIF stpCtl, DwcaResourceModel resourceModel) {
+	public AbstractDialog(String title, StepControllerIF stpCtl, boolean isEdition) {
 		// Set stepController:
 		this.stepController = stpCtl;
-		this.resourceModel = resourceModel;
+		this.isEdition = isEdition;
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		this.setTitle(title);
 		this.setModal(true);

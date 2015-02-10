@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author canadensys, Pedro Guimarães
  * 
  */
-public class EditResourceDialog extends AbstractDialog {
+public class ResourceDialog extends AbstractDialog {
 
 	private static final long serialVersionUID = 672869826178689726L;
 
@@ -36,9 +36,13 @@ public class EditResourceDialog extends AbstractDialog {
 	private JTextField urlTxt;
 	private JTextField sfIdTxt;
 	private JTextField resourceUuidTxt;
+	
+	private DwcaResourceModel resourceModel = null;
 
-	public EditResourceDialog(Component parent, StepControllerIF stepController, DwcaResourceModel selectedResource) {
-		super(Messages.getString("resourceView.title"), stepController, selectedResource);
+	
+	public ResourceDialog(Component parent, StepControllerIF stepController, DwcaResourceModel selectedResource, boolean isEdition) {
+		super(Messages.getString("resourceView.title"), stepController, isEdition);
+		this.resourceModel = selectedResource;
 		setLocationRelativeTo(parent);
 		displayResource();
 	}
@@ -158,12 +162,17 @@ public class EditResourceDialog extends AbstractDialog {
 	 */
 	public void displayResource() {
 		if (resourceModel != null) {
-			nameTxt.setText(resourceModel.getName());
-			urlTxt.setText(resourceModel.getArchive_url());
-			sfIdTxt.setText(resourceModel.getSourcefileid());
+			nameTxt.setText(resourceModel.getName()); 
+			urlTxt.setText(resourceModel.getArchive_url()); 
+			sfIdTxt.setText(resourceModel.getSourcefileid()); 
 			resourceUuidTxt.setText((resourceModel.getResource_uuid()));
-			setVisible(true);
+		} 
+		// Add resource, set UUID and source file id editable:
+		else {
+		 sfIdTxt.setEditable(true);
+		 resourceUuidTxt.setEditable(true);
 		}
+		setVisible(true);
 	}
 
 	/**
@@ -176,6 +185,11 @@ public class EditResourceDialog extends AbstractDialog {
 		String sourceFileIdValue = sfIdTxt.getText();
 		String resourceUuid = resourceUuidTxt.getText();
 		String publisherName = (String) publishersCmbBox.getSelectedItem();
+		
+		// This is a new resource, initialize resourceModel
+		if (!isEdition) {
+			resourceModel = new DwcaResourceModel();
+		}
 
 		if (StringUtils.isNotBlank(nameValue) && StringUtils.isNotBlank(urlValue) && StringUtils.isNotBlank(sourceFileIdValue)) {
 			resourceModel.setName(nameValue);
@@ -183,8 +197,13 @@ public class EditResourceDialog extends AbstractDialog {
 			resourceModel.setSourcefileid(sourceFileIdValue);
 			resourceModel.setResource_uuid(resourceUuid);
 			// Check if it has been set a valid publisher:
+			
 			if (!publisherName.equalsIgnoreCase(""))
 				resourceModel.setPublisher(getPublisherFromName(publisherName));
+			if (!isEdition) {
+				// Set record_count to 0 by default:
+				resourceModel.setRecord_count(0);
+			}
 			exitValue = JOptionPane.OK_OPTION;
 			dispose();
 		}
@@ -212,7 +231,7 @@ public class EditResourceDialog extends AbstractDialog {
 	 * 
 	 */
 	private void initPublishersComboBox() {
-		publishersCmbBox = new JComboBox();
+		publishersCmbBox = new JComboBox<String>();
 		// Retrieve available resources list:
 		List<PublisherModel> publishers = stepController
 				.getPublisherModelList();
@@ -222,7 +241,9 @@ public class EditResourceDialog extends AbstractDialog {
 		for (PublisherModel publisher: publishers) {
 			publishersCmbBox.addItem(publisher.getName());
 		}
-		publishersCmbBox.setSelectedItem(resourceModel.getPublisher().getName());
+		if (isEdition) {
+			publishersCmbBox.setSelectedItem(resourceModel.getPublisher().getName());
+		}
 	}
 	
 	/**
@@ -242,6 +263,10 @@ public class EditResourceDialog extends AbstractDialog {
 		return publisher;
 	}
 	
+	/**
+	 * Returns the resource model
+	 * @return
+	 */
 	public DwcaResourceModel getResourceModel() {
 		return this.resourceModel;
 	}

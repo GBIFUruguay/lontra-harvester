@@ -235,9 +235,8 @@ public class PublishersPanel extends JPanel {
 	 * Add publisher button action
 	 */
 	private void onAddPublisher() {
-		AddPublisherDialog apd = new AddPublisherDialog(this);
-		PublisherModel publisherModel = new PublisherModel();
-		publisherModel = apd.displayPublisher(publisherModel);
+		PublisherDialog apd = new PublisherDialog(this, null, false);
+		PublisherModel publisherModel = apd.getPublisherModel();
 		// Case the user hit OK:
 		if (apd.getExitValue() == JOptionPane.OK_OPTION) {
 			// Save or upload publisher:
@@ -289,8 +288,7 @@ public class PublishersPanel extends JPanel {
 					break;
 				}
 			}
-			EditPublisherDialog epd = new EditPublisherDialog(this, publisherToEdit);
-			epd.displayPublisher();
+			PublisherDialog epd = new PublisherDialog(this, publisherToEdit, true);
 			// Case the user hit OK:
 			if (epd.getExitValue() == JOptionPane.OK_OPTION) {
 				// Save or upload publisher:

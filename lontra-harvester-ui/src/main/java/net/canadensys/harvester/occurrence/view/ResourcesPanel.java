@@ -112,8 +112,8 @@ public class ResourcesPanel extends JPanel {
 				Messages.getString("view.button.edit.resource"));
 		editResourceBtn.setToolTipText(Messages
 				.getString("view.button.edit.resource.tooltip"));
-		editResourceBtn.setEnabled(true);
 		editResourceBtn.setVisible(true);
+		editResourceBtn.setEnabled(false);
 		editResourceBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -382,8 +382,10 @@ public class ResourcesPanel extends JPanel {
 				String selectedResource = (String) resourcesCmbBox
 						.getSelectedItem();
 				if (selectedResource != null) {
-					if (!selectedResource.equalsIgnoreCase(""))
+					if (!selectedResource.equalsIgnoreCase("")) {
+						editResourceBtn.setEnabled(true);
 						importBtn.setEnabled(true);
+					}	
 					else
 						importBtn.setEnabled(false);
 				}
@@ -517,7 +519,7 @@ public class ResourcesPanel extends JPanel {
 	 */
 	private void onEditResource() {
 		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
-			
+			boolean ok = false;
 			@Override
 			public Boolean doInBackground() {
 				importBtn.setEnabled(false);
@@ -525,7 +527,7 @@ public class ResourcesPanel extends JPanel {
 				addResourceBtn.setEnabled(false);
 				editResourceBtn.setEnabled(false);
 				computeUniqueValuesBtn.setEnabled(false);
-				editResourceDialog();
+				ok = editResourceDialog();
 				return true;
 			}
 			@Override
@@ -536,15 +538,18 @@ public class ResourcesPanel extends JPanel {
 				// Change back status and buttons display:
 				addResourceBtn.setEnabled(true);
 				computeUniqueValuesBtn.setEnabled(true);
-				updateStatusLabel(Messages.getString("view.info.status.updateDone"));
-				statusLbl.setIcon(null);
-				statusLbl.setForeground(Color.BLUE);
+				// Case the select button was pressed (instead of cancel)
+				if (ok) {
+					statusLbl.setIcon(null);
+					statusLbl.setForeground(Color.BLUE);
+					updateStatusLabel(Messages.getString("view.info.status.updateDone"));
+				}
 			}
 		};
 		swingWorker.execute();
 	}
 
-	private void editResourceDialog() {
+	private boolean editResourceDialog() {
 		DwcaResourceModel resourceToEdit = null;
 		// Check there is a valid item selected
 		if (resourcesCmbBox.getSelectedItem() != null) {
@@ -560,8 +565,8 @@ public class ResourcesPanel extends JPanel {
 				}
 			}
 			// Start resource edition panel
-			EditResourceDialog erd = new EditResourceDialog(this,
-					stepController, resourceToEdit);
+			ResourceDialog erd = new ResourceDialog(this,
+					stepController, resourceToEdit, true);
 			String resourceUuid = resourceToEdit.getResource_uuid();
 			String resourceName = resourceToEdit.getName();
 			String publisherName = "";
@@ -589,18 +594,19 @@ public class ResourcesPanel extends JPanel {
 					stepController.updateStep(resourceUuid, resourceName,
 							publisherName);
 				}
-			}	
+				return true;
+			}
 		}
+		return false;
 	}
 
 	/**
 	 * Add resource button action
 	 */
 	private void onAddResource() {
-		AddResourceDialog rmv = new AddResourceDialog(this, stepController);
-		DwcaResourceModel resourceModel = new DwcaResourceModel();
-		resourceModel = rmv.displayResource(resourceModel);
-		if (rmv.getExitValue() == JOptionPane.OK_OPTION) {
+		ResourceDialog rd = new ResourceDialog(this, stepController, null, false);
+		DwcaResourceModel resourceModel = rd.getResourceModel();
+		if (rd.getExitValue() == JOptionPane.OK_OPTION) {
 			if (!stepController.updateResourceModel(resourceModel)) {
 				JOptionPane
 						.showMessageDialog(
