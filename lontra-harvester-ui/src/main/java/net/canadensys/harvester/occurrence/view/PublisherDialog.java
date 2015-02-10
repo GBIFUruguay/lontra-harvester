@@ -26,7 +26,6 @@ public class PublisherDialog extends AbstractDialog {
 
 	private static final long serialVersionUID = 1188349656123737L;
 
-	private PublisherModel publisherModel = null;
 	private static final int TXT_FIELD_LENGTH = 50;
 
 	private JTextField nameTxt;
@@ -42,6 +41,8 @@ public class PublisherDialog extends AbstractDialog {
 	private JTextField latTxt;
 	private JTextField longTxt;
 
+	private PublisherModel publisherModel = null;
+	
 	public PublisherDialog(Component parent, PublisherModel publisherToEdit, boolean isEdition) {
 		super(Messages.getString("publisherView.title"), null, isEdition);
 		this.publisherModel = publisherToEdit;

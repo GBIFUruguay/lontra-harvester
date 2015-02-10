@@ -386,8 +386,10 @@ public class ResourcesPanel extends JPanel {
 						editResourceBtn.setEnabled(true);
 						importBtn.setEnabled(true);
 					}	
-					else
+					else {
+						editResourceBtn.setEnabled(false);
 						importBtn.setEnabled(false);
+					}
 				}
 			}
 		});

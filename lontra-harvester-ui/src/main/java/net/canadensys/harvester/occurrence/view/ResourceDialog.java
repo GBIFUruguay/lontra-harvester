@@ -143,7 +143,7 @@ public class ResourceDialog extends AbstractDialog {
 		contentPanel.add(resourceUuidTxt, c);
 
 		/* Init publishers combo box and add it to the dialog */
-		initPublishersComboBox();
+		publishersCmbBox = new JComboBox<String>();
 		c.gridx = 0;
 		c.gridy = 5;
 		contentPanel.add(new JLabel(Messages.getString("resourceView.resource.publisher")), c);
@@ -166,6 +166,7 @@ public class ResourceDialog extends AbstractDialog {
 			urlTxt.setText(resourceModel.getArchive_url()); 
 			sfIdTxt.setText(resourceModel.getSourcefileid()); 
 			resourceUuidTxt.setText((resourceModel.getResource_uuid()));
+			initPublishersComboBox();
 		} 
 		// Add resource, set UUID and source file id editable:
 		else {
@@ -231,7 +232,6 @@ public class ResourceDialog extends AbstractDialog {
 	 * 
 	 */
 	private void initPublishersComboBox() {
-		publishersCmbBox = new JComboBox<String>();
 		// Retrieve available resources list:
 		List<PublisherModel> publishers = stepController
 				.getPublisherModelList();
