@@ -166,13 +166,13 @@ public class ResourceDialog extends AbstractDialog {
 			urlTxt.setText(resourceModel.getArchive_url()); 
 			sfIdTxt.setText(resourceModel.getSourcefileid()); 
 			resourceUuidTxt.setText((resourceModel.getResource_uuid()));
-			initPublishersComboBox();
 		} 
 		// Add resource, set UUID and source file id editable:
 		else {
 		 sfIdTxt.setEditable(true);
 		 resourceUuidTxt.setEditable(true);
 		}
+		initPublishersComboBox();
 		setVisible(true);
 	}
 
