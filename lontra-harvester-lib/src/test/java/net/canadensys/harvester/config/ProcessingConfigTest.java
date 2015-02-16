@@ -43,8 +43,6 @@ import net.canadensys.harvester.occurrence.step.async.ProcessInsertOccurrenceSte
 import net.canadensys.harvester.occurrence.step.stream.StreamDwcContentStep;
 import net.canadensys.harvester.occurrence.step.stream.StreamDwcExtensionContentStep;
 import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
-import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
-import net.canadensys.harvester.occurrence.task.ComputeMultimediaDataTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
 import net.canadensys.harvester.occurrence.task.GetResourceInfoTask;
 import net.canadensys.harvester.occurrence.task.PostProcessOccurrenceTask;
@@ -61,8 +59,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
@@ -71,6 +71,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
+@ImportResource("classpath:taskDefinitions.xml")
 public class ProcessingConfigTest {
 
 	@Bean
@@ -161,6 +162,11 @@ public class ProcessingConfigTest {
 	}
 
 	@Bean
+	public NamedParameterJdbcTemplate namedParameterJdbcTemplate() {
+		return new NamedParameterJdbcTemplate(dataSource());
+	}
+
+	@Bean
 	public DatabaseConfig databaseConfig() {
 		DatabaseConfig databaseConfig = new DatabaseConfig();
 		databaseConfig.setSelectColumnNamesSQL(selectColumnNamesSQL);
@@ -234,18 +240,8 @@ public class ProcessingConfigTest {
 	}
 
 	@Bean
-	public ItemTaskIF cleanBufferTableTask() {
-		return new CleanBufferTableTask();
-	}
-
-	@Bean
 	public ItemTaskIF computeGISDataTask() {
 		return new MockComputeGISDataTask();
-	}
-
-	@Bean
-	public ItemTaskIF computeMultimediaDataTask() {
-		return new ComputeMultimediaDataTask();
 	}
 
 	@Bean

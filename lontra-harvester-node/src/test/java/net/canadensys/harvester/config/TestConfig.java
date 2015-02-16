@@ -35,7 +35,6 @@ import net.canadensys.harvester.occurrence.step.StreamEmlContentStep;
 import net.canadensys.harvester.occurrence.step.async.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.stream.StreamDwcContentStep;
 import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
-import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
@@ -114,11 +113,6 @@ public class TestConfig {
 	}
 
 	@Bean
-	public ItemTaskIF cleanBufferTableTask() {
-		return new CleanBufferTableTask();
-	}
-
-	@Bean
 	public ItemTaskIF computeGISDataTask() {
 		return null;
 	}
@@ -181,7 +175,7 @@ public class TestConfig {
 	public ImportDwcaJob importDwcaJob() {
 		return new ImportDwcaJob();
 	}
-	
+
 	@Bean
 	public UpdateJob updateJob() {
 		return new UpdateJob();

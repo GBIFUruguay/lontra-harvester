@@ -52,8 +52,6 @@ import net.canadensys.harvester.occurrence.step.async.ProcessInsertOccurrenceSte
 import net.canadensys.harvester.occurrence.step.stream.StreamDwcContentStep;
 import net.canadensys.harvester.occurrence.step.stream.StreamDwcExtensionContentStep;
 import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
-import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
-import net.canadensys.harvester.occurrence.task.ComputeMultimediaDataTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
 import net.canadensys.harvester.occurrence.task.PostProcessOccurrenceTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
@@ -69,8 +67,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
@@ -79,6 +79,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration("processingConfig")
 @EnableTransactionManagement
+@ImportResource("classpath:taskDefinitions.xml")
 public class TestConfig {
 
 	@Value("${database.url}")
@@ -116,7 +117,7 @@ public class TestConfig {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ContactModel.class,
-				ResourceMetadataModel.class, OccurrenceExtensionModel.class, DwcaResourceModel.class, PublisherModel.class});
+				ResourceMetadataModel.class, OccurrenceExtensionModel.class, DwcaResourceModel.class, PublisherModel.class });
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
 		hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
@@ -141,6 +142,11 @@ public class TestConfig {
 	}
 
 	@Bean
+	public NamedParameterJdbcTemplate namedParameterJdbcTemplate() {
+		return new NamedParameterJdbcTemplate(dataSource());
+	}
+
+	@Bean
 	public DatabaseConfig databaseConfig() {
 		DatabaseConfig databaseConfig = new DatabaseConfig();
 		return databaseConfig;
@@ -162,11 +168,6 @@ public class TestConfig {
 	}
 
 	@Bean
-	public ItemTaskIF cleanBufferTableTask() {
-		return new CleanBufferTableTask();
-	}
-
-	@Bean
 	public ItemTaskIF computeGISDataTask() {
 		return null;
 	}
@@ -180,7 +181,7 @@ public class TestConfig {
 	public ItemTaskIF computeUniqueValueTask() {
 		return new ComputeUniqueValueTask();
 	}
-	
+
 	@Bean
 	public ItemTaskIF postProcessOccurrenceTask() {
 		return new PostProcessOccurrenceTask();
@@ -264,7 +265,7 @@ public class TestConfig {
 	public ResourceStatusNotifierIF resourceStatusNotifierIF() {
 		return null;
 	}
-	
+
 	@Bean
 	public PublisherDAO publisherDAO() {
 		return new HibernatePublisherDAO();
@@ -295,7 +296,7 @@ public class TestConfig {
 	public UpdateJob updateJob() {
 		return new UpdateJob();
 	}
-	
+
 	// ---TASK wiring---
 
 	@Bean
@@ -306,11 +307,6 @@ public class TestConfig {
 	@Bean(name = "insertResourceInformationStep")
 	public StepIF insertResourceInformationStep() {
 		return new InsertResourceInformationStep();
-	}
-
-	@Bean
-	public ItemTaskIF computeMultimediaDataTask() {
-		return new ComputeMultimediaDataTask();
 	}
 
 	/**

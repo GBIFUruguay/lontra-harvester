@@ -13,7 +13,6 @@ import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.StepResult;
 import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
-import net.canadensys.harvester.occurrence.model.JobStatusModel;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -96,7 +95,7 @@ public class SynchronousProcessOccurrenceStep implements StepIF {
 		List<OccurrenceRawModel> occRawList = new ArrayList<OccurrenceRawModel>(DEFAULT_FLUSH_INTERVAL);
 		int numberOfRecords = 0;
 
-		JobStatusModel jobStatus = (JobStatusModel) sharedParameters.get(SharedParameterEnum.JOB_STATUS_MODEL);
+		// JobStatusModel jobStatus = (JobStatusModel) sharedParameters.get(SharedParameterEnum.JOB_STATUS_MODEL);
 
 		try {
 			OccurrenceRawModel currRawModel = reader.read();
@@ -115,7 +114,7 @@ public class SynchronousProcessOccurrenceStep implements StepIF {
 
 					occRawList.clear();
 					occList.clear();
-					jobStatus.setCurrentJobProgress(numberOfRecords + " records");
+					// jobStatus.setCurrentJobProgress(numberOfRecords + " records");
 				}
 			}
 			// flush remaining content
@@ -125,7 +124,7 @@ public class SynchronousProcessOccurrenceStep implements StepIF {
 
 				occRawList.clear();
 				occList.clear();
-				jobStatus.setCurrentJobProgress(numberOfRecords + " records");
+				// jobStatus.setCurrentJobProgress(numberOfRecords + " records");
 			}
 		}
 		catch (WriterException wEx) {

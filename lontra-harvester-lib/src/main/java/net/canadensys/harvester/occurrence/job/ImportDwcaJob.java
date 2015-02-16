@@ -12,7 +12,6 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
-import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
 import net.canadensys.harvester.occurrence.task.GetResourceInfoTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 
@@ -55,7 +54,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 
 	@Autowired
 	private LongRunningTaskIF checkProcessingCompletenessTask;
-	
+
 	private JobStatusModel jobStatusModel;
 
 	public ImportDwcaJob() {
@@ -68,7 +67,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 	public void doJob(JobStatusModel jobStatusModel) {
 		this.jobStatusModel = jobStatusModel;
 		// share the statusJobModel so step(s) can update it
-		sharedParameters.put(SharedParameterEnum.JOB_STATUS_MODEL, jobStatusModel);
+		// sharedParameters.put(SharedParameterEnum.JOB_STATUS_MODEL, jobStatusModel);
 		jobStatusModel.setCurrentStatus(JobStatus.RUNNING);
 
 		// TODO this is not optional anymore
@@ -125,10 +124,6 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 
 	public void setPrepareDwcaTask(PrepareDwcaTask prepareDwcaTask) {
 		this.prepareDwcaTask = prepareDwcaTask;
-	}
-
-	public void setCleanBufferTableTask(CleanBufferTableTask cleanBufferTableTask) {
-		this.cleanBufferTableTask = cleanBufferTableTask;
 	}
 
 	public void setCheckProcessingCompletenessTask(CheckHarvestingCompletenessTask checkProcessingCompletenessTask) {
