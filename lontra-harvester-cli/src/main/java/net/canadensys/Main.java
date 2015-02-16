@@ -1,6 +1,6 @@
 package net.canadensys;
 
-import net.canadensys.harvester.main.JobInitiatorMain;
+import net.canadensys.harvester.main.DiagnosisMain;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -17,7 +17,8 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		Options cmdLineOptions = new Options();
-		cmdLineOptions.addOption("r", true, "sourcefileid to harvest");
+		// cmdLineOptions.addOption("r", true, "sourcefileid to harvest");
+		cmdLineOptions.addOption("check", false, "run diagnosis");
 
 		CommandLineParser parser = new PosixParser();
 		CommandLine cmdLine = null;
@@ -29,8 +30,11 @@ public class Main {
 		}
 
 		if (cmdLine != null) {
-			String sourcefileid = cmdLine.getOptionValue("r");
-			JobInitiatorMain.main(sourcefileid);
+			if (cmdLine.hasOption("check")) {
+				DiagnosisMain.main();
+			}
+			// String sourcefileid = cmdLine.getOptionValue("r");
+			// JobInitiatorMain.main(sourcefileid);
 		}
 	}
 }

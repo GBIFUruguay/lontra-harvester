@@ -33,6 +33,9 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 	@Autowired
 	private ApplicationContext appContext;
 
+	@Autowired
+	private ItemTaskIF validateSchemaVersion;
+
 	// Task and step
 	@Autowired
 	private ItemTaskIF getResourceInfoTask;
@@ -65,6 +68,9 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 	 * Run the actual job.
 	 */
 	public void doJob(JobStatusModel jobStatusModel) {
+
+		validateSchemaVersion.execute(sharedParameters);
+
 		this.jobStatusModel = jobStatusModel;
 		// share the statusJobModel so step(s) can update it
 		// sharedParameters.put(SharedParameterEnum.JOB_STATUS_MODEL, jobStatusModel);

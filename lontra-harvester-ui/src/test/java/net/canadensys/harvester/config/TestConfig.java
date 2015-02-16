@@ -61,6 +61,7 @@ import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.ResourceMetadataHibernateWriter;
+import net.canadensys.harvester.task.ValidateSchemaVersion;
 
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
@@ -307,6 +308,11 @@ public class TestConfig {
 	@Bean(name = "insertResourceInformationStep")
 	public StepIF insertResourceInformationStep() {
 		return new InsertResourceInformationStep();
+	}
+
+	@Bean
+	public ItemTaskIF validateSchemaVersion() {
+		return new ValidateSchemaVersion();
 	}
 
 	/**

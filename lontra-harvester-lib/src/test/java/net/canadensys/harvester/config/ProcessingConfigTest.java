@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import net.canadensys.databaseutils.model.DBMetadata;
 import net.canadensys.dataportal.occurrence.model.ContactModel;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
@@ -52,6 +53,7 @@ import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.ResourceMetadataHibernateWriter;
+import net.canadensys.harvester.task.ValidateSchemaVersion;
 import net.canadensys.harvester.writer.GenericHibernateWriter;
 
 import org.gbif.metadata.eml.Eml;
@@ -137,7 +139,7 @@ public class ProcessingConfigTest {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ContactModel.class,
-				ResourceMetadataModel.class, OccurrenceExtensionModel.class, DwcaResourceModel.class, PublisherModel.class });
+				ResourceMetadataModel.class, OccurrenceExtensionModel.class, DwcaResourceModel.class, PublisherModel.class, DBMetadata.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -247,6 +249,11 @@ public class ProcessingConfigTest {
 	@Bean
 	public LongRunningTaskIF checkProcessingCompletenessTask() {
 		return new CheckHarvestingCompletenessTask();
+	}
+
+	@Bean
+	public ItemTaskIF validateSchemaVersion() {
+		return new ValidateSchemaVersion();
 	}
 
 	@Bean

@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import net.canadensys.databaseutils.model.DBMetadata;
 import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.dao.PublisherDAO;
@@ -71,6 +72,7 @@ import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.ResourceMetadataHibernateWriter;
+import net.canadensys.harvester.task.ValidateSchemaVersion;
 
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,6 +82,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
@@ -182,7 +185,7 @@ public class UIConfig {
 		sb.setAnnotatedClasses(new Class[] {
 				OccurrenceRawModel.class, OccurrenceModel.class,
 				ImportLogModel.class, ContactModel.class, ResourceMetadataModel.class,
-				DwcaResourceModel.class, PublisherModel.class });
+				DwcaResourceModel.class, PublisherModel.class, DBMetadata.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -205,6 +208,11 @@ public class UIConfig {
 		HibernateTransactionManager htmgr = new HibernateTransactionManager();
 		htmgr.setSessionFactory(publicSessionFactory().getObject());
 		return htmgr;
+	}
+
+	@Bean
+	public NamedParameterJdbcTemplate namedParameterJdbcTemplate() {
+		return new NamedParameterJdbcTemplate(dataSource());
 	}
 
 	@Bean
@@ -329,6 +337,11 @@ public class UIConfig {
 	@Bean
 	public ItemTaskIF computeUniqueValueTask() {
 		return new ComputeUniqueValueTask();
+	}
+
+	@Bean
+	public ItemTaskIF validateSchemaVersion() {
+		return new ValidateSchemaVersion();
 	}
 
 	@Bean

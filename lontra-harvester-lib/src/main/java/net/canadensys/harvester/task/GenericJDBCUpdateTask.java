@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Generic JDBC task that can run multiple SQL updates using NamedParameter extracted from
@@ -41,6 +42,7 @@ public class GenericJDBCUpdateTask implements ItemTaskIF {
 		this.sqlStatements = sqlStatements;
 	}
 
+	@Transactional("bufferTransactionManager")
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) throws TaskExecutionException {
 

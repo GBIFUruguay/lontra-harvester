@@ -37,7 +37,6 @@ import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessEmlContentStep;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessOccurrenceStep;
 import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
-import net.canadensys.harvester.occurrence.task.CleanBufferTableTask;
 import net.canadensys.harvester.occurrence.task.ComputeGISDataTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
 import net.canadensys.harvester.occurrence.task.GetResourceInfoTask;
@@ -212,11 +211,6 @@ public class CLIProcessingConfig {
 		PrepareDwcaTask pdwca = new PrepareDwcaTask();
 		pdwca.setAllowDatasetShortnameExtraction(allowLocalFileImport);
 		return pdwca;
-	}
-
-	@Bean
-	public ItemTaskIF cleanBufferTableTask() {
-		return new CleanBufferTableTask();
 	}
 
 	@Bean

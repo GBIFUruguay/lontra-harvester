@@ -32,6 +32,7 @@ public class TestDataHelper {
 
 		try {
 			JdbcTestUtils.deleteFromTables(template, "dwca_resource");
+			JdbcTestUtils.deleteFromTables(template, "db_metadata");
 			ScriptUtils.executeSqlScript(template.getDataSource().getConnection(), testDataScript);
 		}
 		catch (ScriptException e) {
