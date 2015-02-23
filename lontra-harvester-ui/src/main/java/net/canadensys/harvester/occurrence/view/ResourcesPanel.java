@@ -296,7 +296,7 @@ public class ResourcesPanel extends JPanel {
 			}
 		});
 	}
-	
+
 	public void onMoveDone(JobStatus status) {
 		statusLbl.setIcon(null);
 		if (JobStatus.DONE == status) {
@@ -307,7 +307,8 @@ public class ResourcesPanel extends JPanel {
 			bufferSchemaTxt.setText("");
 			statusLbl.setText(Messages.getString("view.info.status.moveDone"));
 			statusLbl.setForeground(Color.BLUE);
-		} else {
+		}
+		else {
 			JOptionPane.showMessageDialog(this,
 					Messages.getString("view.info.status.error.details"),
 					Messages.getString("view.info.status.error"),
@@ -316,7 +317,7 @@ public class ResourcesPanel extends JPanel {
 					.getString("view.info.status.error.moveError"));
 		}
 	}
-	
+
 	public void onUpdateDone(JobStatus status) {
 		statusLbl.setIcon(null);
 		if (JobStatus.DONE == status) {
@@ -327,7 +328,8 @@ public class ResourcesPanel extends JPanel {
 			bufferSchemaTxt.setText("");
 			statusLbl.setText(Messages.getString("view.info.status.updateDone"));
 			statusLbl.setForeground(Color.BLUE);
-		} else {
+		}
+		else {
 			JOptionPane.showMessageDialog(this,
 					Messages.getString("view.info.status.error.details"),
 					Messages.getString("view.info.status.error"),
@@ -339,32 +341,33 @@ public class ResourcesPanel extends JPanel {
 
 	public void onJobStatusChanged(JobStatus newStatus) {
 		switch (newStatus) {
-		case DONE:
-			statusLbl.setIcon(null);
-			bufferSchemaTxt.setText(resourceToImport.getSourcefileid());
-			updateStatusLabel(Messages.getString("view.info.status.importDone"));
-			// If auto move is set, start move:
-			if (moveChkBox.getSelectedObjects() != null) {
-				onMoveToPublic();
-			} else {
-				moveToPublicBtn.setEnabled(true);
-			}
-			break;
-		case ERROR:
-			statusLbl.setIcon(null);
-			updateStatusLabel(Messages
-					.getString("view.info.status.error.importError"));
-			JOptionPane.showMessageDialog(this,
-					Messages.getString("view.info.status.error.details"),
-					Messages.getString("view.info.status.error"),
-					JOptionPane.ERROR_MESSAGE);
-			break;
-		case CANCEL:
-			statusLbl.setIcon(null);
-			updateStatusLabel(Messages.getString("view.info.status.canceled"));
-			break;
-		default:
-			break;
+			case DONE:
+				statusLbl.setIcon(null);
+				bufferSchemaTxt.setText(resourceToImport.getSourcefileid());
+				updateStatusLabel(Messages.getString("view.info.status.importDone"));
+				// If auto move is set, start move:
+				if (moveChkBox.getSelectedObjects() != null) {
+					onMoveToPublic();
+				}
+				else {
+					moveToPublicBtn.setEnabled(true);
+				}
+				break;
+			case ERROR:
+				statusLbl.setIcon(null);
+				updateStatusLabel(Messages
+						.getString("view.info.status.error.importError"));
+				JOptionPane.showMessageDialog(this,
+						Messages.getString("view.info.status.error.details"),
+						Messages.getString("view.info.status.error"),
+						JOptionPane.ERROR_MESSAGE);
+				break;
+			case CANCEL:
+				statusLbl.setIcon(null);
+				updateStatusLabel(Messages.getString("view.info.status.canceled"));
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -385,7 +388,7 @@ public class ResourcesPanel extends JPanel {
 					if (!selectedResource.equalsIgnoreCase("")) {
 						editResourceBtn.setEnabled(true);
 						importBtn.setEnabled(true);
-					}	
+					}
 					else {
 						editResourceBtn.setEnabled(false);
 						importBtn.setEnabled(false);
@@ -430,7 +433,8 @@ public class ResourcesPanel extends JPanel {
 						try {
 							if (resourceToImport != null) {
 								stepController.importDwcA(resourceToImport.getId());
-							} else {
+							}
+							else {
 								stepController
 										.importDwcAFromLocalFile((String) (resourcesCmbBox
 												.getSelectedItem()));
@@ -465,10 +469,7 @@ public class ResourcesPanel extends JPanel {
 		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
 			@Override
 			public Boolean doInBackground() {
-				// Resource information:
-				String resourceUuid = resourceToImport.getResource_uuid();
-				Integer resourceId = resourceToImport.getId();
-				String resourceName = resourceToImport.getName();
+
 				String publisherName = "";
 				// Publisher information:
 				// Avoid cases when a publisher is not associated to the
@@ -477,9 +478,7 @@ public class ResourcesPanel extends JPanel {
 				if (publisher != null) {
 					publisherName = publisher.getName();
 				}
-				// Update database:
-				stepController.updateStep(resourceUuid, resourceName,
-						publisherName);
+
 				// Check if the indexing is supposed to process unique values or
 				// not:
 				if (uniqueValuesChkBox.getSelectedObjects() != null) {
@@ -513,38 +512,29 @@ public class ResourcesPanel extends JPanel {
 	}
 
 	/**
-	 * Edit resource button action, triggers parallel execution of tasks releasing the GUI back to use.
+	 * Edit resource button action.
 	 */
 	private void onEditResource() {
-		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
-			boolean ok = false;
-			@Override
-			public Boolean doInBackground() {
-				importBtn.setEnabled(false);
-				moveToPublicBtn.setEnabled(false);
-				addResourceBtn.setEnabled(false);
-				editResourceBtn.setEnabled(false);
-				computeUniqueValuesBtn.setEnabled(false);
-				ok = editResourceDialog();
-				return true;
-			}
-			@Override
-			protected void done() {
-				// reload data to ensure we have the latest changes
-				knownResources = stepController.getResourceModelList();
-				updateResourceComboBox();
-				// Change back status and buttons display:
-				addResourceBtn.setEnabled(true);
-				computeUniqueValuesBtn.setEnabled(true);
-				// Case the select button was pressed (instead of cancel)
-				if (ok) {
-					statusLbl.setIcon(null);
-					statusLbl.setForeground(Color.BLUE);
-					updateStatusLabel(Messages.getString("view.info.status.updateDone"));
-				}
-			}
-		};
-		swingWorker.execute();
+
+		importBtn.setEnabled(false);
+		moveToPublicBtn.setEnabled(false);
+		addResourceBtn.setEnabled(false);
+		editResourceBtn.setEnabled(false);
+		computeUniqueValuesBtn.setEnabled(false);
+
+		boolean ok = editResourceDialog();
+
+		knownResources = stepController.getResourceModelList();
+		updateResourceComboBox();
+		// Change back status and buttons display:
+		addResourceBtn.setEnabled(true);
+		computeUniqueValuesBtn.setEnabled(true);
+		// Case the select button was pressed (instead of cancel)
+		if (ok) {
+			statusLbl.setIcon(null);
+			statusLbl.setForeground(Color.BLUE);
+			updateStatusLabel(Messages.getString("view.info.status.updateDone"));
+		}
 	}
 
 	private boolean editResourceDialog() {
@@ -586,9 +576,10 @@ public class ResourcesPanel extends JPanel {
 									Messages.getString("resourceView.resource.error.save.msg"),
 									Messages.getString("resourceView.resource.error.title"),
 									JOptionPane.ERROR_MESSAGE);
-				} else {
+				}
+				else {
 					// Resource has been changed successfully, update database:
-					// Update database after move 
+					// Update database after move
 					stepController.updateStep(resourceUuid, resourceName,
 							publisherName);
 				}

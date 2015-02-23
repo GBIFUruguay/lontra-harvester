@@ -27,7 +27,7 @@ public class GetResourceInfoTask implements ItemTaskIF {
 	@Qualifier(value = "publicSessionFactory")
 	private SessionFactory sessionFactory;
 
-	@Transactional("publicTransactionManager")
+	@Transactional(value = "publicTransactionManager", readOnly = true)
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) throws TaskExecutionException {
 		Integer resourceId = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
@@ -39,7 +39,7 @@ public class GetResourceInfoTask implements ItemTaskIF {
 		if (resourceModel == null) {
 			throw new TaskExecutionException("ResourceID " + resourceId + " not found");
 		}
-		
+
 		sharedParameters.put(SharedParameterEnum.DWCA_URL, resourceModel.getArchive_url());
 		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, resourceModel.getSourcefileid());
 		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID, resourceModel.getResource_uuid());

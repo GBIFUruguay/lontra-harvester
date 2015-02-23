@@ -72,8 +72,6 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 		validateSchemaVersion.execute(sharedParameters);
 
 		this.jobStatusModel = jobStatusModel;
-		// share the statusJobModel so step(s) can update it
-		// sharedParameters.put(SharedParameterEnum.JOB_STATUS_MODEL, jobStatusModel);
 		jobStatusModel.setCurrentStatus(JobStatus.RUNNING);
 
 		// TODO this is not optional anymore

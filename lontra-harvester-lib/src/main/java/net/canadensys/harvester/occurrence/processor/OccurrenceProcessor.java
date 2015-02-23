@@ -76,7 +76,7 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 
 	@Override
 	public void init() {
-	};
+	}
 
 	@Override
 	public OccurrenceModel process(OccurrenceRawModel rawModel, Map<SharedParameterEnum, Object> sharedParameters) {
@@ -87,7 +87,9 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 		processedModel.setAuto_id(rawModel.getAuto_id());
 		processedModel.setDwcaid(rawModel.getDwcaid());
 		processedModel.setSourcefileid(rawModel.getSourcefileid());
-		processedModel.setResource_uuid(rawModel.getResource_uuid());
+
+		// see https://github.com/WingLongitude/liger-data-access/issues/24
+		// processedModel.setResource_uuid(rawModel.getResource_uuid());
 
 		processedModel.setBasisofrecord(rawModel.getBasisofrecord());
 

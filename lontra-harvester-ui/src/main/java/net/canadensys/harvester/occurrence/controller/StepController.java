@@ -69,7 +69,7 @@ public class StepController implements StepControllerIF {
 
 	@Autowired
 	private MoveToPublicSchemaJob moveToPublicSchemaJob;
-	
+
 	@Autowired
 	private UpdateJob updateJob;
 
@@ -95,6 +95,9 @@ public class StepController implements StepControllerIF {
 		importDwcaJob.setItemProgressListener(progressListener);
 	}
 
+	/**
+	 * FIXME we should NOT reuse the importDwcaJob, it is not an immutable class
+	 */
 	@Override
 	public void importDwcA(Integer resourceId) {
 		controlMessageProducer.open();
@@ -137,9 +140,9 @@ public class StepController implements StepControllerIF {
 			computeUniqueValues(jobStatusModel);
 		}
 	}
-	
+
 	/**
-	 * Updates database after indexing or record changes.
+	 * Updates database after resource change.
 	 */
 	@Override
 	@Transactional("bufferTransactionManager")

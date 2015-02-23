@@ -36,10 +36,9 @@ public class ResourceDialog extends AbstractDialog {
 	private JTextField urlTxt;
 	private JTextField sfIdTxt;
 	private JTextField resourceUuidTxt;
-	
+
 	private DwcaResourceModel resourceModel = null;
 
-	
 	public ResourceDialog(Component parent, StepControllerIF stepController, DwcaResourceModel selectedResource, boolean isEdition) {
 		super(Messages.getString("resourceView.title"), stepController, isEdition);
 		this.resourceModel = selectedResource;
@@ -123,9 +122,9 @@ public class ResourceDialog extends AbstractDialog {
 		sfIdTxt = new JTextField(TXT_FIELD_LENGTH);
 		sfIdTxt.setEditable(false);
 		contentPanel.add(sfIdTxt, c);
-		
+
 		/* Resource UUID */
-		JLabel resourceJLabel  = new JLabel(Messages.getString("resourceView.resource.uuid"));
+		JLabel resourceJLabel = new JLabel(Messages.getString("resourceView.resource.uuid"));
 		resourceJLabel.setToolTipText(Messages.getString("resourceView.resource.uuid.tooltip"));
 		c = new GridBagConstraints();
 		c.gridx = 0;
@@ -150,7 +149,7 @@ public class ResourceDialog extends AbstractDialog {
 		c.gridx = 1;
 		c.gridy = 5;
 		contentPanel.add(publishersCmbBox, c);
-	
+
 	}
 
 	/**
@@ -162,15 +161,15 @@ public class ResourceDialog extends AbstractDialog {
 	 */
 	public void displayResource() {
 		if (resourceModel != null) {
-			nameTxt.setText(resourceModel.getName()); 
-			urlTxt.setText(resourceModel.getArchive_url()); 
-			sfIdTxt.setText(resourceModel.getSourcefileid()); 
+			nameTxt.setText(resourceModel.getName());
+			urlTxt.setText(resourceModel.getArchive_url());
+			sfIdTxt.setText(resourceModel.getSourcefileid());
 			resourceUuidTxt.setText((resourceModel.getResource_uuid()));
-		} 
+		}
 		// Add resource, set UUID and source file id editable:
 		else {
-		 sfIdTxt.setEditable(true);
-		 resourceUuidTxt.setEditable(true);
+			sfIdTxt.setEditable(true);
+			resourceUuidTxt.setEditable(true);
 		}
 		initPublishersComboBox();
 		setVisible(true);
@@ -186,7 +185,7 @@ public class ResourceDialog extends AbstractDialog {
 		String sourceFileIdValue = sfIdTxt.getText();
 		String resourceUuid = resourceUuidTxt.getText();
 		String publisherName = (String) publishersCmbBox.getSelectedItem();
-		
+
 		// This is a new resource, initialize resourceModel
 		if (!isEdition) {
 			resourceModel = new DwcaResourceModel();
@@ -198,7 +197,7 @@ public class ResourceDialog extends AbstractDialog {
 			resourceModel.setSourcefileid(sourceFileIdValue);
 			resourceModel.setResource_uuid(resourceUuid);
 			// Check if it has been set a valid publisher:
-			
+
 			if (!publisherName.equalsIgnoreCase(""))
 				resourceModel.setPublisher(getPublisherFromName(publisherName));
 			if (!isEdition) {
@@ -225,7 +224,7 @@ public class ResourceDialog extends AbstractDialog {
 		// use 'OK' instead of 'Select'
 		selectBtn.setText(Messages.getString("view.button.ok"));
 	}
-	
+
 	/**
 	 * Initializes the resources combo box by creating a JComboBox and filling
 	 * it with resource data from database
@@ -235,26 +234,29 @@ public class ResourceDialog extends AbstractDialog {
 		// Retrieve available resources list:
 		List<PublisherModel> publishers = stepController
 				.getPublisherModelList();
+
 		// Add blank item:
 		publishersCmbBox.addItem("");
 		// Add an item for each publisher:
-		for (PublisherModel publisher: publishers) {
+		for (PublisherModel publisher : publishers) {
 			publishersCmbBox.addItem(publisher.getName());
 		}
-		if (isEdition) {
+		if (isEdition && resourceModel.getPublisher() != null) {
 			publishersCmbBox.setSelectedItem(resourceModel.getPublisher().getName());
 		}
 	}
-	
+
 	/**
 	 * Fetch a PublisherModel from database from its name
-	 * @param publisherName the name field of the publisher table
+	 * 
+	 * @param publisherName
+	 *            the name field of the publisher table
 	 * @return
 	 */
 	private PublisherModel getPublisherFromName(String publisherName) {
 		List<PublisherModel> publishers = stepController.getPublisherModelList();
 		PublisherModel publisher = null;
-		for (PublisherModel p: publishers) {
+		for (PublisherModel p : publishers) {
 			if (p.getName().equalsIgnoreCase(publisherName)) {
 				publisher = p;
 				break;
@@ -262,9 +264,10 @@ public class ResourceDialog extends AbstractDialog {
 		}
 		return publisher;
 	}
-	
+
 	/**
 	 * Returns the resource model
+	 * 
 	 * @return
 	 */
 	public DwcaResourceModel getResourceModel() {
