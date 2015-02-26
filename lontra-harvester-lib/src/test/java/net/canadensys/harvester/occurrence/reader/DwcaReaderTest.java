@@ -27,14 +27,23 @@ public class DwcaReaderTest {
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
 		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
+		int count = 0;
 
 		ItemReaderIF<OccurrenceRawModel> dwcaItemReader = new DwcaItemReader();
 		dwcaItemReader.openReader(sharedParameters);
 
 		OccurrenceRawModel rawModel = dwcaItemReader.read();
+		count++;
 		// ensure that we read default values
 		assertEquals("PreservedSpecimen", rawModel.getBasisofrecord());
 		assertEquals("Rigaud", rawModel.getMunicipality());
+
+		while (dwcaItemReader.read() != null) {
+			count++;
+		}
+
+		// Ensure we read the entire file
+		assertEquals(11, count);
 	}
 
 	/**

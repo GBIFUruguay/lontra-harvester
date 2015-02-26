@@ -22,6 +22,8 @@ import org.gbif.dwc.text.Archive;
 import org.gbif.dwc.text.ArchiveFactory;
 import org.gbif.dwc.text.UnsupportedArchiveException;
 
+import com.google.common.collect.Lists;
+
 /**
  * Item reader for Darwin Core Archive.
  * 
@@ -34,6 +36,7 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 
 	private final AtomicBoolean canceled = new AtomicBoolean(false);
 	private final ItemMapperIF<OccurrenceRawModel> mapper = new OccurrenceMapper();
+	private final List<String> dwcaIdExcludeList = Lists.newArrayList();
 
 	@Override
 	public OccurrenceRawModel read() {
@@ -106,12 +109,16 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 
 	/**
 	 * Method used to discard(skip) some records allowing to partially import a resource.
-	 * This option should be use carefully.
+	 * This option should be used carefully in exceptional circumstance when an archive needs to be harvested
+	 * and faulty records (no or duplicated coredId) can not be fixed.
 	 * 
 	 * @param occurrenceRawModel
 	 * @return
 	 */
 	private boolean shouldSkipRecord(OccurrenceRawModel occurrenceRawModel) {
+		if (!dwcaIdExcludeList.isEmpty()) {
+			return dwcaIdExcludeList.contains(occurrenceRawModel.getDwcaid());
+		}
 		return false;
 	}
 

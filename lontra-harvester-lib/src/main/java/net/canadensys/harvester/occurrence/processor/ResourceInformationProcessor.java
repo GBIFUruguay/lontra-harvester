@@ -71,27 +71,6 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 			}
 		}
 
-		// TODO clarify the use cases when the UUID is inside the AlternateIdentifiers
-		// Guid is not the UUID, fetch from alternative identifiers:
-		// if (eml.getGuid().startsWith("http")) {
-		// for (String ai : eml.getAlternateIdentifiers()) {
-		// if (!ai.startsWith("http")) {
-		// // Sanity UUID check:
-		// UUID uuid = UUID.fromString(ai);
-		// if (uuid.toString().equals(ai)) {
-		// guid = ai;
-		// break;
-		// }
-		// }
-		// }
-		// } // Guid is the UUID:
-		// else {
-		// UUID uuid = UUID.fromString(guid);
-		// if (!uuid.toString().equals(guid)) {
-		// throw new ProcessException("Alternate identifier didn't provide a proper UUID");
-		// }
-		// }
-
 		metadata = new ResourceMetadataModel();
 		metadata.setDwca_resource_id(resourceId);
 
