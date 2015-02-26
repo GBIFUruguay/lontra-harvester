@@ -31,7 +31,7 @@ public class DwcaLineProcessorTest {
 	public void testDwcALineProcessor() {
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "MySourceFileId");
-		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID, "54321");
+		sharedParameters.put(SharedParameterEnum.RESOURCE_ID, 1);
 
 		OccurrenceRawModel rawModel = new OccurrenceRawModel();
 		OccurrenceRawModel occModel = ProcessorRunner.runItemProcessor(lineProcessor, rawModel, sharedParameters);

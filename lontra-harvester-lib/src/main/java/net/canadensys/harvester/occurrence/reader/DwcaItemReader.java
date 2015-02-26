@@ -33,30 +33,36 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 	private static final Logger LOGGER = Logger.getLogger(DwcaItemReader.class);
 
 	private final AtomicBoolean canceled = new AtomicBoolean(false);
-	private ItemMapperIF<OccurrenceRawModel> mapper = new OccurrenceMapper();
+	private final ItemMapperIF<OccurrenceRawModel> mapper = new OccurrenceMapper();
 
 	@Override
 	public OccurrenceRawModel read() {
 
-		if (canceled.get() || !rowsIt.hasNext()) {
-			return null;
-		}
-
-		// ImmutableMap from Google Collections?
-		Map<String, Object> properties = new HashMap<String, Object>();
-		int i = 0;
-		String[] data = rowsIt.next();
-		for (String currHeader : headers) {
-			properties.put(currHeader, data[i]);
-			i++;
-		}
-		// check if some default values must be handled
-		if (defaultValues != null) {
-			for (String defaultValueCol : defaultValues.keySet()) {
-				properties.put(defaultValueCol, defaultValues.get(defaultValueCol));
+		OccurrenceRawModel occurrenceRawModel;
+		do {
+			if (canceled.get() || !rowsIt.hasNext()) {
+				return null;
 			}
+
+			// ImmutableMap from Google Collections?
+			Map<String, Object> properties = new HashMap<String, Object>();
+			int i = 0;
+			String[] data = rowsIt.next();
+			for (String currHeader : headers) {
+				properties.put(currHeader, data[i]);
+				i++;
+			}
+			// check if some default values must be handled
+			if (defaultValues != null) {
+				for (String defaultValueCol : defaultValues.keySet()) {
+					properties.put(defaultValueCol, defaultValues.get(defaultValueCol));
+				}
+			}
+			occurrenceRawModel = mapper.mapElement(properties);
 		}
-		return mapper.mapElement(properties);
+		while (shouldSkipRecord(occurrenceRawModel));
+
+		return occurrenceRawModel;
 	}
 
 	/**
@@ -98,18 +104,33 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 		sharedParameters.put(SharedParameterEnum.DWCA_USED_TERMS, usedDwcTerms);
 	}
 
-	@Override
-	public void closeReader() {
-		super.closeReader();
+	/**
+	 * Method used to discard(skip) some records allowing to partially import a resource.
+	 * This option should be use carefully.
+	 * 
+	 * @param occurrenceRawModel
+	 * @return
+	 */
+	private boolean shouldSkipRecord(OccurrenceRawModel occurrenceRawModel) {
+		return false;
 	}
 
+	/**
+	 * This method validates that the headers found in the archive can be mapped to OccurrenceRawModel.
+	 * 
+	 */
 	private void validateDwcaHeaders() {
 		OccurrenceRawModel testModel = new OccurrenceRawModel();
 		for (String currHeader : headers) {
 			if (!PropertyUtils.isWriteable(testModel, currHeader)) {
-				System.out.println("Property " + currHeader + " is not found or writeable in OccurrenceModel");
+				LOGGER.warn("Property " + currHeader + " is not found or writeable in OccurrenceRawModel");
 			}
 		}
+	}
+
+	@Override
+	public void closeReader() {
+		super.closeReader();
 	}
 
 	@Override

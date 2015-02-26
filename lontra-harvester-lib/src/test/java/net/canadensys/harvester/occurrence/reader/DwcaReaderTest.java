@@ -50,7 +50,6 @@ public class DwcaReaderTest {
 		dwcaItemReader.openReader(sharedParameters);
 
 		OccurrenceRawModel rawModel = dwcaItemReader.read();
-		// ensure that we read default values
 		assertEquals("1", rawModel.getCatalognumber());
 		assertEquals("Gomphus", rawModel.getGenus());
 	}

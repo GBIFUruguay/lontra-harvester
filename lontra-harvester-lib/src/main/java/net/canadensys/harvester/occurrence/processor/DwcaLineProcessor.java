@@ -65,17 +65,18 @@ public class DwcaLineProcessor implements ItemProcessorIF<OccurrenceRawModel, Oc
 	@SuppressWarnings("unchecked")
 	@Override
 	public OccurrenceRawModel process(OccurrenceRawModel occModel, Map<SharedParameterEnum, Object> sharedParameters) {
-		// TODO could be done at init phase?
-		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
-		String resourceUUID = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
 
-		if (sourceFileId == null || resourceUUID == null) {
-			LOGGER.fatal("Misconfigured processor : sourceFileId and resourceUUID are required");
+		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
+		Integer resourceId = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
+
+		if (sourceFileId == null || resourceId == null) {
+			LOGGER.fatal("Misconfigured processor : sourceFileId and resourceId are required");
 			throw new TaskExecutionException("Misconfigured processor");
 		}
 
 		occModel.setSourcefileid(sourceFileId);
-		occModel.setResource_uuid(resourceUUID);
+		// TODO use resource_id instead of resource_uuid
+		// occModel.setResource_uuid(resourceUUID);
 
 		if (nextId == null || idPoll.isEmpty()) {
 			try {
@@ -89,10 +90,8 @@ public class DwcaLineProcessor implements ItemProcessorIF<OccurrenceRawModel, Oc
 			}
 		}
 		nextId = idPoll.remove(0).longValue();
-
 		occModel.setAuto_id(nextId.intValue());
 
-		// TODO maybe check the uniqueness of occModel.getId()
 		return occModel;
 	}
 
