@@ -3,26 +3,17 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<parent>
-		<groupId>net.canadensys</groupId>
-		<artifactId>lontra-harvester-parent</artifactId>
-		<version>1.0</version>
+		<groupId>winglongitude</groupId>
+		<artifactId>winglongitude-lontra</artifactId>
+		<version>0.1</version>
 	</parent>
 	
-	<groupId>net.canadensys</groupId>
 	<artifactId>lontra-harvester-ui</artifactId>
 	<packaging>jar</packaging>
-	<version>0.4-SNAPSHOT</version>
 	<name>lontra-harvester-ui</name>
 
 	<properties>
 		<appClass>net.canadensys.Main</appClass>
-		<spring.version>4.0.2.RELEASE</spring.version>
-		
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
-		<!-- maven-compiler-plugin config -->
-		<maven.compiler.source>6</maven.compiler.source>
-		<maven.compiler.target>6</maven.compiler.target>
 	</properties>
 
 	<repositories>
@@ -93,9 +84,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>net.canadensys</groupId>
+			<groupId>winglongitude</groupId>
 			<artifactId>lontra-harvester-lib</artifactId>
-			<version>0.4-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
