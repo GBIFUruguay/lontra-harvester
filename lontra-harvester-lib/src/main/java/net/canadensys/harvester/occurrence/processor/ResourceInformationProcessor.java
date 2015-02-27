@@ -79,7 +79,7 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 
 		// Fetch only first identifier available:
 		List<String> alternateIdentifiers = eml.getAlternateIdentifiers();
-		if (!alternateIdentifiers.equals(null) && !alternateIdentifiers.isEmpty()) {
+		if (alternateIdentifiers != null && !alternateIdentifiers.isEmpty()) {
 			metadata.setAlternate_identifier(alternateIdentifiers.get(0));
 		}
 		metadata.setCitation(eml.getCitationString());
@@ -89,7 +89,7 @@ public class ResourceInformationProcessor implements ItemProcessorIF<Eml, Resour
 		metadata.setIntellectual_rights(eml.getIntellectualRights());
 		// Fetch only the first keywords/thesaurus available:
 		List<KeywordSet> keyList = eml.getKeywords();
-		if (!keyList.equals(null) && !keyList.isEmpty()) {
+		if (keyList != null && !keyList.isEmpty()) {
 			KeywordSet keywordSet = keyList.get(0);
 			metadata.setKeyword(keywordSet.getKeywordsString());
 			metadata.setKeyword_thesaurus(keywordSet.getKeywordThesaurus());
