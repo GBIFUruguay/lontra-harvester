@@ -1,11 +1,11 @@
-canadensys-harvester-lib
+lontra-harvester-lib
 ========================
 
-Library component of the Canadensys harvester.
+Library component of the lontra harvester.
 
 Documentation
 -------------
-Visit our [wiki](https://github.com/Canadensys/canadensys-harvester/wiki)
+Visit our [wiki](https://github.com/WingLongitude/lontra-harvester/wiki)
 
 
 Dependencies
@@ -18,7 +18,7 @@ Dependencies
 ### Libraries
 * [Rome](https://github.com/rometools/rome)
 * [Jackson](https://github.com/FasterXML/jackson)
+* [liger-data-access](https://github.com/WingLongitude/liger-data-access)
 
 ### Projects
-* [Canadensys Data Access 2.2.2](https://github.com/Canadensys/canadensys-data-access)
 * [narwhal-processor 1.5](https://github.com/Canadensys/narwhal-processor)

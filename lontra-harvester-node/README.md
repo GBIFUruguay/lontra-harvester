@@ -1,7 +1,7 @@
-canadensys-harvester-node
+lontra-harvester-node
 =======================
 
-Canadensys harvester node
+lontra harvester node
 
 This application allows:
 * Process data from ActiveMQ queue
@@ -11,4 +11,4 @@ Dependencies
 ------------
 
 ### Projects
-* canadensys-harvester-lib
+* lontra-harvester-lib

@@ -1,7 +1,7 @@
-canadensys-harvester-ui
+lontra-harvester-ui
 =======================
 
-Swing based management tool for the Canadensys harvester.
+Swing based management tool for the lontra harvester.
 
 This tool allows:
 * Trigger the harvest for a single resource
@@ -15,4 +15,4 @@ Dependencies
 * [Apache CLI](http://commons.apache.org/proper/commons-cli/)
 
 ### Projects
-* canadensys-harvester-lib
+* lontra-harvester-lib
