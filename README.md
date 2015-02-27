@@ -1,13 +1,17 @@
-lontra-harvester
+#lontra-harvester
 
-Lightweight harvester used to feed the [canadensys-explorer](https://github.com/Canadensys/canadensys-explorer) from occurrence Darwin Core Archive. The ingested data are processed using the [narwhal-processor](https://github.com/Canadensys/narwhal-processor).
+Harvester used to feed the data portals based on [canadensys-explorer](https://github.com/Canadensys/canadensys-explorer) from occurrence Darwin Core Archive. The ingested data are processed using the [narwhal-processor](https://github.com/Canadensys/narwhal-processor).
+
+Code Status
+-----------
+[![Build Status](https://travis-ci.org/WingLongitude/lontra-harvester.png)](https://travis-ci.org/Canadensys/canadensys-harvester)
 
 Modules
 -------
-* [lontra-harvester-lib](https://github.com/Canadensys/canadensys-harvester/tree/master/canadensys-harvester-lib)
-* [lontra-harvester-ui](https://github.com/Canadensys/canadensys-harvester/tree/master/canadensys-harvester-ui)
-* [lontra-harvester-node](https://github.com/Canadensys/canadensys-harvester/tree/master/canadensys-harvester-node)
-* [lontra-harvrster-cli]()
+* [lontra-harvester-lib](https://github.com/WingLongitude/lontra-harvester/tree/master/lontra-harvester-lib)
+* [lontra-harvester-ui](https://github.com/WingLongitude/lontra-harvester/tree/master/lontra-harvester-ui)
+* [lontra-harvester-node](https://github.com/WingLongitude/lontra-harvester/tree/master/lontra-harvester-node)
+* [lontra-harvester-cli](https://github.com/WingLongitude/lontra-harvester/tree/master/lontra-harvester-cli)
 
 Documentation
 -------------
