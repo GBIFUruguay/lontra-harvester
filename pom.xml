@@ -6,27 +6,35 @@
 	<groupId>winglongitude</groupId>
 	<artifactId>winglongitude-lontra</artifactId>
 	<packaging>pom</packaging>
-	<version>1.0</version>
+	<version>0.1</version>
 	<name>WingLongitude Lontra Harvester</name>
-
+  
 	<modules>
-		<module>canadensys-harvester-lib</module>
-		<module>canadensys-harvester-ui</module>
-    <module>canadensys-harvester-node</module>
+		<module>lontra-harvester-lib</module>
+		<module>lontra-harvester-ui</module>
+		<module>lontra-harvester-node</module>
+		<module>lontra-harvester-cli</module>
 	</modules>
 
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
+		<compiler.source>1.7</compiler.source>
+		<compiler.target>1.7</compiler.target>
+    
+		<spring.version>4.0.9.RELEASE</spring.version>
+    
 		<junit.version>4.11</junit.version>
 	</properties>
 	<scm>
-		<connection>scm:git:git@github.com:Canadensys/canadensys-harvester.git</connection>
-		<developerConnection>scm:git:git@github.com:Canadensys/canadensys-harvester.git</developerConnection>
-		<url>scm:git:git@github.com:Canadensys/canadensys-harvester.git</url>
+		<connection>scm:git:git@github.com:WingLongitude/lontra-harvester.git</connection>
+		<developerConnection>scm:git:git@github.com:WingLongitude/lontra-harvester.git</developerConnection>
+		<url>scm:git:git@github.com:WingLongitude/lontra-harvester.git</url>
 	</scm>
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/Canadensys/canadensys-harvester/issues</url>
+		<url>https://github.com/WingLongitude/lontra-harvester/issues</url>
 	</issueManagement>
 
 	<repositories>
@@ -35,7 +43,20 @@
 			<url>http://repository.gbif.org/content/groups/gbif</url>
 		</repository>
 	</repositories>
-
+  
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.2</version>
+				<configuration>
+					<source>${compiler.source}</source>
+					<target>${compiler.target}</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+  
 	<dependencies>
 		<!-- TEST SCOPE -->
 		<dependency>

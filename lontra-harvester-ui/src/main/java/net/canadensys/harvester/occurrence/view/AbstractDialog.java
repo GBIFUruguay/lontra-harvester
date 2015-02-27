@@ -1,0 +1,142 @@
+package net.canadensys.harvester.occurrence.view;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+import net.canadensys.harvester.occurrence.controller.StepControllerIF;
+
+/**
+ * Abstract dialog display with select, cancel buttons.
+ * 
+ * @author canadensys
+ * 
+ */
+public abstract class AbstractDialog extends JDialog {
+
+	private static final long serialVersionUID = -1880715071077984208L;
+
+	// UI components
+	private JPanel mainPanel;
+	protected JPanel contentPanel;
+
+	protected JButton selectBtn = null;
+	protected JButton cancelBtn = null;
+
+	protected StepControllerIF stepController;
+
+	protected JComboBox<String> publishersCmbBox = null;
+	
+	// If this is true, this is a resource edition dialog. If not, it is a resource addition dialog.
+	protected boolean isEdition = false;
+
+	// initialize with CANCEL_OPTION to handle the case when the dialog is
+	// closed with the 'X'
+	protected int exitValue = JOptionPane.CANCEL_OPTION;
+	
+	public AbstractDialog(String title, StepControllerIF stpCtl, boolean isEdition) {
+		// Set stepController:
+		this.stepController = stpCtl;
+		this.isEdition = isEdition;
+		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		this.setTitle(title);
+		this.setModal(true);
+
+		// panel used by subclasses
+		contentPanel = new JPanel();
+		init(contentPanel);
+		innerInit();
+		postInit();
+
+		pack();
+	}
+
+	private void innerInit() {
+		mainPanel = new JPanel();
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.fill = GridBagConstraints.BOTH;
+		c.weightx = 1.0;
+		c.weighty = 1.0;
+
+		mainPanel.add(contentPanel, c);
+
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new GridBagLayout());
+
+		// select button
+		selectBtn = new JButton(Messages.getString("view.button.select"));
+		selectBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onSelect();
+			}
+		});
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		buttonPanel.add(selectBtn, c);
+
+		// close button
+		cancelBtn = new JButton(Messages.getString("view.button.cancel"));
+		cancelBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onCancel();
+			}
+		});
+		c = new GridBagConstraints();
+		c.gridx = 1;
+		c.gridy = 0;
+		buttonPanel.add(cancelBtn, c);
+
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 2;
+		c.gridwidth = 2;
+		mainPanel.add(buttonPanel, c);
+
+		setLayout(new GridBagLayout());
+		mainPanel.setLayout(new GridBagLayout());
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 1;
+		mainPanel.add(buttonPanel, c);
+		this.add(mainPanel, c);
+	}
+
+	/**
+	 * Returns the 'option' chosen to exit the dialog.
+	 * 
+	 * @return JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION
+	 */
+	public int getExitValue() {
+		return exitValue;
+	}
+
+	/**
+	 * Initialization function of the sub class.
+	 * 
+	 * @param contentPanel
+	 *            Panel to add user components
+	 */
+	protected abstract void init(JPanel contentPanel);
+
+	/**
+	 * Called after all initialization methods but before pack().
+	 */
+	protected abstract void postInit();
+
+	protected abstract void onSelect();
+
+	protected abstract void onCancel();
+
+}
