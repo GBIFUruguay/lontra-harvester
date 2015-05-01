@@ -30,7 +30,7 @@ public class ResourceInformationProcessorTest {
 		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID, uuid);
 		sharedParameters.put(SharedParameterEnum.RESOURCE_ID, 1);
 
-		ResourceInformationProcessor informationProcessor = new ResourceInformationProcessor();
+		ResourceMetadataProcessor informationProcessor = new ResourceMetadataProcessor();
 		Eml eml = new Eml();
 
 		eml.setAbstract("This is a generic abstract information");

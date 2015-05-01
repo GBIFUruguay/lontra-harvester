@@ -48,7 +48,7 @@ import net.canadensys.harvester.occurrence.notification.impl.DefaultResourceStat
 import net.canadensys.harvester.occurrence.processor.DwcaExtensionLineProcessor;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
-import net.canadensys.harvester.occurrence.processor.ResourceInformationProcessor;
+import net.canadensys.harvester.occurrence.processor.ResourceMetadataProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaEmlReader;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionInfoReader;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
@@ -371,7 +371,7 @@ public class UIConfig {
 
 	@Bean(name = "resourceInformationProcessor")
 	public ItemProcessorIF<Eml, ResourceMetadataModel> resourceInformationProcessor() {
-		return new ResourceInformationProcessor();
+		return new ResourceMetadataProcessor();
 	}
 
 	// ---READER wiring---

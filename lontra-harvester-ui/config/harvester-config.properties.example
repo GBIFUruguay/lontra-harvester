@@ -14,5 +14,6 @@ jms.broker_url=tcp://127.0.0.1:61616
 
 # SQL query to get 100 ID from the occurrence_raw table
 occurrence.idGenerationSQL=SELECT nextval('buffer.occurrence_auto_id_seq') FROM generate_series(1,100)
+occurrence.extension.idGenerationSQL=SELECT nextval('buffer.occurrence_extension_id_seq') FROM generate_series(1,100)
 
 ipt.rss=http://data.canadensys.net/ipt/rss.do

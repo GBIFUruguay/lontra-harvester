@@ -24,10 +24,10 @@ import org.gbif.metadata.eml.KeywordSet;
  * @author Pedro Guimarães
  * 
  */
-public class ResourceInformationProcessor implements ItemProcessorIF<Eml, ResourceMetadataModel> {
+public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceMetadataModel> {
 
 	// get log4j handler
-	private static final Logger LOGGER = Logger.getLogger(ResourceInformationProcessor.class);
+	private static final Logger LOGGER = Logger.getLogger(ResourceMetadataProcessor.class);
 
 	@Override
 	public void init() {

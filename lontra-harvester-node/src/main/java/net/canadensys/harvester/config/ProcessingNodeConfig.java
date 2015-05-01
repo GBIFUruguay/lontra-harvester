@@ -20,7 +20,7 @@ import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.main.ProcessingNodeMain;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
-import net.canadensys.harvester.occurrence.processor.ResourceInformationProcessor;
+import net.canadensys.harvester.occurrence.processor.ResourceMetadataProcessor;
 import net.canadensys.harvester.occurrence.step.InsertResourceInformationStep;
 import net.canadensys.harvester.occurrence.step.async.AsyncManageOccurrenceExtensionStep;
 import net.canadensys.harvester.occurrence.step.async.ProcessInsertOccurrenceStep;
@@ -200,7 +200,7 @@ public class ProcessingNodeConfig {
 
 	@Bean(name = "resourceInformationProcessor")
 	public ItemProcessorIF<Eml, ResourceMetadataModel> resourceInformationProcessor() {
-		return new ResourceInformationProcessor();
+		return new ResourceMetadataProcessor();
 	}
 
 	@Bean
