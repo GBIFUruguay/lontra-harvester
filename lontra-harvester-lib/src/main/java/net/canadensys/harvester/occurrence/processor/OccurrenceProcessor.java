@@ -1,5 +1,9 @@
 package net.canadensys.harvester.occurrence.processor;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -11,7 +15,9 @@ import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
+import net.canadensys.parser.DictionaryBasedValueParser;
 import net.canadensys.processor.AbstractDataProcessor;
+import net.canadensys.processor.DictionaryBackedProcessor;
 import net.canadensys.processor.ProcessingResult;
 import net.canadensys.processor.datetime.DateIntervalProcessor;
 import net.canadensys.processor.datetime.DateProcessor;
@@ -19,19 +25,16 @@ import net.canadensys.processor.geography.CountryContinentProcessor;
 import net.canadensys.processor.geography.CountryProcessor;
 import net.canadensys.processor.geography.DecimalLatLongProcessor;
 import net.canadensys.processor.geography.DegreeMinuteToDecimalProcessor;
-import net.canadensys.processor.geography.StateProvinceProcessor;
 import net.canadensys.processor.numeric.NumericPairDataProcessor;
 import net.canadensys.utils.ArrayUtils;
 import net.canadensys.vocabulary.Continent;
-import net.canadensys.vocabulary.stateprovince.BEProvince;
-import net.canadensys.vocabulary.stateprovince.CAProvince;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.math.util.MathUtils;
+import org.apache.commons.math3.util.Precision;
 import org.apache.log4j.Logger;
 import org.gbif.api.model.checklistbank.ParsedName;
-import org.gbif.api.model.vocabulary.Country;
+import org.gbif.api.vocabulary.Country;
 import org.gbif.api.vocabulary.NameType;
 import org.gbif.nameparser.NameParser;
 import org.gbif.nameparser.UnparsableException;
@@ -40,9 +43,9 @@ import com.google.common.base.CharMatcher;
 
 /**
  * Processing each OccurrenceRawModel into OccurrenceModel.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, OccurrenceModel> {
 
@@ -68,14 +71,34 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 	private final AbstractDataProcessor altitudeProcessor = new NumericPairDataProcessor("minimumelevationinmeters", "maximumelevationinmeters");
 	private final DegreeMinuteToDecimalProcessor dmsProcessor = new DegreeMinuteToDecimalProcessor();
 
-	private static Map<String, AbstractDataProcessor> stateProvinceProcessorMap = new HashMap<String, AbstractDataProcessor>();
-	static {
-		stateProvinceProcessorMap.put(Country.CANADA.getTitle(), new StateProvinceProcessor<CAProvince>(Country.CANADA, CAProvince.class));
-		stateProvinceProcessorMap.put(Country.BELGIUM.getTitle(), new StateProvinceProcessor<BEProvince>(Country.BELGIUM, BEProvince.class));
-	}
+	private final Map<String, AbstractDataProcessor> iso3166_2ProcessorMap = new HashMap<String, AbstractDataProcessor>();
+	private final Map<String, AbstractDataProcessor> stateProvinceProcessorMap = new HashMap<String, AbstractDataProcessor>();
 
 	@Override
 	public void init() {
+		Map<String, File> iso3166_2Files = StateProvinceHelper.getISO3166_2DictionaryFiles();
+		Map<String, File> stateProvinceFiles = StateProvinceHelper.getStateProvinceNameDictionaryFiles();
+
+		DictionaryBasedValueParser dbvp;
+		for (String isoCode : iso3166_2Files.keySet()) {
+			try {
+				dbvp = new DictionaryBasedValueParser(new InputStream[] { new FileInputStream(iso3166_2Files.get(isoCode)) });
+				iso3166_2ProcessorMap.put(isoCode, new DictionaryBackedProcessor(dbvp));
+			}
+			catch (FileNotFoundException ioEx) {
+				LOGGER.error("Can't read file fro ISO " + isoCode, ioEx);
+			}
+		}
+
+		for (String isoCode : stateProvinceFiles.keySet()) {
+			try {
+				dbvp = new DictionaryBasedValueParser(new InputStream[] { new FileInputStream(stateProvinceFiles.get(isoCode)) });
+				stateProvinceProcessorMap.put(isoCode, new DictionaryBackedProcessor(dbvp));
+			}
+			catch (FileNotFoundException ioEx) {
+				LOGGER.error("Can't read file fro ISO " + isoCode, ioEx);
+			}
+		}
 	}
 
 	@Override
@@ -178,9 +201,10 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 	}
 
 	/**
+	 * FIXME we should keep the pipe character
 	 * This method will normalize the separator(in case of multiple URLs) of an URL field.
 	 * TODO : test the URL?
-	 * 
+	 *
 	 * @param rawURLField
 	 * @return
 	 */
@@ -204,7 +228,7 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 	 * The raw scientificname will be set into the rawscientificname.
 	 * If it's not possible to parse this scientific name, the raw scientific name will be kept in scientificname
 	 * and will also be in rawscientificname.
-	 * 
+	 *
 	 * @param rawModel
 	 * @param occModel
 	 */
@@ -241,7 +265,7 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 
 	/**
 	 * Process 'eventdate' or 'verbatimeventdate'
-	 * 
+	 *
 	 * @param rawModel
 	 * @param occModel
 	 */
@@ -296,7 +320,7 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 	/**
 	 * Try to process the providedDateInterval as date interval.
 	 * Only complete start and end dates are supported for now.
-	 * 
+	 *
 	 * @param providedDateInterval
 	 * @param occModel
 	 * @param pr
@@ -330,7 +354,7 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 
 	/**
 	 * //lat long parsing
-	 * 
+	 *
 	 * @param rawModel
 	 * @param occModel
 	 */
@@ -387,14 +411,14 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 		// compute the rounded average elevation
 		if (minElevationDouble != null && maxElevationDouble != null) {
 			avgElevationDouble = (minElevationDouble + maxElevationDouble) / 2d;
-			occModel.setAveragealtituderounded(((int) MathUtils.round(avgElevationDouble / 100d, 0)) * 100);
+			occModel.setAveragealtituderounded(((int) Precision.round(avgElevationDouble / 100d, 0)) * 100);
 		}
 	}
 
 	/**
 	 * Validate start date value and make sure they are valid. If not, remove them from occModel.
 	 * TODO should be replaced by dwca-validator library
-	 * 
+	 *
 	 * @param occModel
 	 */
 	private void validateStartDate(OccurrenceModel occModel) {
@@ -432,7 +456,7 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 
 	/**
 	 * Make sure the date is within accepted range and set the decade.
-	 * 
+	 *
 	 * @param occModel
 	 */
 	private void secondPassDateProcess(OccurrenceModel occModel) {

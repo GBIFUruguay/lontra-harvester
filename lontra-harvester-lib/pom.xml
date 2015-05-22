@@ -18,13 +18,13 @@
 		<postgresql.version>9.3-1102-jdbc4</postgresql.version>
 		<jsch.version>0.1.51</jsch.version>
 		<activemq.version>5.10.0</activemq.version>
-		<narwhal.version>1.5.2</narwhal.version>
+		<narwhal.version>1.5.3</narwhal.version>
 		<data-access.version>2.12.0</data-access.version>
-			
-		<gbif-api.version>0.10</gbif-api.version>
-		<dwca-reader.version>1.18</dwca-reader.version>
+		<commons-validator.version>1.4.1</commons-validator.version>
+		
+		<dwca-reader.version>1.21</dwca-reader.version>
 	</properties>
-
+	
 	<repositories>
 		<repository>
 			<id>gbif-all</id>
@@ -58,6 +58,11 @@
 			<version>${activemq.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>commons-validator</groupId>
+			<artifactId>commons-validator</artifactId>
+			<version>${commons-validator.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.jcraft</groupId>
 			<artifactId>jsch</artifactId>
 			<version>${jsch.version}</version>
@@ -66,6 +71,11 @@
 			<groupId>winglongitude</groupId>
 			<artifactId>liger-data-access</artifactId>
 			<version>${data-access.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>winglongitude</groupId>
+			<artifactId>shared-dictionaries</artifactId>
+			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -83,11 +93,6 @@
 			<groupId>org.gbif</groupId>
 			<artifactId>dwca-reader</artifactId>
 			<version>${dwca-reader.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.gbif</groupId>
-			<artifactId>gbif-api</artifactId>
-			<version>${gbif-api.version}</version>
 		</dependency>
 
 		<dependency>
