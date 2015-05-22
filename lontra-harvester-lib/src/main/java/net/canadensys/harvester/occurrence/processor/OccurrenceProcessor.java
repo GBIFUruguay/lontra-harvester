@@ -1,8 +1,5 @@
 package net.canadensys.harvester.occurrence.processor;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -76,28 +73,18 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 
 	@Override
 	public void init() {
-		Map<String, File> iso3166_2Files = StateProvinceHelper.getISO3166_2DictionaryFiles();
-		Map<String, File> stateProvinceFiles = StateProvinceHelper.getStateProvinceNameDictionaryFiles();
+		Map<String, InputStream> iso3166_2Files = StateProvinceHelper.getISO3166_2DictionaryInputStreams();
+		Map<String, InputStream> stateProvinceFiles = StateProvinceHelper.getStateProvinceNameDictionaryInputStreams();
 
 		DictionaryBasedValueParser dbvp;
 		for (String isoCode : iso3166_2Files.keySet()) {
-			try {
-				dbvp = new DictionaryBasedValueParser(new InputStream[] { new FileInputStream(iso3166_2Files.get(isoCode)) });
-				iso3166_2ProcessorMap.put(isoCode, new DictionaryBackedProcessor(dbvp));
-			}
-			catch (FileNotFoundException ioEx) {
-				LOGGER.error("Can't read file fro ISO " + isoCode, ioEx);
-			}
+			dbvp = new DictionaryBasedValueParser(new InputStream[] { iso3166_2Files.get(isoCode) });
+			iso3166_2ProcessorMap.put(isoCode, new DictionaryBackedProcessor(dbvp));
 		}
 
 		for (String isoCode : stateProvinceFiles.keySet()) {
-			try {
-				dbvp = new DictionaryBasedValueParser(new InputStream[] { new FileInputStream(stateProvinceFiles.get(isoCode)) });
-				stateProvinceProcessorMap.put(isoCode, new DictionaryBackedProcessor(dbvp));
-			}
-			catch (FileNotFoundException ioEx) {
-				LOGGER.error("Can't read file fro ISO " + isoCode, ioEx);
-			}
+			dbvp = new DictionaryBasedValueParser(new InputStream[] { stateProvinceFiles.get(isoCode) });
+			stateProvinceProcessorMap.put(isoCode, new DictionaryBackedProcessor(dbvp));
 		}
 	}
 

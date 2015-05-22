@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
@@ -19,9 +21,9 @@ import org.xml.sax.SAXException;
 
 /**
  * Item reader for an EML file inside a DarwinCore Archive
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class DwcaEmlReader implements ItemReaderIF<Eml> {
 
@@ -63,6 +65,9 @@ public class DwcaEmlReader implements ItemReaderIF<Eml> {
 			LOGGER.fatal("Can't open DwcaEmlReader", e);
 		}
 		catch (SAXException e) {
+			LOGGER.fatal("Can't open DwcaEmlReader", e);
+		}
+		catch (ParserConfigurationException e) {
 			LOGGER.fatal("Can't open DwcaEmlReader", e);
 		}
 	}

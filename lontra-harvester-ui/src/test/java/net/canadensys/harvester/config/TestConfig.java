@@ -63,6 +63,7 @@ import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.ResourceMetadataHibernateWriter;
 import net.canadensys.harvester.task.ValidateSchemaVersion;
 
+import org.gbif.dwc.terms.Term;
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
@@ -215,13 +216,13 @@ public class TestConfig {
 	}
 
 	@Bean
-	public ItemReaderIF<String> dwcaExtensionInfoReader() {
+	public ItemReaderIF<Term> dwcaExtensionInfoReader() {
 		return new DwcaExtensionInfoReader();
 	}
 
 	/**
 	 * Always return a new instance.
-	 * 
+	 *
 	 * @return
 	 */
 	@Bean
@@ -318,7 +319,7 @@ public class TestConfig {
 	/**
 	 * Always return a new instance. We do not want to share JMS Writer
 	 * instance.
-	 * 
+	 *
 	 * @return
 	 */
 	@Bean

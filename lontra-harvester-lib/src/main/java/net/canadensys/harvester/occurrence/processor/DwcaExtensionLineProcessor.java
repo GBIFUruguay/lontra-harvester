@@ -10,6 +10,7 @@ import net.canadensys.harvester.exception.TaskExecutionException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
 import org.apache.log4j.Logger;
+import org.gbif.dwc.terms.Term;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.SessionFactory;
@@ -21,9 +22,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Processing each line read from an Darwin Core extension.
  * Assign an unique id and set the sourceFileId.
  * NOT thread safe
- * 
+ *
  * @author canadenys
- * 
+ *
  */
 public class DwcaExtensionLineProcessor implements ItemProcessorIF<OccurrenceExtensionModel, OccurrenceExtensionModel> {
 
@@ -65,7 +66,7 @@ public class DwcaExtensionLineProcessor implements ItemProcessorIF<OccurrenceExt
 
 		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
 		String resourceUUID = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
-		String extensionType = (String) sharedParameters.get(SharedParameterEnum.DWCA_EXTENSION_TYPE);
+		Term extensionType = (Term) sharedParameters.get(SharedParameterEnum.DWCA_EXTENSION_TYPE);
 
 		if (sourceFileId == null) {
 			LOGGER.fatal("Misconfigured processor : sourceFileId required");
@@ -82,7 +83,7 @@ public class DwcaExtensionLineProcessor implements ItemProcessorIF<OccurrenceExt
 
 		data.setSourcefileid(sourceFileId);
 		data.setResource_uuid(resourceUUID);
-		data.setExt_type(extensionType);
+		data.setExt_type(extensionType.simpleName());
 		if (nextId == null || idPoll.isEmpty()) {
 			try {
 				idPoll = sqlQuery.list();

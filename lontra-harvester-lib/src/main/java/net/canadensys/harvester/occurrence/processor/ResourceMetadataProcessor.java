@@ -14,15 +14,16 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
 import org.apache.log4j.Logger;
 import org.gbif.metadata.eml.Agent;
+import org.gbif.metadata.eml.Collection;
 import org.gbif.metadata.eml.Eml;
 import org.gbif.metadata.eml.KeywordSet;
 
 /**
  * Process org.gbif.metadata.eml.Eml to extract info into a ResourceMetadataModel.
- * 
+ *
  * @author cgendreau
  * @author Pedro Guimarães
- * 
+ *
  */
 public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceMetadataModel> {
 
@@ -83,8 +84,14 @@ public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceM
 			metadata.setAlternate_identifier(alternateIdentifiers.get(0));
 		}
 		metadata.setCitation(eml.getCitationString());
-		metadata.setCollection_identifier(eml.getCollectionId());
-		metadata.setCollection_name(eml.getCollectionName());
+
+		// FIXME we only take one collection
+		for (Collection c : eml.getCollections()) {
+			metadata.setCollection_identifier(c.getCollectionId());
+			metadata.setCollection_name(c.getCollectionName());
+			metadata.setParent_collection_identifier(c.getParentCollectionId());
+			break;
+		}
 		metadata.setHierarchy_level(eml.getHierarchyLevel());
 		metadata.setIntellectual_rights(eml.getIntellectualRights());
 		// Fetch only the first keywords/thesaurus available:
@@ -95,7 +102,6 @@ public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceM
 			metadata.setKeyword_thesaurus(keywordSet.getKeywordThesaurus());
 		}
 		metadata.setLanguage(eml.getLanguage());
-		metadata.setParent_collection_identifier(eml.getParentCollectionId());
 		metadata.setPublication_date(eml.getPubDate());
 		metadata.setResource_logo_url(eml.getLogoUrl());
 		// TODO: verify what field should relate to this:
@@ -105,21 +111,13 @@ public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceM
 		metadata.setTitle(eml.getTitle());
 
 		// Add resource contacts information:
-		Agent tempAgent = null;
-
-		// Add contact agents
-		tempAgent = eml.getContact();
-		if (tempAgent != null) {
+		for (Agent tempAgent : eml.getContacts()) {
 			metadata.addContact(buildContactFromAgent(tempAgent, guid, ResourceMetadataDAO.ContactRole.CONTACT));
 		}
-		// Add resource metadata provider information:
-		tempAgent = eml.getMetadataProvider();
-		if (tempAgent != null) {
+		for (Agent tempAgent : eml.getMetadataProviders()) {
 			metadata.addContact(buildContactFromAgent(tempAgent, guid, ResourceMetadataDAO.ContactRole.METADATA_PROVIDER));
 		}
-		// Add resource creator information:
-		tempAgent = eml.getResourceCreator();
-		if (tempAgent != null) {
+		for (Agent tempAgent : eml.getCreators()) {
 			metadata.addContact(buildContactFromAgent(tempAgent, guid, ResourceMetadataDAO.ContactRole.RESOURCE_CREATOR));
 		}
 		// Add associatedParties information:
@@ -132,7 +130,7 @@ public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceM
 
 	/**
 	 * Configure each ResourceContactModel based on an EML Agent, setting it's proper resource_uuid and contact_type
-	 * 
+	 *
 	 * @param agent
 	 * @param resource_uuid
 	 * @param role
@@ -152,6 +150,7 @@ public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceM
 		contact.setPostal_code(agent.getAddress().getPostalCode());
 
 		contact.setRole(role.getKey());
+
 		return contact;
 	}
 

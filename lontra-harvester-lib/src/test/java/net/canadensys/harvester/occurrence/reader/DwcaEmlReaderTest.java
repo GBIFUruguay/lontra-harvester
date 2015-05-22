@@ -13,9 +13,9 @@ import org.junit.Test;
 
 /**
  * Test the reading of an EML file and get an Eml object back.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class DwcaEmlReaderTest {
 
@@ -26,6 +26,6 @@ public class DwcaEmlReaderTest {
 		ItemReaderIF<Eml> emlreader = new DwcaEmlReader();
 		emlreader.openReader(sharedParameters);
 		Eml eml = emlreader.read();
-		assertEquals("Louise Cloutier", eml.getContact().getFullName());
+		assertEquals("Louise Cloutier", eml.getContacts().get(0).getFullName());
 	}
 }

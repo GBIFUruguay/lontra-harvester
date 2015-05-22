@@ -17,6 +17,7 @@ import net.canadensys.harvester.occurrence.message.DefaultMessage;
 import net.canadensys.harvester.occurrence.mock.writer.MockMessageWriter;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
 
+import org.gbif.dwc.terms.GbifTerm;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,9 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 /**
  * Test StreamDwcExtensionContentStep
- * 
+ *
  * @author cgendreau
- * 
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ProcessingConfigTest.class, loader = AnnotationConfigContextLoader.class)
@@ -55,7 +56,7 @@ public class StreamDwcExtensionContentStepTest {
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "dwca-vascan-checklist");
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-vascan-checklist");
-		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE, "description");
+		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE, GbifTerm.Description);
 		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID, "1");
 
 		streamExtStep.preStep(sharedParameters);

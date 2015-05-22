@@ -12,13 +12,14 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.mock.MockHabitObject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.gbif.dwc.terms.GbifTerm;
 import org.junit.Test;
 
 /**
  * Test the reading of a DarwinCore extension file and get a custom object back.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class DwcaExtensionReaderTest {
 
@@ -26,7 +27,7 @@ public class DwcaExtensionReaderTest {
 	public void testExtensionReading() {
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-vascan-checklist");
-		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE, "description");
+		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE, GbifTerm.Description);
 
 		DwcaExtensionReader<MockHabitObject> extReader = new DwcaExtensionReader<MockHabitObject>();
 		extReader.setMapper(new DefaultBeanMapper<MockHabitObject>(MockHabitObject.class));

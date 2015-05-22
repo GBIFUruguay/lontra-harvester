@@ -25,6 +25,7 @@ import net.canadensys.harvester.occurrence.step.async.GenericAsyncStep;
 import net.canadensys.harvester.occurrence.step.stream.AbstractStreamStep;
 import net.canadensys.harvester.occurrence.step.stream.GenericStreamStep;
 
+import org.gbif.dwc.terms.GbifTerm;
 import org.junit.Test;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -32,7 +33,7 @@ import com.google.common.util.concurrent.FutureCallback;
 /**
  * Test aiming to test a job create with and for user defined object.
  * MockHabitObject is used as the user defined object.
- * 
+ *
  * Sequence:
  * -Read data from a DarwinCore extension file
  * -Map it to MockHabitObject
@@ -41,9 +42,9 @@ import com.google.common.util.concurrent.FutureCallback;
  * -Create another node(mocked) that would receive the message through a GenericAsyncProcessingStep step
  * -Rebuild the MockHabitObject from the received message (and process it in GenericAsyncProcessingStep)
  * -Write the objects
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class UserDefinedJobTest {
 
@@ -107,7 +108,7 @@ public class UserDefinedJobTest {
 		jmsReader.open();
 
 		userDefinedJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-vascan-checklist");
-		userDefinedJob.addToSharedParameters(SharedParameterEnum.DWCA_EXTENSION_TYPE, "description");
+		userDefinedJob.addToSharedParameters(SharedParameterEnum.DWCA_EXTENSION_TYPE, GbifTerm.Description);
 
 		userDefinedJob.doJob();
 
@@ -214,9 +215,9 @@ public class UserDefinedJobTest {
 
 	/**
 	 * Inner class to handle callbacks with a synchronized object.
-	 * 
+	 *
 	 * @author canadensys
-	 * 
+	 *
 	 */
 	private class InnerCallback implements FutureCallback<Void> {
 		private final AtomicBoolean notifyObject;
@@ -241,9 +242,9 @@ public class UserDefinedJobTest {
 
 	/**
 	 * User defined job declared as inner class.
-	 * 
+	 *
 	 * @author canadensys
-	 * 
+	 *
 	 */
 	private class InnerUserDefinedJob extends AbstractProcessingJob {
 		private AbstractStreamStep genericStreamStep;

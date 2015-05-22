@@ -4,6 +4,10 @@ before_install:
  - git clone https://github.com/Canadensys/narwhal-processor.git
  - cd narwhal-processor
  - mvn install
+ - cd ..
+ - git clone https://github.com/WingLongitude/shared-dictionaries.git
+ - cd shared-dictionaries
+ - mvn install
  - cd ../lontra-harvester
 jdk:
   - oraclejdk7

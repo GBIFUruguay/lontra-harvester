@@ -74,6 +74,7 @@ import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.ResourceMetadataHibernateWriter;
 import net.canadensys.harvester.task.ValidateSchemaVersion;
 
+import org.gbif.dwc.terms.Term;
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
@@ -91,9 +92,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /**
  * Configuration class using Spring annotations.
  * All the beans that could be changed based on configuration or could be mock are created from here.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 @Configuration
 @EnableTransactionManagement
@@ -386,13 +387,13 @@ public class UIConfig {
 	}
 
 	@Bean
-	public ItemReaderIF<String> dwcaExtensionInfoReader() {
+	public ItemReaderIF<Term> dwcaExtensionInfoReader() {
 		return new DwcaExtensionInfoReader();
 	}
 
 	/**
 	 * Always return a new instance.
-	 * 
+	 *
 	 * @return
 	 */
 	@Bean
@@ -461,7 +462,7 @@ public class UIConfig {
 
 	/**
 	 * Always return a new instance. We do not want to share JMS Writer instance.
-	 * 
+	 *
 	 * @return
 	 */
 	@Bean

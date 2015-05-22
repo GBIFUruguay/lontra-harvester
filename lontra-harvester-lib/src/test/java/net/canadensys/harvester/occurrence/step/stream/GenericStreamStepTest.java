@@ -17,13 +17,14 @@ import net.canadensys.harvester.occurrence.mock.writer.MockObjectWriter;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
 import net.canadensys.harvester.occurrence.step.async.GenericAsyncStep;
 
+import org.gbif.dwc.terms.GbifTerm;
 import org.junit.Test;
 
 /**
  * Unit test for GenericStreamStep
- * 
+ *
  * @author cgendreau
- * 
+ *
  */
 public class GenericStreamStepTest {
 
@@ -33,7 +34,7 @@ public class GenericStreamStepTest {
 		MockObjectWriter<ProcessingMessageIF> writer = new MockObjectWriter<ProcessingMessageIF>();
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-vascan-checklist");
-		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE, "description");
+		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE, GbifTerm.Description);
 		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID, "1");
 
 		// setup reader

@@ -15,16 +15,15 @@ import net.canadensys.harvester.exception.WriterException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
 import org.gbif.dwc.terms.Term;
-import org.gbif.dwc.terms.TermFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 
 /**
  * Read, process and write all occurrence extension(s) data from an archive.
- * 
+ *
  * @author cgendreau
- * 
+ *
  */
 public class SynchronousProcessOccurrenceExtensionStep implements StepIF {
 
@@ -35,7 +34,7 @@ public class SynchronousProcessOccurrenceExtensionStep implements StepIF {
 
 	@Autowired
 	@Qualifier("dwcaExtensionInfoReader")
-	private ItemReaderIF<String> dwcaInfoReader;
+	private ItemReaderIF<Term> dwcaInfoReader;
 
 	@Autowired
 	@Qualifier("extLineProcessor")
@@ -76,9 +75,8 @@ public class SynchronousProcessOccurrenceExtensionStep implements StepIF {
 	public StepResult doStep() {
 		List<OccurrenceExtensionModel> occExtList = new ArrayList<OccurrenceExtensionModel>(DEFAULT_FLUSH_INTERVAL);
 		int numberOfRecords = 0;
-		String currExtension = dwcaInfoReader.read();
+		Term currExtension = dwcaInfoReader.read();
 		while (currExtension != null) {
-			Term extTerm = TermFactory.instance().findTerm(currExtension);
 			// TODO if there is more than one extension maybe trigger on thread per extension?
 			// create a reader
 			ItemReaderIF<OccurrenceExtensionModel> extReader = (ItemReaderIF<OccurrenceExtensionModel>) appContext
@@ -88,7 +86,7 @@ public class SynchronousProcessOccurrenceExtensionStep implements StepIF {
 			// this is probably not the best way to achieve that
 			Map<SharedParameterEnum, Object> innerSharedParameters = new HashMap<SharedParameterEnum, Object>(sharedParameters);
 
-			innerSharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE, extTerm.simpleName());
+			innerSharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE, currExtension);
 			extReader.openReader(innerSharedParameters);
 
 			try {
