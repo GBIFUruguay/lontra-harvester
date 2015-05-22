@@ -23,6 +23,7 @@
 		<commons-validator.version>1.4.1</commons-validator.version>
 		
 		<dwca-reader.version>1.21</dwca-reader.version>
+		<gbif-metadata-profile.version>1.1</gbif-metadata-profile.version>
 	</properties>
 	
 	<repositories>
@@ -93,6 +94,11 @@
 			<groupId>org.gbif</groupId>
 			<artifactId>dwca-reader</artifactId>
 			<version>${dwca-reader.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.gbif</groupId>
+			<artifactId>gbif-metadata-profile</artifactId>
+			<version>${gbif-metadata-profile.version}</version>
 		</dependency>
 
 		<dependency>
