@@ -8,13 +8,15 @@ import java.util.Map;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
+import org.gbif.dwc.terms.GbifTerm;
+import org.gbif.dwc.terms.Term;
 import org.junit.Test;
 
 /**
  * Test the reading of the name(rowType) of all extensions included in a DarwinCore Archive.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class ExtensionInfoReaderTest {
 
@@ -23,10 +25,10 @@ public class ExtensionInfoReaderTest {
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
 
-		ItemReaderIF<String> extInfoReader = new DwcaExtensionInfoReader();
+		ItemReaderIF<Term> extInfoReader = new DwcaExtensionInfoReader();
 		extInfoReader.openReader(sharedParameters);
 
-		String providedExtension = extInfoReader.read();
-		assertEquals("http://rs.gbif.org/terms/1.0/Multimedia", providedExtension);
+		Term providedExtension = extInfoReader.read();
+		assertEquals(GbifTerm.Multimedia, providedExtension);
 	}
 }

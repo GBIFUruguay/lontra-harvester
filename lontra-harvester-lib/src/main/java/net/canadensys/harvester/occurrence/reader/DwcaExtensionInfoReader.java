@@ -10,6 +10,7 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.gbif.dwc.terms.Term;
 import org.gbif.dwc.text.Archive;
 import org.gbif.dwc.text.ArchiveFactory;
 import org.gbif.dwc.text.ArchiveFile;
@@ -17,11 +18,11 @@ import org.gbif.dwc.text.UnsupportedArchiveException;
 
 /**
  * ItemReader to read the name(rowType) of all extensions included in a DarwinCore Archive.
- * 
+ *
  * @author cgendreau
- * 
+ *
  */
-public class DwcaExtensionInfoReader implements ItemReaderIF<String> {
+public class DwcaExtensionInfoReader implements ItemReaderIF<Term> {
 
 	// get log4j handler
 	private static final Logger LOGGER = Logger.getLogger(DwcaExtensionInfoReader.class);
@@ -62,7 +63,7 @@ public class DwcaExtensionInfoReader implements ItemReaderIF<String> {
 	}
 
 	@Override
-	public String read() {
+	public Term read() {
 		if (extIt != null && extIt.hasNext()) {
 			return extIt.next().getRowType();
 		}
