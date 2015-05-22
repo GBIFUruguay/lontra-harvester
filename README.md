@@ -4,7 +4,7 @@ Harvester used to feed the data portals based on [canadensys-explorer](https://g
 
 Code Status
 -----------
-[![Build Status](https://travis-ci.org/WingLongitude/lontra-harvester.png)](https://travis-ci.org/Canadensys/canadensys-harvester)
+[![Build Status](https://travis-ci.org/WingLongitude/lontra-harvester.png)](https://travis-ci.org/WingLongitude/lontra-harvester)
 
 Modules
 -------
