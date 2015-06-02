@@ -146,8 +146,8 @@ public class StepController implements StepControllerIF {
 	 */
 	@Override
 	@Transactional("bufferTransactionManager")
-	public void updateStep(String gbifPackageId, String resourceName, String publisherName) {
-		updateJob.addToSharedParameters(SharedParameterEnum.GBIF_PACKAGE_ID, gbifPackageId);
+	public void updateStep(int resourceId, String resourceName, String publisherName) {
+		updateJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceId);
 		updateJob.addToSharedParameters(SharedParameterEnum.RESOURCE_NAME, resourceName);
 		updateJob.addToSharedParameters(SharedParameterEnum.PUBLISHER_NAME, publisherName);
 		JobStatusModel jobStatusModel = new JobStatusModel();

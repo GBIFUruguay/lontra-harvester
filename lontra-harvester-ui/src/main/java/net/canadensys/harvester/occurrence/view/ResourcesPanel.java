@@ -555,7 +555,7 @@ public class ResourcesPanel extends JPanel {
 			// Start resource edition panel
 			ResourceDialog erd = new ResourceDialog(this,
 					stepController, resourceToEdit, true);
-			String gbifPackageId = resourceToEdit.getGbif_package_id();
+			int resourceId = resourceToEdit.getId();
 			String resourceName = resourceToEdit.getName();
 			String publisherName = "";
 			// Publisher information:
@@ -580,7 +580,7 @@ public class ResourcesPanel extends JPanel {
 				else {
 					// Resource has been changed successfully, update database:
 					// Update database after move
-					stepController.updateStep(gbifPackageId, resourceName,
+					stepController.updateStep(resourceId, resourceName,
 							publisherName);
 				}
 				return true;

@@ -56,5 +56,5 @@ public interface StepControllerIF {
 
 	public void computeUniqueValues(JobStatusModel jobStatusModel);
 
-	public void updateStep(String resourceUuid, String resourceName, String publisherName);
+	public void updateStep(int resourceId, String resourceName, String publisherName);
 }
