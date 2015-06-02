@@ -4,7 +4,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import net.canadensys.databaseutils.model.DBMetadata;
 import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.dao.PublisherDAO;
@@ -72,7 +71,6 @@ import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.ResourceMetadataHibernateWriter;
-import net.canadensys.harvester.task.ValidateSchemaVersion;
 
 import org.gbif.dwc.terms.Term;
 import org.gbif.metadata.eml.Eml;
@@ -186,7 +184,7 @@ public class UIConfig {
 		sb.setAnnotatedClasses(new Class[] {
 				OccurrenceRawModel.class, OccurrenceModel.class,
 				ImportLogModel.class, ContactModel.class, ResourceMetadataModel.class,
-				DwcaResourceModel.class, PublisherModel.class, DBMetadata.class });
+				DwcaResourceModel.class, PublisherModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -338,11 +336,6 @@ public class UIConfig {
 	@Bean
 	public ItemTaskIF computeUniqueValueTask() {
 		return new ComputeUniqueValueTask();
-	}
-
-	@Bean
-	public ItemTaskIF validateSchemaVersion() {
-		return new ValidateSchemaVersion();
 	}
 
 	@Bean
