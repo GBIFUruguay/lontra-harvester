@@ -35,9 +35,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Main controller to initiate jobs.
  * This controller is NOT thread safe.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class StepController implements StepControllerIF {
 
@@ -146,8 +146,8 @@ public class StepController implements StepControllerIF {
 	 */
 	@Override
 	@Transactional("bufferTransactionManager")
-	public void updateStep(String resourceUuid, String resourceName, String publisherName) {
-		updateJob.addToSharedParameters(SharedParameterEnum.RESOURCE_UUID, resourceUuid);
+	public void updateStep(String gbifPackageId, String resourceName, String publisherName) {
+		updateJob.addToSharedParameters(SharedParameterEnum.GBIF_PACKAGE_ID, gbifPackageId);
 		updateJob.addToSharedParameters(SharedParameterEnum.RESOURCE_NAME, resourceName);
 		updateJob.addToSharedParameters(SharedParameterEnum.PUBLISHER_NAME, publisherName);
 		JobStatusModel jobStatusModel = new JobStatusModel();
@@ -183,7 +183,7 @@ public class StepController implements StepControllerIF {
 	/**
 	 * Get the sorted ImportLogModel list using our own session. Sorted by desc
 	 * event_date
-	 * 
+	 *
 	 * @return
 	 */
 	@Override

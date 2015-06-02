@@ -20,9 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Task to move all the records for a specific sourcefileid from buffer to public database schema
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 	// get log4j handler
@@ -45,11 +45,11 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 		Session session = sessionFactory.getCurrentSession();
 
 		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
-		String resourceUUID = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
+		String gbifPackageId = (String) sharedParameters.get(SharedParameterEnum.GBIF_PACKAGE_ID);
 		Integer resourceID = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
 
-		if (sourceFileId == null || resourceUUID == null || resourceID == null ) {
-			LOGGER.fatal("Misconfigured task : sourceFileId, resourceUUID and resourceID are required");
+		if (sourceFileId == null || gbifPackageId == null || resourceID == null) {
+			LOGGER.fatal("Misconfigured task : sourceFileId, gbifPackageId and resourceID are required");
 			throw new TaskExecutionException("Misconfigured ReplaceOldOccurrenceTask");
 		}
 
@@ -67,16 +67,16 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
 
-			query = session.createSQLQuery("DELETE FROM occurrence_extension WHERE resource_uuid=?");
-			query.setString(0, resourceUUID);
+			query = session.createSQLQuery("DELETE FROM occurrence_extension WHERE resource_id=?");
+			query.setInteger(0, resourceID);
 			query.executeUpdate();
 
 			query = session.createSQLQuery("DELETE FROM contact WHERE resource_metadata_fkey=?");
 			query.setInteger(0, resourceID);
 			query.executeUpdate();
 
-			query = session.createSQLQuery("DELETE FROM resource_metadata WHERE resource_uuid=?");
-			query.setString(0, resourceUUID);
+			query = session.createSQLQuery("DELETE FROM resource_metadata WHERE gbif_package_id=?");
+			query.setString(0, gbifPackageId);
 			query.executeUpdate();
 
 			// get public occurrence table columns names
@@ -96,12 +96,12 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
 
-			query = session.createSQLQuery("INSERT INTO occurrence_extension (SELECT * FROM buffer.occurrence_extension WHERE resource_uuid=?)");
-			query.setString(0, resourceUUID);
+			query = session.createSQLQuery("INSERT INTO occurrence_extension (SELECT * FROM buffer.occurrence_extension WHERE resource_id=?)");
+			query.setInteger(0, resourceID);
 			query.executeUpdate();
 
-			query = session.createSQLQuery("INSERT INTO resource_metadata (SELECT * FROM buffer.resource_metadata WHERE resource_uuid = ?)");
-			query.setString(0, resourceUUID);
+			query = session.createSQLQuery("INSERT INTO resource_metadata (SELECT * FROM buffer.resource_metadata WHERE gbif_package_id = ?)");
+			query.setString(0, gbifPackageId);
 			query.executeUpdate();
 			query = session.createSQLQuery("INSERT INTO contact (SELECT * FROM buffer.contact WHERE resource_metadata_fkey=?)");
 			query.setInteger(0, resourceID);
@@ -114,16 +114,16 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query = session.createSQLQuery("DELETE FROM buffer.occurrence_raw WHERE sourcefileid=?");
 			query.setString(0, sourceFileId);
 			query.executeUpdate();
-			query = session.createSQLQuery("DELETE FROM buffer.occurrence_extension WHERE resource_uuid=?");
-			query.setString(0, resourceUUID);
+			query = session.createSQLQuery("DELETE FROM buffer.occurrence_extension WHERE resource_id=?");
+			query.setInteger(0, resourceID);
 			query.executeUpdate();
 
 			// empty buffer schema for resource_uuid
 			query = session.createSQLQuery("DELETE FROM buffer.contact WHERE resource_metadata_fkey = ?");
 			query.setInteger(0, resourceID);
 			query.executeUpdate();
-			query = session.createSQLQuery("DELETE FROM buffer.resource_metadata WHERE resource_uuid=?");
-			query.setString(0, resourceUUID);
+			query = session.createSQLQuery("DELETE FROM buffer.resource_metadata WHERE gbif_package_id=?");
+			query.setString(0, gbifPackageId);
 			query.executeUpdate();
 
 			sharedParameters.put(SharedParameterEnum.NUMBER_OF_RECORDS, numberOfRecords);
@@ -137,7 +137,7 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 	/**
 	 * Get the name of all columns of a table. The main purpose is to ensure correct colum order when moving
 	 * from buffer to public schema.
-	 * 
+	 *
 	 * @param session
 	 * @param schema
 	 * @param table

@@ -17,9 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Task to record(save) the import for traceability
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class RecordImportTask implements ItemTaskIF {
 	private static final String CURRENT_USER = System.getProperty("user.name");
@@ -41,15 +41,15 @@ public class RecordImportTask implements ItemTaskIF {
 		Session session = sessionFactory.getCurrentSession();
 		ImportLogModel importLogModel = new ImportLogModel();
 		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
-		String resourceUUID = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
+		String gbifPackageId = (String) sharedParameters.get(SharedParameterEnum.GBIF_PACKAGE_ID);
 		Integer numberOfRecords = (Integer) sharedParameters.get(SharedParameterEnum.NUMBER_OF_RECORDS);
 
-		if (sourceFileId == null || numberOfRecords == null || resourceUUID == null) {
-			LOGGER.fatal("Misconfigured task : sourceFileId, resourceUUID and numberOfRecords are required");
+		if (sourceFileId == null || numberOfRecords == null || gbifPackageId == null) {
+			LOGGER.fatal("Misconfigured task : sourceFileId, gbifPackageId and numberOfRecords are required");
 			throw new TaskExecutionException("Misconfigured task");
 		}
 		importLogModel.setSourcefileid(sourceFileId);
-		importLogModel.setResource_uuid(resourceUUID);
+		importLogModel.setGbif_package_id(gbifPackageId);
 		// this is only core records
 		importLogModel.setRecord_quantity(numberOfRecords);
 		importLogModel.setUpdated_by(CURRENT_USER);

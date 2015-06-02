@@ -14,9 +14,9 @@ import org.junit.Test;
 
 /**
  * Test ResourceInformationProcessor behavior.
- * 
+ *
  * @author cgendreau
- * 
+ *
  */
 public class ResourceInformationProcessorTest {
 
@@ -27,7 +27,7 @@ public class ResourceInformationProcessorTest {
 	public void testProcessingMechanism() {
 		HashMap<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		String uuid = UUID.randomUUID().toString();
-		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID, uuid);
+		sharedParameters.put(SharedParameterEnum.GBIF_PACKAGE_ID, uuid);
 		sharedParameters.put(SharedParameterEnum.RESOURCE_ID, 1);
 
 		ResourceMetadataProcessor informationProcessor = new ResourceMetadataProcessor();
@@ -40,7 +40,7 @@ public class ResourceInformationProcessorTest {
 			ResourceMetadataModel processedInformation = informationProcessor.process(eml, sharedParameters);
 			assertEquals("This is a generic abstract information", processedInformation.get_abstract());
 			assertEquals("This is a generic title", processedInformation.getTitle());
-			assertEquals(uuid, processedInformation.getResource_uuid());
+			assertEquals(uuid, processedInformation.getGbif_package_id());
 		}
 		catch (Exception e) {
 			e.printStackTrace();

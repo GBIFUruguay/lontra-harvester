@@ -11,6 +11,7 @@ import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,9 +26,9 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
  * Test coverage :
  * -Move to public schema
  * -Log the import
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ProcessingConfigTest.class, loader = AnnotationConfigContextLoader.class)
@@ -53,10 +54,25 @@ public class MoveToPublicSchemaTest {
 
 		jdbcTemplate.batchUpdate(new String[] {
 				"DELETE FROM buffer.occurrence", "DELETE FROM occurrence",
+				"DELETE FROM buffer.occurrence_raw",
+				"DELETE FROM occurrence_raw",
 				"DELETE FROM buffer.contact", "DELETE FROM contact",
 				"DELETE FROM buffer.resource_metadata", "DELETE FROM resource_metadata",
-				"INSERT INTO buffer.occurrence (auto_id,dwca_id,stateprovince,sourcefileid) VALUES (1,'1','Delaware','qmor-specimens')",
-				"INSERT INTO buffer.occurrence (auto_id,dwca_id,stateprovince,sourcefileid) VALUES (2,'3','Florida','qmor-specimens')", });
+				"INSERT INTO buffer.occurrence (auto_id,dwca_id,stateprovince,sourcefileid,resource_id) VALUES (1,'1','Delaware','qmor-specimens',1)",
+				"INSERT INTO buffer.occurrence (auto_id,dwca_id,stateprovince,sourcefileid,resource_id) VALUES (2,'3','Florida','qmor-specimens',1)", });
+	}
+
+	@After
+	public void cleanup() {
+		jdbcTemplate.batchUpdate(new String[] {
+				"DELETE FROM buffer.occurrence",
+				"DELETE FROM occurrence",
+				"DELETE FROM buffer.occurrence_raw",
+				"DELETE FROM occurrence_raw",
+				"DELETE FROM buffer.contact",
+				"DELETE FROM contact",
+				"DELETE FROM buffer.resource_metadata",
+		"DELETE FROM resource_metadata" });
 	}
 
 	@Test

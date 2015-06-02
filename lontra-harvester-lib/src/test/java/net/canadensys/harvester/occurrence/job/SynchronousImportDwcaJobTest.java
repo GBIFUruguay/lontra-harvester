@@ -14,6 +14,7 @@ import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessEmlContentStep;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessOccurrenceStep;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,9 +31,9 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 /**
  * Test coverage : -Read a DarwinCore archive from a folder -Insert raw data in
  * buffer schema -Process data and insert results in buffer schema
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SynchronousImportDwcaJobTest.SynchronousProcessingConfigTest.class, loader = AnnotationConfigContextLoader.class)
@@ -55,10 +56,21 @@ public class SynchronousImportDwcaJobTest {
 
 	@Before
 	public void setupTest() {
-
 		TestDataHelper.loadTestData(appContext, jdbcTemplate);
-
 		jdbcTemplate.batchUpdate(new String[] { "DELETE FROM buffer.contact", "DELETE FROM buffer.resource_metadata" });
+	}
+
+	@After
+	public void cleanup() {
+		jdbcTemplate.batchUpdate(new String[] {
+				"DELETE FROM buffer.occurrence",
+				"DELETE FROM occurrence",
+				"DELETE FROM buffer.occurrence_raw",
+				"DELETE FROM occurrence_raw",
+				"DELETE FROM buffer.contact",
+				"DELETE FROM contact",
+				"DELETE FROM buffer.resource_metadata",
+				"DELETE FROM resource_metadata" });
 	}
 
 	@Configuration
@@ -96,7 +108,8 @@ public class SynchronousImportDwcaJobTest {
 
 		// Test information is being also processed from EML content:
 		String alternateIdentifier = jdbcTemplate.queryForObject(
-				"SELECT alternate_identifier FROM buffer.resource_metadata where resource_uuid='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'", String.class);
+				"SELECT alternate_identifier FROM buffer.resource_metadata where gbif_package_id='ada5d0b1-07de-4dc0-83d4-e312f0fb81cb'",
+				String.class);
 		assertTrue("Collection entomologique Ouellet-Robert (QMOR)".equals(alternateIdentifier));
 
 		assertTrue(new Integer(EXPECTED_NUMBER_OF_RESULTS).equals(count));

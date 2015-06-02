@@ -13,9 +13,9 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.gbif.dwc.terms.Term;
-import org.gbif.dwc.text.Archive;
-import org.gbif.dwc.text.ArchiveFactory;
-import org.gbif.dwc.text.UnsupportedArchiveException;
+import org.gbif.dwca.io.Archive;
+import org.gbif.dwca.io.ArchiveFactory;
+import org.gbif.dwca.io.UnsupportedArchiveException;
 
 /**
  * Generic reader to read a DarwinCore Archive extension.

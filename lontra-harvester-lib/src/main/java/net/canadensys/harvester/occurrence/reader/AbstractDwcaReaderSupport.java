@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.gbif.dwc.text.ArchiveField;
-import org.gbif.dwc.text.ArchiveFile;
+import org.gbif.dwca.io.ArchiveField;
+import org.gbif.dwca.io.ArchiveFile;
 import org.gbif.utils.file.ClosableIterator;
 
 public abstract class AbstractDwcaReaderSupport {
@@ -75,7 +75,7 @@ public abstract class AbstractDwcaReaderSupport {
 
 	/**
 	 * Handle reserved word and lowercase header from ArchiveField.
-	 * 
+	 *
 	 * @param archiveField
 	 * @return
 	 */

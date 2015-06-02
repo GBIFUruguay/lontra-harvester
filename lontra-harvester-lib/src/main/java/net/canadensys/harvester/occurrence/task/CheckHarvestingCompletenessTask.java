@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.canadensys.dataportal.occurrence.model.OccurrenceFieldConstants;
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.LongRunningTaskIF;
 import net.canadensys.harvester.exception.TaskExecutionException;
@@ -30,42 +31,43 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 
 	private static final int MAX_WAITING_SECONDS = 10;
 	private static final Logger LOGGER = Logger.getLogger(CheckHarvestingCompletenessTask.class);
-	
+
 	@Autowired
 	@Qualifier(value="bufferSessionFactory")
 	private SessionFactory sessionFactory;
-	
+
 	private List<ItemProgressListenerIF> itemListenerList;
 	private int secondsWaiting = 0;
-	private AtomicBoolean taskCanceled = new AtomicBoolean(false);
-	
+	private final AtomicBoolean taskCanceled = new AtomicBoolean(false);
+
 	private String targetedTable;
 	private SharedParameterEnum identifier;
 	private Integer expectedNumberOfRecords;
-	
+
 	/**
 	 * @param sharedParameters SharedParameterEnum.NUMBER_OF_RECORDS, SharedParameterEnum.SOURCE_FILE_ID required
 	 */
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
 		final Integer _expectedNumberOfRecords = expectedNumberOfRecords;
-		
+
 		if(_expectedNumberOfRecords == null){
 			LOGGER.fatal("Misconfigured task : needs numberOfRecords, sourceFileId");
 			throw new TaskExecutionException("Misconfigured task");
 		}
-		if(identifier != SharedParameterEnum.SOURCE_FILE_ID && identifier != SharedParameterEnum.RESOURCE_UUID){
-			LOGGER.fatal("Misconfigured task : identifier can only be SOURCE_FILE_ID or RESOURCE_UUID");
+		if (identifier != SharedParameterEnum.SOURCE_FILE_ID && identifier != SharedParameterEnum.RESOURCE_ID) {
+			LOGGER.fatal("Misconfigured task : identifier can only be SOURCE_FILE_ID or RESOURCE_ID");
 			throw new TaskExecutionException("Misconfigured task");
 		}
 		if(StringUtils.isBlank(targetedTable) || identifier == null){
 			LOGGER.fatal("Misconfigured task : check completeness details are required");
 			throw new TaskExecutionException("Misconfigured task");
 		}
-		
-		final String identifierColumn = (identifier == SharedParameterEnum.SOURCE_FILE_ID)?"sourcefileid":"resource_uuid";
+
+		final String identifierColumn = (identifier == SharedParameterEnum.SOURCE_FILE_ID) ? OccurrenceFieldConstants.SOURCE_FILE_ID
+				: OccurrenceFieldConstants.RESOURCE_ID;
 		final String sourceFileId = (String)sharedParameters.get(identifier);
-		
+
 		Thread checkThread = new Thread(new Runnable() {
 			private int previousCount = 0;
 			@Override
@@ -89,7 +91,7 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 						}
 						previousCount = currNumberOfResult.intValue();
 						notifyListeners(targetedTable,currNumberOfResult.intValue(),_expectedNumberOfRecords);
-						
+
 						try {
 							Thread.sleep(1000);
 						} catch (InterruptedException e) {
@@ -101,7 +103,7 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 					notifyListenersOnFailure(hEx);
 				}
 				session.close();
-				
+
 				if(taskCanceled.get()){
 					notifyListenersOnCancel();
 				}
@@ -117,11 +119,11 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 		});
 		checkThread.start();
 	}
-	
+
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
-	
+
 	private void notifyListeners(String context,int current,int total){
 		if(itemListenerList != null){
 			for(ItemProgressListenerIF currListener : itemListenerList){
@@ -150,14 +152,14 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 			}
 		}
 	}
-	
+
 	public void addItemProgressListenerIF(ItemProgressListenerIF listener){
 		if(itemListenerList == null){
 			itemListenerList = new ArrayList<ItemProgressListenerIF>();
 		}
 		itemListenerList.add(listener);
 	}
-	
+
 	/**
 	 * Set SQL query details to check if the completeness
 	 * @param targetedTable in which we want to count the rows
@@ -173,7 +175,7 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 	public void cancel() {
 		taskCanceled.set(true);
 	}
-	
+
 	@Override
 	public String getTitle() {
 		return "Waiting for completion";

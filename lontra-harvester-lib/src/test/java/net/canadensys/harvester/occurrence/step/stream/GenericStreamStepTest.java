@@ -35,7 +35,7 @@ public class GenericStreamStepTest {
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-vascan-checklist");
 		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE, GbifTerm.Description);
-		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID, "1");
+		sharedParameters.put(SharedParameterEnum.GBIF_PACKAGE_ID, "1");
 
 		// setup reader
 		DwcaExtensionReader<MockHabitObject> extReader = new DwcaExtensionReader<MockHabitObject>();

@@ -18,17 +18,17 @@ import net.canadensys.harvester.occurrence.mapper.OccurrenceMapper;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.gbif.dwc.text.Archive;
-import org.gbif.dwc.text.ArchiveFactory;
-import org.gbif.dwc.text.UnsupportedArchiveException;
+import org.gbif.dwca.io.Archive;
+import org.gbif.dwca.io.ArchiveFactory;
+import org.gbif.dwca.io.UnsupportedArchiveException;
 
 import com.google.common.collect.Lists;
 
 /**
  * Item reader for Darwin Core Archive.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemReaderIF<OccurrenceRawModel> {
 	// get log4j handler
@@ -111,7 +111,7 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 	 * Method used to discard(skip) some records allowing to partially import a resource.
 	 * This option should be used carefully in exceptional circumstance when an archive needs to be harvested
 	 * and faulty records (no or duplicated coredId) can not be fixed.
-	 * 
+	 *
 	 * @param occurrenceRawModel
 	 * @return
 	 */
@@ -124,7 +124,7 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 
 	/**
 	 * This method validates that the headers found in the archive can be mapped to OccurrenceRawModel.
-	 * 
+	 *
 	 */
 	private void validateDwcaHeaders() {
 		OccurrenceRawModel testModel = new OccurrenceRawModel();

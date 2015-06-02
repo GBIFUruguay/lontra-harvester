@@ -43,10 +43,10 @@ public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceM
 
 		ResourceMetadataModel metadata = null;
 
-		String resourceUuid = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
+		String gbifPackageId = (String) sharedParameters.get(SharedParameterEnum.GBIF_PACKAGE_ID);
 		Integer resourceId = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
-		if (resourceUuid == null || resourceId == null) {
-			LOGGER.fatal("Misconfigured ResourceInformationProcessor: resource_uuid and resource_id are required");
+		if (gbifPackageId == null || resourceId == null) {
+			LOGGER.fatal("Misconfigured ResourceInformationProcessor: gbifPackageId and resource_id are required");
 			throw new TaskExecutionException("Misconfigured ResourceInformationProcessor");
 		}
 
@@ -55,7 +55,7 @@ public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceM
 
 		if (isUUID(guid)) {
 			// if the resource_uuid inside the archive is different than what we asked for, do not harvest.
-			if (!guid.equalsIgnoreCase(resourceUuid)) {
+			if (!guid.equalsIgnoreCase(gbifPackageId)) {
 				throw new ProcessException("The extracted UUID from the EML doesn't match the provided UUID");
 			}
 		}
@@ -63,7 +63,7 @@ public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceM
 			// for now we support http address in resource_uuid
 			// until this issue is fixed: https://github.com/WingLongitude/liger-data-access/issues/23
 			if (guid.startsWith("http")) {
-				if (!guid.equalsIgnoreCase(resourceUuid)) {
+				if (!guid.equalsIgnoreCase(gbifPackageId)) {
 					throw new ProcessException("The extracted packageId from the EML doesn't match the provided UUID");
 				}
 			}
@@ -107,7 +107,7 @@ public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceM
 		// TODO: verify what field should relate to this:
 		// C.G. : I think there is none, this is probably 'title'
 		// metadata.setResource_name("");
-		metadata.setResource_uuid(guid);
+		metadata.setGbif_package_id(guid);
 		metadata.setTitle(eml.getTitle());
 
 		// Add resource contacts information:

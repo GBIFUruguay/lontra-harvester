@@ -17,9 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Task to get info based on a resource id.
  * The info will be shared using the sharedParameters map.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class GetResourceInfoTask implements ItemTaskIF {
 
@@ -42,7 +42,7 @@ public class GetResourceInfoTask implements ItemTaskIF {
 
 		sharedParameters.put(SharedParameterEnum.DWCA_URL, resourceModel.getArchive_url());
 		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, resourceModel.getSourcefileid());
-		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID, resourceModel.getResource_uuid());
+		sharedParameters.put(SharedParameterEnum.GBIF_PACKAGE_ID, resourceModel.getGbif_package_id());
 		sharedParameters.put(SharedParameterEnum.RESOURCE_ID, resourceId);
 	}
 

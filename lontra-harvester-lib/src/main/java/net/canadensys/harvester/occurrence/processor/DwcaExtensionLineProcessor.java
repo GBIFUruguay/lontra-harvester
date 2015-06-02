@@ -65,15 +65,15 @@ public class DwcaExtensionLineProcessor implements ItemProcessorIF<OccurrenceExt
 	public OccurrenceExtensionModel process(OccurrenceExtensionModel data, Map<SharedParameterEnum, Object> sharedParameters) throws ProcessException {
 
 		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
-		String resourceUUID = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
+		Integer resourceId = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
 		Term extensionType = (Term) sharedParameters.get(SharedParameterEnum.DWCA_EXTENSION_TYPE);
 
 		if (sourceFileId == null) {
 			LOGGER.fatal("Misconfigured processor : sourceFileId required");
 			throw new TaskExecutionException("Misconfigured DwcaExtensionLineProcessor");
 		}
-		if (resourceUUID == null) {
-			LOGGER.fatal("Misconfigured processor : resourceUUID required");
+		if (resourceId == null) {
+			LOGGER.fatal("Misconfigured processor : resourceId required");
 			throw new TaskExecutionException("Misconfigured DwcaExtensionLineProcessor");
 		}
 		if (extensionType == null) {
@@ -82,7 +82,7 @@ public class DwcaExtensionLineProcessor implements ItemProcessorIF<OccurrenceExt
 		}
 
 		data.setSourcefileid(sourceFileId);
-		data.setResource_uuid(resourceUUID);
+		data.setResource_id(resourceId);
 		data.setExt_type(extensionType.simpleName());
 		if (nextId == null || idPoll.isEmpty()) {
 			try {

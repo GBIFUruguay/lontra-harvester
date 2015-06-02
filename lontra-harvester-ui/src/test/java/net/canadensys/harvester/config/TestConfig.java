@@ -1,14 +1,19 @@
 package net.canadensys.harvester.config;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import liquibase.exception.DatabaseException;
+import liquibase.exception.LiquibaseException;
 import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.dao.PublisherDAO;
 import net.canadensys.dataportal.occurrence.dao.impl.HibernateDwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.dao.impl.HibernatePublisherDAO;
+import net.canadensys.dataportal.occurrence.migration.LiquibaseHelper;
 import net.canadensys.dataportal.occurrence.model.ContactModel;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
@@ -116,6 +121,7 @@ public class TestConfig {
 
 	@Bean(name = "bufferSessionFactory")
 	public LocalSessionFactoryBean bufferSessionFactory() {
+
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
 		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ContactModel.class,
@@ -191,12 +197,30 @@ public class TestConfig {
 
 	@Bean(name = "datasource")
 	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
+		DataSource ds = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
 				// comes from lib project
 				.addScript("classpath:h2/h2setup.sql")
 				// those 2 scripts are loaded from canadensys-data-access
 				.addScript("/script/occurrence/create_occurrence_tables.sql")
 				.addScript("/script/occurrence/create_occurrence_tables_buffer_schema.sql").build();
+
+		Connection conn;
+
+		try {
+			conn = ds.getConnection();
+			LiquibaseHelper.migrate(conn);
+			conn.close();
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		catch (DatabaseException e) {
+			e.printStackTrace();
+		}
+		catch (LiquibaseException e) {
+			e.printStackTrace();
+		}
+		return ds;
 	}
 
 	@Bean

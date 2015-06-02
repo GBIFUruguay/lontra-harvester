@@ -43,7 +43,7 @@ public class SynchronousProcessEmlContentStepTest {
 	@Test
 	public void testSynchronousProcessEmlContentStep() {
 		Map<SharedParameterEnum, Object> sharedParameters = MockSharedParameters.getQMORSharedParameters();
-		String resourceUUID = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_UUID);
+		String gbifPackageId = (String) sharedParameters.get(SharedParameterEnum.GBIF_PACKAGE_ID);
 
 		synchronousProcessEmlContentStep.preStep(sharedParameters);
 		synchronousProcessEmlContentStep.doStep();
@@ -52,13 +52,13 @@ public class SynchronousProcessEmlContentStepTest {
 		int count = jdbcTemplate.queryForObject("SELECT count(*) FROM buffer.resource_metadata", BigDecimal.class).intValue();
 		assertTrue(count >= 1);
 
-		String alternateIdentifier = jdbcTemplate.queryForObject("SELECT alternate_identifier FROM buffer.resource_metadata where resource_uuid='"
-				+ resourceUUID + "'", String.class);
+		String alternateIdentifier = jdbcTemplate.queryForObject("SELECT alternate_identifier FROM buffer.resource_metadata where gbif_package_id='"
+				+ gbifPackageId + "'", String.class);
 		assertTrue("Collection entomologique Ouellet-Robert (QMOR)".equals(alternateIdentifier));
 
 		// Test if the foreign key is being set:
 		Integer fkey = jdbcTemplate.queryForObject("SELECT resource_metadata_fkey FROM buffer.contact where role='contact'", Integer.class);
-		Integer auto_id = jdbcTemplate.queryForObject("SELECT dwca_resource_id FROM buffer.resource_metadata where resource_uuid='" + resourceUUID
+		Integer auto_id = jdbcTemplate.queryForObject("SELECT dwca_resource_id FROM buffer.resource_metadata where gbif_package_id='" + gbifPackageId
 				+ "'", Integer.class);
 		assertTrue(fkey == auto_id);
 	}

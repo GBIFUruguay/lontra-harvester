@@ -13,9 +13,9 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * Helper class to manipulate test data between tests.
- * 
+ *
  * @author cgendreau
- * 
+ *
  */
 public class TestDataHelper {
 
@@ -23,7 +23,7 @@ public class TestDataHelper {
 
 	/**
 	 * Delete and insert data from the insert-test-data.sql script.
-	 * 
+	 *
 	 * @param appContext
 	 * @param template
 	 */

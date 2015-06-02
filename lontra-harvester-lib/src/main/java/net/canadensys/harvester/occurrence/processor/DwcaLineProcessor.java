@@ -20,9 +20,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Processing each line read from a Darwin Core Archive.
  * Assign an unique id to link the raw and processed model together.
  * NOT thread safe
- * 
+ *
  * @author canadenys
- * 
+ *
  */
 public class DwcaLineProcessor implements ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> {
 
@@ -75,8 +75,7 @@ public class DwcaLineProcessor implements ItemProcessorIF<OccurrenceRawModel, Oc
 		}
 
 		occModel.setSourcefileid(sourceFileId);
-		// TODO use resource_id instead of resource_uuid
-		// occModel.setResource_uuid(resourceUUID);
+		occModel.setResource_id(resourceId);
 
 		if (nextId == null || idPoll.isEmpty()) {
 			try {

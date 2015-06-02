@@ -30,9 +30,9 @@ import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 
 /**
  * Resources panel for tabbed pane
- * 
+ *
  * @author Canadensys, Pedro Guimarães
- * 
+ *
  */
 public class ResourcesPanel extends JPanel {
 
@@ -66,7 +66,7 @@ public class ResourcesPanel extends JPanel {
 		// Load icon image:
 		loadingImg = new ImageIcon(
 				OccurrenceHarvesterMainView.class
-						.getResource("/ajax-loader.gif"));
+				.getResource("/ajax-loader.gif"));
 
 		// Vertical alignment reference index:
 		int lineIdx = 0;
@@ -276,7 +276,7 @@ public class ResourcesPanel extends JPanel {
 
 	/**
 	 * Safely update the content of the status label.
-	 * 
+	 *
 	 * @param status
 	 */
 	public void updateStatusLabel(final String status) {
@@ -374,7 +374,7 @@ public class ResourcesPanel extends JPanel {
 	/**
 	 * Initializes the resources combo box by creating a JComboBox and filling
 	 * it with resource data from database
-	 * 
+	 *
 	 */
 	private void initResourceComboBox() {
 		resourcesCmbBox = new JComboBox<String>();
@@ -436,8 +436,8 @@ public class ResourcesPanel extends JPanel {
 							}
 							else {
 								stepController
-										.importDwcAFromLocalFile((String) (resourcesCmbBox
-												.getSelectedItem()));
+								.importDwcAFromLocalFile((String) (resourcesCmbBox
+										.getSelectedItem()));
 							}
 						}
 						catch (Exception e) {
@@ -555,7 +555,7 @@ public class ResourcesPanel extends JPanel {
 			// Start resource edition panel
 			ResourceDialog erd = new ResourceDialog(this,
 					stepController, resourceToEdit, true);
-			String resourceUuid = resourceToEdit.getResource_uuid();
+			String gbifPackageId = resourceToEdit.getGbif_package_id();
 			String resourceName = resourceToEdit.getName();
 			String publisherName = "";
 			// Publisher information:
@@ -571,16 +571,16 @@ public class ResourcesPanel extends JPanel {
 				statusLbl.setIcon(loadingImg);
 				if (!stepController.updateResourceModel(erd.getResourceModel())) {
 					JOptionPane
-							.showMessageDialog(
-									this,
-									Messages.getString("resourceView.resource.error.save.msg"),
-									Messages.getString("resourceView.resource.error.title"),
-									JOptionPane.ERROR_MESSAGE);
+					.showMessageDialog(
+							this,
+							Messages.getString("resourceView.resource.error.save.msg"),
+							Messages.getString("resourceView.resource.error.title"),
+							JOptionPane.ERROR_MESSAGE);
 				}
 				else {
 					// Resource has been changed successfully, update database:
 					// Update database after move
-					stepController.updateStep(resourceUuid, resourceName,
+					stepController.updateStep(gbifPackageId, resourceName,
 							publisherName);
 				}
 				return true;
@@ -598,11 +598,11 @@ public class ResourcesPanel extends JPanel {
 		if (rd.getExitValue() == JOptionPane.OK_OPTION) {
 			if (!stepController.updateResourceModel(resourceModel)) {
 				JOptionPane
-						.showMessageDialog(
-								this,
-								Messages.getString("resourceView.resource.error.save.msg"),
-								Messages.getString("resourceView.resource.error.title"),
-								JOptionPane.ERROR_MESSAGE);
+				.showMessageDialog(
+						this,
+						Messages.getString("resourceView.resource.error.save.msg"),
+						Messages.getString("resourceView.resource.error.title"),
+						JOptionPane.ERROR_MESSAGE);
 			}
 
 			// reload data to ensure we have the latest changes

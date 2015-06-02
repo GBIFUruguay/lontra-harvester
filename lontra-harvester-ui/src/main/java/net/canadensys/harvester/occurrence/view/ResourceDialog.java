@@ -19,9 +19,9 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * View component to display and edit a resource.
- * 
+ *
  * @author canadensys, Pedro Guimarães
- * 
+ *
  */
 public class ResourceDialog extends AbstractDialog {
 
@@ -154,7 +154,7 @@ public class ResourceDialog extends AbstractDialog {
 
 	/**
 	 * Display a ResourceModel and allow user to update it.
-	 * 
+	 *
 	 * @param resourceModel
 	 * @return updated ResourceModel or null if resourceModel in parameter was
 	 *         null
@@ -164,7 +164,7 @@ public class ResourceDialog extends AbstractDialog {
 			nameTxt.setText(resourceModel.getName());
 			urlTxt.setText(resourceModel.getArchive_url());
 			sfIdTxt.setText(resourceModel.getSourcefileid());
-			resourceUuidTxt.setText((resourceModel.getResource_uuid()));
+			resourceUuidTxt.setText((resourceModel.getGbif_package_id()));
 		}
 		// Add resource, set UUID and source file id editable:
 		else {
@@ -183,7 +183,7 @@ public class ResourceDialog extends AbstractDialog {
 		String nameValue = nameTxt.getText();
 		String urlValue = urlTxt.getText();
 		String sourceFileIdValue = sfIdTxt.getText();
-		String resourceUuid = resourceUuidTxt.getText();
+		String gbifPackageId = resourceUuidTxt.getText();
 		String publisherName = (String) publishersCmbBox.getSelectedItem();
 
 		// This is a new resource, initialize resourceModel
@@ -195,7 +195,7 @@ public class ResourceDialog extends AbstractDialog {
 			resourceModel.setName(nameValue);
 			resourceModel.setArchive_url(urlValue);
 			resourceModel.setSourcefileid(sourceFileIdValue);
-			resourceModel.setResource_uuid(resourceUuid);
+			resourceModel.setGbif_package_id(gbifPackageId);
 			// Check if it has been set a valid publisher:
 
 			if (!publisherName.equalsIgnoreCase(""))
@@ -228,7 +228,7 @@ public class ResourceDialog extends AbstractDialog {
 	/**
 	 * Initializes the resources combo box by creating a JComboBox and filling
 	 * it with resource data from database
-	 * 
+	 *
 	 */
 	private void initPublishersComboBox() {
 		// Retrieve available resources list:
@@ -248,7 +248,7 @@ public class ResourceDialog extends AbstractDialog {
 
 	/**
 	 * Fetch a PublisherModel from database from its name
-	 * 
+	 *
 	 * @param publisherName
 	 *            the name field of the publisher table
 	 * @return
@@ -267,7 +267,7 @@ public class ResourceDialog extends AbstractDialog {
 
 	/**
 	 * Returns the resource model
-	 * 
+	 *
 	 * @return
 	 */
 	public DwcaResourceModel getResourceModel() {

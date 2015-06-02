@@ -10,9 +10,9 @@
         <list>
         	<value><![CDATA[ ]]>DELETE FROM buffer.occurrence_raw WHERE sourcefileid=:source_file_id</value>
         	<value><![CDATA[ ]]>DELETE FROM buffer.occurrence WHERE sourcefileid=:source_file_id</value>
-        	<value><![CDATA[ ]]>DELETE FROM buffer.occurrence_extension WHERE resource_uuid=:resource_uuid</value>
+        	<value><![CDATA[ ]]>DELETE FROM buffer.occurrence_extension WHERE resource_id=:resource_id</value>
         	<value><![CDATA[ ]]>DELETE FROM buffer.contact WHERE resource_metadata_fkey=:resource_id</value>
-        	<value><![CDATA[ ]]>DELETE FROM buffer.resource_metadata WHERE resource_uuid=:resource_uuid</value>
+        	<value><![CDATA[ ]]>DELETE FROM buffer.resource_metadata WHERE dwca_resource_id=:resource_id</value>
         </list>
         </property>
 	</bean>
@@ -24,7 +24,7 @@
         	<value><![CDATA[
         		UPDATE buffer.occurrence AS bocc SET hasmedia = true WHERE
 				EXISTS(SELECT dwca_id from buffer.occurrence_extension 
-				WHERE dwca_id = bocc.dwca_id AND resource_uuid = :resource_uuid AND ext_type = 'Multimedia')
+				WHERE dwca_id = bocc.dwca_id AND resource_id = :resource_id AND ext_type = 'Multimedia')
 				AND sourcefileid = :source_file_id]]>
 			</value>
         </list>

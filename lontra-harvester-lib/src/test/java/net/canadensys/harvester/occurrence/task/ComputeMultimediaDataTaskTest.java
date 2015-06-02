@@ -22,9 +22,9 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 /**
  * Test ComputeMultimediaDataTask built from XML configuration file.
- * 
+ *
  * @author cgendreau
- * 
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ProcessingConfigTest.class, loader = AnnotationConfigContextLoader.class)
@@ -46,11 +46,11 @@ public class ComputeMultimediaDataTaskTest {
 		Map<SharedParameterEnum, Object> sharedParameters = MockSharedParameters.getQMORSharedParameters();
 
 		// Insert mock data
-		jdbcTemplate.update("INSERT INTO buffer.occurrence (auto_id, dwca_id,resource_uuid,sourcefileid,hasmedia) VALUES (?,?,?,?,?)",
-				1, "1", sharedParameters.get(SharedParameterEnum.RESOURCE_UUID), sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID), false);
+		jdbcTemplate.update("INSERT INTO buffer.occurrence (auto_id, dwca_id,resource_id,sourcefileid,hasmedia) VALUES (?,?,?,?,?)",
+				1, "1", sharedParameters.get(SharedParameterEnum.RESOURCE_ID), sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID), false);
 
-		jdbcTemplate.update("INSERT INTO buffer.occurrence_extension (auto_id, dwca_id,resource_uuid,sourcefileid,ext_type) VALUES (?,?,?,?,?)",
-				1, "1", sharedParameters.get(SharedParameterEnum.RESOURCE_UUID), sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID),
+		jdbcTemplate.update("INSERT INTO buffer.occurrence_extension (auto_id, dwca_id,resource_id,sourcefileid,ext_type) VALUES (?,?,?,?,?)",
+				1, "1", sharedParameters.get(SharedParameterEnum.RESOURCE_ID), sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID),
 				"Multimedia");
 
 		computeMultimediaDataTask.execute(sharedParameters);

@@ -17,9 +17,9 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 /**
  * Main test class StepController.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class, loader = AnnotationConfigContextLoader.class)
@@ -35,7 +35,7 @@ public class StepControllerTest {
 
 		resourceModel.setName("Test resource");
 		resourceModel.setArchive_url("http://locahost/testname.zip");
-		resourceModel.setResource_uuid("kagf93u");
+		resourceModel.setGbif_package_id("kagf93u");
 		resourceModel.setSourcefileid("test-resource");
 
 		// save it
@@ -46,7 +46,7 @@ public class StepControllerTest {
 		for (DwcaResourceModel currModel : resourceModelList) {
 			if ("test-resource".equals(currModel.getSourcefileid())) {
 				found = true;
-				assertEquals("kagf93u", currModel.getResource_uuid());
+				assertEquals("kagf93u", currModel.getGbif_package_id());
 			}
 		}
 		assertTrue(found);

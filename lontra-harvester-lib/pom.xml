@@ -19,11 +19,12 @@
 		<jsch.version>0.1.51</jsch.version>
 		<activemq.version>5.10.0</activemq.version>
 		<narwhal.version>1.5.3</narwhal.version>
-		<data-access.version>2.12.0</data-access.version>
+		<data-access.version>2.13.0-SNAPSHOT</data-access.version>
 		<commons-validator.version>1.4.1</commons-validator.version>
-		
-		<dwca-reader.version>1.21</dwca-reader.version>
+
 		<gbif-metadata-profile.version>1.1</gbif-metadata-profile.version>
+		
+		<liquibase.version>3.3.2</liquibase.version>
 	</properties>
 	
 	<repositories>
@@ -90,11 +91,6 @@
 		</dependency>
 
 		<!-- GBIF -->
-		<dependency>
-			<groupId>org.gbif</groupId>
-			<artifactId>dwca-reader</artifactId>
-			<version>${dwca-reader.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.gbif</groupId>
 			<artifactId>gbif-metadata-profile</artifactId>
@@ -164,6 +160,14 @@
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
 			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.liquibase</groupId>
+		    <artifactId>liquibase-core</artifactId>
+		    <version>${liquibase.version}</version>
+		    <scope>compile</scope>
+			<optional>true</optional>
 		</dependency>
 		
 		<dependency>

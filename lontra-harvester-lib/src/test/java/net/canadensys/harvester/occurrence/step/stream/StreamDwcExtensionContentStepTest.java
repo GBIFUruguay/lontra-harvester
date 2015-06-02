@@ -57,7 +57,7 @@ public class StreamDwcExtensionContentStepTest {
 		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "dwca-vascan-checklist");
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-vascan-checklist");
 		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE, GbifTerm.Description);
-		sharedParameters.put(SharedParameterEnum.RESOURCE_UUID, "1");
+		sharedParameters.put(SharedParameterEnum.RESOURCE_ID, 1);
 
 		streamExtStep.preStep(sharedParameters);
 		streamExtStep.doStep();

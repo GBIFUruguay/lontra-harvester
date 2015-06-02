@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
-import net.canadensys.dataportal.occurrence.model.ImportLogModel;
+import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
+import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
@@ -24,16 +24,16 @@ import org.springframework.transaction.annotation.Transactional;
  * Default implementation of ResourceStatusNotifierIF that is using the IPT RSS
  * feed to get the last publication date. The date is then used to compare with
  * the last import event of each resources.
- * 
+ *
  * @author cgendreau
- * 
+ *
  */
 public class DefaultResourceStatusNotifier implements ResourceStatusNotifierIF {
 	private static final Logger LOGGER = Logger.getLogger(DefaultResourceStatusNotifier.class);
 	private static final String IPT_RSS_SUFFIX = "/rss.do";
 
 	// very simple cache to avoid parsing the RSS feed on each resources
-	private Map<String, List<IPTFeedModel>> feedModelByIPTAddress;
+	private final Map<String, List<IPTFeedModel>> feedModelByIPTAddress;
 
 	@Autowired
 	private DwcaResourceDAO resourceDAO;
@@ -75,12 +75,12 @@ public class DefaultResourceStatusNotifier implements ResourceStatusNotifierIF {
 			String resourceKey;
 			ImportLogModel lastImportLog;
 
-			if (StringUtils.isNotBlank(currResource.getResource_uuid())) {
+			if (StringUtils.isNotBlank(currResource.getGbif_package_id())) {
 				for (IPTFeedModel currFeed : feedEntryList) {
 					// strip the version from the URI
 					resourceKey = StringUtils.substringBeforeLast(currFeed.getUri(), "/");
 
-					if (currResource.getResource_uuid().equals(resourceKey)) {
+					if (currResource.getGbif_package_id().equals(resourceKey)) {
 						lastImportLog = importLogDAO.loadLastFrom(currResource.getSourcefileid());
 						if (lastImportLog != null) {
 							// compare date

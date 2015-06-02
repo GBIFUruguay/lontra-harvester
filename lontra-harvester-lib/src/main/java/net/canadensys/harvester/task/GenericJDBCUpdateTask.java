@@ -15,11 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Generic JDBC task that can run multiple SQL updates using NamedParameter extracted from
- * shartedParameters.
+ * sharedParameters.
  * Transaction management is the responsibility of the caller.
- * 
+ *
  * @author cgendreau
- * 
+ *
  */
 public class GenericJDBCUpdateTask implements ItemTaskIF {
 

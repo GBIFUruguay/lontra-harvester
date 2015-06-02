@@ -99,7 +99,7 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 		processedModel.setSourcefileid(rawModel.getSourcefileid());
 
 		// see https://github.com/WingLongitude/liger-data-access/issues/24
-		// processedModel.setResource_uuid(rawModel.getResource_uuid());
+		processedModel.setResource_id(rawModel.getResource_id());
 
 		processedModel.setBasisofrecord(rawModel.getBasisofrecord());
 

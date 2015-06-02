@@ -1,10 +1,17 @@
 package net.canadensys.harvester.config;
 
+import static org.junit.Assert.fail;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import liquibase.exception.DatabaseException;
+import liquibase.exception.LiquibaseException;
 import net.canadensys.databaseutils.model.DBMetadata;
+import net.canadensys.dataportal.occurrence.migration.LiquibaseHelper;
 import net.canadensys.dataportal.occurrence.model.ContactModel;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
@@ -114,10 +121,31 @@ public class ProcessingConfigTest {
 
 	@Bean(name = "datasource")
 	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).addScript("classpath:h2/h2setup.sql")
+		DataSource ds = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).addScript("classpath:h2/h2setup.sql")
 				// those 2 scripts are loaded from liger-data-access
 				.addScript("/script/occurrence/create_occurrence_tables.sql")
 				.addScript("/script/occurrence/create_occurrence_tables_buffer_schema.sql").build();
+
+		Connection conn;
+
+		try {
+			conn = ds.getConnection();
+			LiquibaseHelper.migrate(conn);
+			conn.close();
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+			fail();
+		}
+		catch (DatabaseException e) {
+			e.printStackTrace();
+			fail();
+		}
+		catch (LiquibaseException e) {
+			e.printStackTrace();
+			fail();
+		}
+		return ds;
 	}
 
 	@Bean(name = "bufferSessionFactory")

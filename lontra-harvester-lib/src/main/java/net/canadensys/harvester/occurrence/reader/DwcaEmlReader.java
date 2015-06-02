@@ -12,9 +12,9 @@ import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
 import org.apache.log4j.Logger;
-import org.gbif.dwc.text.Archive;
-import org.gbif.dwc.text.ArchiveFactory;
-import org.gbif.dwc.text.UnsupportedArchiveException;
+import org.gbif.dwca.io.Archive;
+import org.gbif.dwca.io.ArchiveFactory;
+import org.gbif.dwca.io.UnsupportedArchiveException;
 import org.gbif.metadata.eml.Eml;
 import org.gbif.metadata.eml.EmlFactory;
 import org.xml.sax.SAXException;
