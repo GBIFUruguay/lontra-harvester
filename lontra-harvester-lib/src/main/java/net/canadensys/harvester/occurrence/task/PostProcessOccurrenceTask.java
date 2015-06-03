@@ -8,6 +8,7 @@ import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.exception.TaskExecutionException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -66,7 +67,7 @@ public class PostProcessOccurrenceTask implements ItemTaskIF {
 			query.executeUpdate();
 
 			// In case the dataset is related to a publisher in the GUI:
-			if (publisherName != null   || !publisherName.equalsIgnoreCase("")) {
+			if (publisherName != null   || StringUtils.isNotBlank(publisherName)) {
 				// Update publisher name for this dataset's occurrence records:
 				query = session.createSQLQuery("update buffer.occurrence set publishername = ? where " + OccurrenceFieldConstants.RESOURCE_ID
 						+ " = ?;");

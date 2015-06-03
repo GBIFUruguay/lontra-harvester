@@ -53,19 +53,10 @@ public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceM
 		// Guid represents the packageId from the EML minus the version part.
 		String guid = eml.getGuid();
 
-		// The package_id is a URL (https://github.com/WingLongitude/liger-data-access/issues/23)
-		if (guid.startsWith("http")) {
+		if (!guid.equalsIgnoreCase(gbifPackageId)) {
 			// if the gbif_package_id inside the archive is different than what was set in the UI, do not harvest.
-			if (!guid.equalsIgnoreCase(gbifPackageId)) {
-				throw new ProcessException("The extracted package_id from the EML file doesn't match the provided one");
-			}
-		}
-		
-		else {
-			if (!isUUID(guid)) {
-				throw new ProcessException("Invalid package_id from the EML");
-			}	
-		}
+			throw new ProcessException("The extracted package_id from the EML file doesn't match the provided one");
+		}	
 
 		metadata = new ResourceMetadataModel();
 		metadata.setDwca_resource_id(resourceId);
