@@ -17,9 +17,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Test behavior of BulkDataObject serialization
- * 
+ *
  * @author cgendreau
- * 
+ *
  */
 public class BulkDataObjectTest {
 
@@ -71,6 +71,22 @@ public class BulkDataObjectTest {
 		OccurrenceModel rebuiltObj2 = new OccurrenceModel();
 		reconstructedBulkObj.retrieveObject(1, rebuiltObj2);
 		assertEquals("2", rebuiltObj2.getDwcaid());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testBulkDataObjectInvalidHeader() {
+		List<String> columns = new ArrayList<String>();
+		columns.add("dwcaid");
+		columns.add("scientificname");
+		columns.add("mock_field");
+
+		BulkDataObject<OccurrenceModel> bulkObj = new BulkDataObject<OccurrenceModel>(columns);
+
+		OccurrenceModel occModel1 = new OccurrenceModel();
+		occModel1.setDwcaid("1");
+		occModel1.setScientificname("scientificname 1");
+
+		bulkObj.addObject(occModel1);
 	}
 
 }

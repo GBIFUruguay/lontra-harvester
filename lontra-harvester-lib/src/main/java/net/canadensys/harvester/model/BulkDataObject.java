@@ -12,9 +12,9 @@ import org.apache.log4j.Logger;
 /**
  * Allows to group a list of Object(of the same class) under one Object storing properties in String arrays.
  * Main usage is JSON serialization where we will only print property names once.
- * 
+ *
  * @author cgendreau
- * 
+ *
  * @param <T>
  */
 public class BulkDataObject<T> {
@@ -35,36 +35,34 @@ public class BulkDataObject<T> {
 	/**
 	 * Add a new Object of instance <T> to the bulk.
 	 * Reflection is used to extract properties based on fieldNames.
-	 * 
+	 *
 	 * @param obj
 	 */
 	@SuppressWarnings("unchecked")
-	public void addObject(T obj) {
+	public void addObject(T obj) throws IllegalArgumentException {
 		try {
 			Map<String, String> objDescription = BeanUtilsBean.getInstance().describe(obj);
 			String[] objData = new String[fieldNames.size()];
 			int i = 0;
 			for (String fieldName : fieldNames) {
+				if (!objDescription.containsKey(fieldName)) {
+					throw new IllegalArgumentException("Can't add object to BulkDataObject: " + fieldName + " is not a valid field name of "
+							+ obj.getClass());
+				}
 				objData[i] = objDescription.get(fieldName);
 				i++;
 			}
 			data.add(objData);
 		}
-		catch (IllegalAccessException e) {
-			LOGGER.error("Can't add object to BulkDataObject", e);
-		}
-		catch (InvocationTargetException e) {
-			LOGGER.error("Can't add object to BulkDataObject", e);
-		}
-		catch (NoSuchMethodException e) {
-			LOGGER.error("Can't add object to BulkDataObject", e);
+		catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
+			throw new IllegalArgumentException("Can't add object to BulkDataObject", ex);
 		}
 	}
 
 	/**
 	 * Add a data line to the current bulk.
 	 * The order and the size shall respect the fieldNames list.
-	 * 
+	 *
 	 * @param obj
 	 */
 	public void addData(String[] _data) {
@@ -76,7 +74,7 @@ public class BulkDataObject<T> {
 
 	/**
 	 * Rebuild an object from the properties.
-	 * 
+	 *
 	 * @param index
 	 *            index of the object to retrieve.
 	 * @param obj
