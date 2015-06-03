@@ -37,7 +37,7 @@ public class StreamDwcContentStep extends AbstractStreamStep {
 		NON_DWC_FIELD_USED.add("auto_id");
 		NON_DWC_FIELD_USED.add("dwcaid");
 		NON_DWC_FIELD_USED.add("sourcefileid");
-		NON_DWC_FIELD_USED.add("resource_uuid");
+		NON_DWC_FIELD_USED.add("resource_id");
 	}
 
 	@Autowired

@@ -66,7 +66,7 @@ public class PostProcessOccurrenceTask implements ItemTaskIF {
 			query.executeUpdate();
 
 			// In case the dataset is related to a publisher in the GUI:
-			if (publisherName != null) {
+			if (publisherName != null   || !publisherName.equalsIgnoreCase("")) {
 				// Update publisher name for this dataset's occurrence records:
 				query = session.createSQLQuery("update buffer.occurrence set publishername = ? where " + OccurrenceFieldConstants.RESOURCE_ID
 						+ " = ?;");

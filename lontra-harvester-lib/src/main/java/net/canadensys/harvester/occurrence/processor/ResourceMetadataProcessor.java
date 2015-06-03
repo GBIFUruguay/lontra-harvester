@@ -50,26 +50,21 @@ public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceM
 			throw new TaskExecutionException("Misconfigured ResourceInformationProcessor");
 		}
 
-		// guid represents the packageId from the EML minus the version part
+		// Guid represents the packageId from the EML minus the version part.
 		String guid = eml.getGuid();
 
-		if (isUUID(guid)) {
-			// if the resource_uuid inside the archive is different than what we asked for, do not harvest.
+		// The package_id is a URL (https://github.com/WingLongitude/liger-data-access/issues/23)
+		if (guid.startsWith("http")) {
+			// if the gbif_package_id inside the archive is different than what was set in the UI, do not harvest.
 			if (!guid.equalsIgnoreCase(gbifPackageId)) {
-				throw new ProcessException("The extracted UUID from the EML doesn't match the provided UUID");
+				throw new ProcessException("The extracted package_id from the EML file doesn't match the provided one");
 			}
 		}
+		
 		else {
-			// for now we support http address in resource_uuid
-			// until this issue is fixed: https://github.com/WingLongitude/liger-data-access/issues/23
-			if (guid.startsWith("http")) {
-				if (!guid.equalsIgnoreCase(gbifPackageId)) {
-					throw new ProcessException("The extracted packageId from the EML doesn't match the provided UUID");
-				}
-			}
-			else {
-				throw new ProcessException("The can't extract packageId from the EML");
-			}
+			if (!isUUID(guid)) {
+				throw new ProcessException("Invalid package_id from the EML");
+			}	
 		}
 
 		metadata = new ResourceMetadataModel();
