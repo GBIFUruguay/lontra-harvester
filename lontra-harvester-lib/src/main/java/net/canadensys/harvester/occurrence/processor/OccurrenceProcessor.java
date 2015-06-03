@@ -68,8 +68,8 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 	private final AbstractDataProcessor altitudeProcessor = new NumericPairDataProcessor("minimumelevationinmeters", "maximumelevationinmeters");
 	private final DegreeMinuteToDecimalProcessor dmsProcessor = new DegreeMinuteToDecimalProcessor();
 
-	private final Map<String, AbstractDataProcessor> iso3166_2ProcessorMap = new HashMap<String, AbstractDataProcessor>();
-	private final Map<String, AbstractDataProcessor> stateProvinceProcessorMap = new HashMap<String, AbstractDataProcessor>();
+	private final Map<String, DictionaryBackedProcessor> iso3166_2ProcessorMap = new HashMap<String, DictionaryBackedProcessor>();
+	private final Map<String, DictionaryBackedProcessor> stateProvinceProcessorMap = new HashMap<String, DictionaryBackedProcessor>();
 
 	@Override
 	public void init() {
@@ -117,6 +117,7 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 
 		// Country processing
 		countryProcessor.processBean(rawModel, processedModel, null, null);
+		Country country = countryProcessor.process(rawModel.getCountry(), null);
 
 		// Continent processing
 		if (!StringUtils.isBlank(rawModel.getContinent())) {
@@ -126,7 +127,6 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 			Continent continent = null;
 			try {
 				if (!StringUtils.isBlank(processedModel.getCountry())) {
-					Country country = Country.valueOf(processedModel.getCountry().toUpperCase().replaceAll(" ", "_"));
 					continent = countryContinentProcessor.process(country.getIso2LetterCode(), null);
 					if (continent != null) {
 						processedModel.setContinent(continent.getTitle());
@@ -138,8 +138,10 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 		}
 
 		// state or province processing
-		if (!StringUtils.isBlank(processedModel.getCountry()) && stateProvinceProcessorMap.get(processedModel.getCountry()) != null) {
-			stateProvinceProcessorMap.get(processedModel.getCountry()).processBean(rawModel, processedModel, null, null);
+		if (country != null && stateProvinceProcessorMap.get(country.getIso2LetterCode()) != null) {
+			// 2 phases processing [raw -> ISO] and [ISO -> common name]
+			String stateProvinceISO = stateProvinceProcessorMap.get(country.getIso2LetterCode()).process(rawModel.getStateprovince(), null);
+			processedModel.setStateprovince(iso3166_2ProcessorMap.get(country.getIso2LetterCode()).process(stateProvinceISO, null));
 		}
 		else {// if we can't process it, copy it
 			processedModel.setStateprovince(rawModel.getStateprovince());

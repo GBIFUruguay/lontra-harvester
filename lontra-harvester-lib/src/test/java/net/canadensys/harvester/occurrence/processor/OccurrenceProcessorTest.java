@@ -17,9 +17,9 @@ import org.junit.Test;
 
 /**
  * Test OccurrenceProcessor behavior
- * 
+ *
  * @author cgendreau
- * 
+ *
  */
 public class OccurrenceProcessorTest {
 
@@ -35,7 +35,7 @@ public class OccurrenceProcessorTest {
 
 		OccurrenceRawModel rawModel = new OccurrenceRawModel();
 		rawModel.setAssociatedmedia("http://www.google.com | http://yahoo.ca");
-		rawModel.setCountry("bra");
+		rawModel.setCountry("ca");
 		// the tab char in the scientific name, the quotes should removed and the NUL should be removed.
 		// actually the NUL will be removed by the Mapper but the Processor should also do it
 		rawModel.setScientificname("\"Carex \tLinnaeus\"" + NULL_CHAR);
@@ -43,7 +43,7 @@ public class OccurrenceProcessorTest {
 		rawModel.setDecimallatitude("10.2");
 		rawModel.setDecimallongitude("27.3");
 
-		rawModel.setStateprovince("Rio de Janeiro");
+		rawModel.setStateprovince("qc");
 		rawModel.setEventdate("2011-12-26");
 
 		try {
@@ -51,8 +51,8 @@ public class OccurrenceProcessorTest {
 
 			assertEquals("http://www.google.com; http://yahoo.ca", processedModel.getAssociatedmedia());
 			assertTrue(processedModel.getHasmedia());
-			assertEquals("South America", processedModel.getContinent());
-			assertEquals("Rio de Janeiro", processedModel.getStateprovince());
+			assertEquals("North America", processedModel.getContinent());
+			assertEquals("Quebec", processedModel.getStateprovince());
 			assertNotNull(processedModel.getDecimallatitude());
 			assertNotNull(processedModel.getDecimallongitude());
 			assertTrue(processedModel.getHascoordinates());
@@ -106,7 +106,7 @@ public class OccurrenceProcessorTest {
 	/**
 	 * Make sure we do not keep an invalid data in processed model.
 	 * Decimallatitude, Decimallongitude, Eventdate (not interval)
-	 * 
+	 *
 	 */
 	@Test
 	public void testProcessingBehaviorOnError() {
@@ -231,7 +231,7 @@ public class OccurrenceProcessorTest {
 	/**
 	 * Make sure we do not keep an invalid data in processed model.
 	 * Eventdate (interval)
-	 * 
+	 *
 	 */
 	@Test
 	public void testDateIntervalProcessingBehaviorOnError() {

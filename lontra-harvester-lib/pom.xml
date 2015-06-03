@@ -19,7 +19,7 @@
 		<jsch.version>0.1.51</jsch.version>
 		<activemq.version>5.10.0</activemq.version>
 		<narwhal.version>1.5.3</narwhal.version>
-		<data-access.version>2.13.0-SNAPSHOT</data-access.version>
+		<data-access.version>2.13.0</data-access.version>
 		<commons-validator.version>1.4.1</commons-validator.version>
 
 		<gbif-metadata-profile.version>1.1</gbif-metadata-profile.version>
