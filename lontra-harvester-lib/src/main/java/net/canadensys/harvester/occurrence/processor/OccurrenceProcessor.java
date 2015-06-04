@@ -127,10 +127,15 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 			Continent continent = null;
 			try {
 				if (!StringUtils.isBlank(processedModel.getCountry())) {
-					continent = countryContinentProcessor.process(country.getIso2LetterCode(), null);
-					if (continent != null) {
-						processedModel.setContinent(continent.getTitle());
-					}
+					if (country != null) {
+						// set country:
+						processedModel.setCountry(country.getTitle());
+						// set continent:
+						continent = countryContinentProcessor.process(country.getIso2LetterCode(), null);
+						if (continent != null) {
+							processedModel.setContinent(continent.getTitle());
+						}
+					}	
 				}
 			}
 			catch (IllegalArgumentException ignore) {
