@@ -6,6 +6,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -399,9 +401,16 @@ public class ResourcesPanel extends JPanel {
 		// Retrieve available resources list:
 		List<DwcaResourceModel> resources = stepController
 				.getResourceModelList();
+		
 		// Add an item for each resource name:
+		ArrayList<String> names = new ArrayList<String>();
 		for (DwcaResourceModel resource : resources) {
-			resourcesCmbBox.addItem(resource.getName());
+			names.add(resource.getName());
+		}
+		// Reorder alphabetically:
+		Collections.sort(names);
+		for (String name : names) {
+			resourcesCmbBox.addItem(name);
 		}
 	}
 
