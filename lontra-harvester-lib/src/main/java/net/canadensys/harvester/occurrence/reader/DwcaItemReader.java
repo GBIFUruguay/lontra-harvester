@@ -3,7 +3,6 @@ package net.canadensys.harvester.occurrence.reader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,14 +93,8 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 			LOGGER.fatal("Can't open DwcaItemReader", e);
 		}
 
-		// make sure those headers can be imported correctly
-		validateDwcaHeaders();
-
-		List<String> usedDwcTerms = new ArrayList<String>();
-		usedDwcTerms.addAll(Arrays.asList(headers));
-		if (defaultValues != null) {
-			usedDwcTerms.addAll(defaultValues.keySet());
-		}
+		// only use terms we know
+		List<String> usedDwcTerms = getDwcaUsedTerms();
 
 		// set the used dwc terms used by this archive
 		sharedParameters.put(SharedParameterEnum.DWCA_USED_TERMS, usedDwcTerms);
@@ -126,13 +119,28 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 	 * This method validates that the headers found in the archive can be mapped to OccurrenceRawModel.
 	 *
 	 */
-	private void validateDwcaHeaders() {
+	private List<String> getDwcaUsedTerms() {
 		OccurrenceRawModel testModel = new OccurrenceRawModel();
+		List<String> usedDwcTerms = new ArrayList<String>();
+
 		for (String currHeader : headers) {
-			if (!PropertyUtils.isWriteable(testModel, currHeader)) {
-				LOGGER.warn("Property " + currHeader + " is not found or writeable in OccurrenceRawModel");
+			if (PropertyUtils.isWriteable(testModel, currHeader)) {
+				usedDwcTerms.add(currHeader);
+			}
+			else {
+				LOGGER.warn("Property [" + currHeader + "] is not found or writeable in OccurrenceRawModel");
 			}
 		}
+
+		for (String currHeader : defaultValues.keySet()) {
+			if (PropertyUtils.isWriteable(testModel, currHeader)) {
+				usedDwcTerms.add(currHeader);
+			}
+			else {
+				LOGGER.warn("Property [" + currHeader + "] is not found or writeable in OccurrenceRawModel");
+			}
+		}
+		return usedDwcTerms;
 	}
 
 	@Override

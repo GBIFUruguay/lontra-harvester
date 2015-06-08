@@ -1,10 +1,12 @@
 package net.canadensys.harvester.occurrence.reader;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
@@ -16,9 +18,9 @@ import org.junit.Test;
 /**
  * Test the reading of a DarwinCore Archive file and get a object back.
  * Ensure the default values are read
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class DwcaReaderTest {
 
@@ -31,6 +33,12 @@ public class DwcaReaderTest {
 
 		ItemReaderIF<OccurrenceRawModel> dwcaItemReader = new DwcaItemReader();
 		dwcaItemReader.openReader(sharedParameters);
+
+		// check headers are correctly set
+		@SuppressWarnings("unchecked")
+		List<String> usedTerms = (List<String>) sharedParameters.get(SharedParameterEnum.DWCA_USED_TERMS);
+		// the reader should not set terms that can not be stored in the model (but a warning will be in the log)
+		assertFalse(usedTerms.contains("source"));
 
 		OccurrenceRawModel rawModel = dwcaItemReader.read();
 		count++;

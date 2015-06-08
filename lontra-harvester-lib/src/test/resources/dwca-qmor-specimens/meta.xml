@@ -68,7 +68,8 @@
     <field index="62" term="http://rs.tdwg.org/dwc/terms/decimalLongitude"/>
     <field index="63" term="http://rs.tdwg.org/dwc/terms/georeferenceSources"/>
     <field index="64" term="http://rs.tdwg.org/dwc/terms/stateProvince"/>
-    <field index="65" term="http://rs.tdwg.org/dwc/terms/typeStatus"/>
+    <field index="65" term="http://rs.tdwg.org/dwc/terms/country"/>
+    <field index="66" term="http://purl.org/dc/terms/source"/>
     <field default="PreservedSpecimen" term="http://rs.tdwg.org/dwc/terms/basisOfRecord"/>
   </core>
   <extension encoding="UTF-8" fieldsTerminatedBy="\t" linesTerminatedBy="\n" fieldsEnclosedBy="" ignoreHeaderLines="0" rowType="http://rs.gbif.org/terms/1.0/Multimedia">
