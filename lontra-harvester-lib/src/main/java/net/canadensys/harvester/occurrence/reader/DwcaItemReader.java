@@ -116,8 +116,9 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 	}
 
 	/**
-	 * This method validates that the headers found in the archive can be mapped to OccurrenceRawModel.
-	 *
+	 * Get headers found in the archive that can be mapped to OccurrenceRawModel.
+	 * 
+	 * @return list of terms (simpleName)
 	 */
 	private List<String> getDwcaUsedTerms() {
 		OccurrenceRawModel testModel = new OccurrenceRawModel();

@@ -20,6 +20,7 @@
 		<activemq.version>5.10.0</activemq.version>
 		<narwhal.version>1.5.3</narwhal.version>
 		<data-access.version>2.13.0</data-access.version>
+		<shared-dictionaries.version>0.1</shared-dictionaries.version>
 		<commons-validator.version>1.4.1</commons-validator.version>
 
 		<gbif-metadata-profile.version>1.1</gbif-metadata-profile.version>
@@ -77,7 +78,7 @@
 		<dependency>
 			<groupId>winglongitude</groupId>
 			<artifactId>shared-dictionaries</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>${shared-dictionaries.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
