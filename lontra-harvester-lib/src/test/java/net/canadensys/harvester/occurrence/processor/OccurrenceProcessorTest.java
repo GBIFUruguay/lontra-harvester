@@ -52,6 +52,7 @@ public class OccurrenceProcessorTest {
 			assertEquals("http://www.google.com; http://yahoo.ca", processedModel.getAssociatedmedia());
 			assertTrue(processedModel.getHasmedia());
 			assertEquals("North America", processedModel.getContinent());
+			assertEquals("Canada", processedModel.getCountry());
 			assertEquals("Quebec", processedModel.getStateprovince());
 			assertNotNull(processedModel.getDecimallatitude());
 			assertNotNull(processedModel.getDecimallongitude());
