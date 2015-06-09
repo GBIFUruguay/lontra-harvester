@@ -6,7 +6,7 @@
 	<groupId>winglongitude</groupId>
 	<artifactId>winglongitude-lontra</artifactId>
 	<packaging>pom</packaging>
-	<version>0.1</version>
+	<version>1.0</version>
 	<name>WingLongitude Lontra Harvester</name>
   
 	<modules>

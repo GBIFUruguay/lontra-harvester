@@ -1,14 +1,11 @@
 Version History
 ===============
+
+Version 1.0 2015-06-09
+ * First release from WingLongitude
+
 Version 0.3 2014-07-20
 * Added new module (component) for the node
-* Changes made to the resource_management table:
-```
-ALTER SEQUENCE resource_management_resource_id_seq RENAME TO resource_management_id_seq;
-ALTER TABLE resource_management RENAME resource_id  TO id;
-ALTER TABLE resource_management RENAME source_file_id  TO sourcefileid;
-ALTER TABLE resource_management DROP COLUMN last_updated;
-```
 
 Version 0.2 2014-01-14
 * Split project into 2 components (Issue #6)
