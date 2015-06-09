@@ -117,7 +117,7 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 
 	/**
 	 * Get headers found in the archive that can be mapped to OccurrenceRawModel.
-	 * 
+	 *
 	 * @return list of terms (simpleName)
 	 */
 	private List<String> getDwcaUsedTerms() {
@@ -133,12 +133,14 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 			}
 		}
 
-		for (String currHeader : defaultValues.keySet()) {
-			if (PropertyUtils.isWriteable(testModel, currHeader)) {
-				usedDwcTerms.add(currHeader);
-			}
-			else {
-				LOGGER.warn("Property [" + currHeader + "] is not found or writeable in OccurrenceRawModel");
+		if (defaultValues != null) {
+			for (String currHeader : defaultValues.keySet()) {
+				if (PropertyUtils.isWriteable(testModel, currHeader)) {
+					usedDwcTerms.add(currHeader);
+				}
+				else {
+					LOGGER.warn("Property [" + currHeader + "] is not found or writeable in OccurrenceRawModel");
+				}
 			}
 		}
 		return usedDwcTerms;
