@@ -3,6 +3,8 @@ package net.canadensys.harvester.occurrence.view;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -237,10 +239,19 @@ public class ResourceDialog extends AbstractDialog {
 
 		// Add blank item:
 		publishersCmbBox.addItem("");
-		// Add an item for each publisher:
+
+		// Reorder alphabetically:
+		ArrayList<String> names = new ArrayList<String>();
 		for (PublisherModel publisher : publishers) {
-			publishersCmbBox.addItem(publisher.getName());
+			names.add(publisher.getName());
 		}
+		Collections.sort(names);
+		
+		// Add an item for each publisher name:
+		for (String name : names) {
+			publishersCmbBox.addItem(name);
+		}
+		
 		if (isEdition && resourceModel.getPublisher() != null) {
 			publishersCmbBox.setSelectedItem(resourceModel.getPublisher().getName());
 		}
