@@ -370,16 +370,19 @@ public class UIConfig {
 
 	// ---READER wiring---
 	@Bean
+	@Scope("prototype")
 	public ItemReaderIF<OccurrenceRawModel> dwcItemReader() {
 		return new DwcaItemReader();
 	}
 
 	@Bean
+	@Scope("prototype")
 	public ItemReaderIF<Eml> dwcaEmlReader() {
 		return new DwcaEmlReader();
 	}
 
 	@Bean
+	@Scope("prototype")
 	public ItemReaderIF<Term> dwcaExtensionInfoReader() {
 		return new DwcaExtensionInfoReader();
 	}

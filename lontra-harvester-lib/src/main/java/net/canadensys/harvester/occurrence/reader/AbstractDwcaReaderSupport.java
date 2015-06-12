@@ -10,6 +10,13 @@ import org.gbif.dwca.io.ArchiveField;
 import org.gbif.dwca.io.ArchiveFile;
 import org.gbif.utils.file.ClosableIterator;
 
+/**
+ * Base class for reading Dwc-A
+ * This class is mutable.
+ *
+ * @author cgendreau
+ *
+ */
 public abstract class AbstractDwcaReaderSupport {
 
 	// TODO should be configurable

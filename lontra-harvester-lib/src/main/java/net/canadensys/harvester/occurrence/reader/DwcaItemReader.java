@@ -25,6 +25,7 @@ import com.google.common.collect.Lists;
 
 /**
  * Item reader for Darwin Core Archive.
+ * This class is mutable.
  *
  * @author canadensys
  *

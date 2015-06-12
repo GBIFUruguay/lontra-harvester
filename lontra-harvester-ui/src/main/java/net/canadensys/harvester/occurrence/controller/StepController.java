@@ -30,6 +30,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -40,6 +41,11 @@ import org.springframework.transaction.annotation.Transactional;
  *
  */
 public class StepController implements StepControllerIF {
+
+	private static final String IMPORT_DWCA_JOB_BEAN = "importDwcaJob";
+
+	@Autowired
+	private ApplicationContext appContext;
 
 	@Autowired
 	private HarvesterConfigIF harvesterConfig;
@@ -65,9 +71,6 @@ public class StepController implements StepControllerIF {
 	private ResourceStatusNotifierIF notifier;
 
 	@Autowired
-	private ImportDwcaJob importDwcaJob;
-
-	@Autowired
 	private MoveToPublicSchemaJob moveToPublicSchemaJob;
 
 	@Autowired
@@ -85,6 +88,7 @@ public class StepController implements StepControllerIF {
 	@Autowired
 	private NodeStatusController nodeStatusController;
 
+	private ItemProgressListenerIF progressListener;
 	private AbstractProcessingJob currentJob;
 
 	public StepController() {
@@ -92,7 +96,7 @@ public class StepController implements StepControllerIF {
 
 	@Override
 	public void registerProgressListener(ItemProgressListenerIF progressListener) {
-		importDwcaJob.setItemProgressListener(progressListener);
+		this.progressListener = progressListener;
 	}
 
 	/**
@@ -105,6 +109,8 @@ public class StepController implements StepControllerIF {
 		controlMessageProducer.publish(new VersionControlMessage(currentVersion));
 		controlMessageProducer.close();
 
+		ImportDwcaJob importDwcaJob = (ImportDwcaJob) appContext.getBean(IMPORT_DWCA_JOB_BEAN);
+		importDwcaJob.setItemProgressListener(progressListener);
 		// enable node status controller
 		nodeStatusController.start();
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceId);
@@ -117,6 +123,8 @@ public class StepController implements StepControllerIF {
 
 	@Override
 	public void importDwcAFromLocalFile(String dwcaFilePath) {
+		ImportDwcaJob importDwcaJob = (ImportDwcaJob) appContext.getBean(IMPORT_DWCA_JOB_BEAN);
+		importDwcaJob.setItemProgressListener(progressListener);
 		// enable node status controller
 		nodeStatusController.start();
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, dwcaFilePath);

@@ -19,10 +19,12 @@ import org.gbif.dwca.io.UnsupportedArchiveException;
 
 /**
  * Generic reader to read a DarwinCore Archive extension.
+ * This class is mutable.
  *
  * @author canadensys
  *
- * @param <T> object that will contain a line of the extension
+ * @param <T>
+ *            object that will contain a line of the extension
  */
 public class DwcaExtensionReader<T> extends AbstractDwcaReaderSupport implements ItemReaderIF<T>{
 

@@ -24,9 +24,9 @@ import org.apache.log4j.Logger;
 /**
  * Task to prepare a Darwin Core Archive.
  * Preparation include : download (if necessary), unzip (if necessary), set shared variables
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class PrepareDwcaTask implements ItemTaskIF {
 	// get log4j handler
@@ -40,7 +40,7 @@ public class PrepareDwcaTask implements ItemTaskIF {
 
 	/**
 	 * Allow to find the Darwin Core archive location from the sharedParameters.
-	 * 
+	 *
 	 * @param sharedParameters
 	 * @return the dwca location or null if the location could not be found or is conflicting
 	 */
@@ -65,7 +65,7 @@ public class PrepareDwcaTask implements ItemTaskIF {
 
 	/**
 	 * @param sharedParameters
-	 *            out:SharedParameterEnum.DWCA_PATH,SharedParameterEnum.DATASET_SHORTNAME(if not already set)
+	 *            out:SharedParameterEnum.DWCA_PATH,SharedParameterEnum.SOURCE_FILE_ID(if not already set)
 	 */
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
@@ -153,7 +153,7 @@ public class PrepareDwcaTask implements ItemTaskIF {
 
 	/**
 	 * Download a DarwinCore archive from a URL and save it locally.
-	 * 
+	 *
 	 * @param url
 	 * @param destinationFile
 	 * @return
@@ -199,9 +199,9 @@ public class PrepareDwcaTask implements ItemTaskIF {
 	}
 
 	/**
-	 * Should we allow this task to set the SharedParameterEnum.DATASET_SHORTNAME using the name of the file
+	 * Should we allow this task to set the SharedParameterEnum.SOURCE_FILE_ID using the name of the file
 	 * in case this parameter is not set?
-	 * 
+	 *
 	 * @param allowDatasetShortnameExtraction
 	 */
 	public void setAllowDatasetShortnameExtraction(boolean allowDatasetShortnameExtraction) {
