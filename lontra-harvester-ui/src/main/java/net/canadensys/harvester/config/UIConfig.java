@@ -248,6 +248,7 @@ public class UIConfig {
 
 	// ---JOB---
 	@Bean
+	@Scope("prototype")
 	public ImportDwcaJob importDwcaJob() {
 		return new ImportDwcaJob();
 	}
