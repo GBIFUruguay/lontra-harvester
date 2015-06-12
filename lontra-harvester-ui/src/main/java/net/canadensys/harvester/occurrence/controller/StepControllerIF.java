@@ -5,7 +5,6 @@ import java.util.List;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.PublisherModel;
-import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 
@@ -27,7 +26,7 @@ public interface StepControllerIF {
 	 * This function should be used very carefully since the 'sourcefileid' will be determined from
 	 * the file name. This could lead to unwanted behavior if 2 different resource have the same name.
 	 * Using importDwcA(Integer resourceId) is always preferable.
-	 * 
+	 *
 	 * @param dwcaPath
 	 */
 	public void importDwcAFromLocalFile(String dwcaPath);
@@ -36,11 +35,9 @@ public interface StepControllerIF {
 
 	public void onNodeError();
 
-	public void registerProgressListener(ItemProgressListenerIF progressListener);
-
 	/**
 	 * Insert or update a ResourceModel.
-	 * 
+	 *
 	 * @param resourceModel
 	 * @return
 	 */
@@ -48,7 +45,7 @@ public interface StepControllerIF {
 
 	/**
 	 * Insert or update a PublisherModel
-	 * 
+	 *
 	 * @param publisherModel
 	 * @return
 	 */

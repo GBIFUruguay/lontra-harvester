@@ -10,7 +10,6 @@ import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.harvester.AbstractProcessingJob;
-import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.config.harvester.HarvesterConfigIF;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.message.control.VersionControlMessage;
@@ -88,20 +87,11 @@ public class StepController implements StepControllerIF {
 	@Autowired
 	private NodeStatusController nodeStatusController;
 
-	private ItemProgressListenerIF progressListener;
 	private AbstractProcessingJob currentJob;
 
 	public StepController() {
 	}
 
-	@Override
-	public void registerProgressListener(ItemProgressListenerIF progressListener) {
-		this.progressListener = progressListener;
-	}
-
-	/**
-	 * FIXME we should NOT reuse the importDwcaJob, it is not an immutable class
-	 */
 	@Override
 	public void importDwcA(Integer resourceId) {
 		controlMessageProducer.open();
@@ -110,7 +100,6 @@ public class StepController implements StepControllerIF {
 		controlMessageProducer.close();
 
 		ImportDwcaJob importDwcaJob = (ImportDwcaJob) appContext.getBean(IMPORT_DWCA_JOB_BEAN);
-		importDwcaJob.setItemProgressListener(progressListener);
 		// enable node status controller
 		nodeStatusController.start();
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceId);
@@ -124,7 +113,6 @@ public class StepController implements StepControllerIF {
 	@Override
 	public void importDwcAFromLocalFile(String dwcaFilePath) {
 		ImportDwcaJob importDwcaJob = (ImportDwcaJob) appContext.getBean(IMPORT_DWCA_JOB_BEAN);
-		importDwcaJob.setItemProgressListener(progressListener);
 		// enable node status controller
 		nodeStatusController.start();
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, dwcaFilePath);
