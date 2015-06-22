@@ -67,9 +67,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * 
  */
 @Configuration
-// @ComponentScan(basePackages ="net.canadensys.harvester",
-// excludeFilters = { @Filter(type = FilterType.CUSTOM, value = { ExcludeTestClassesTypeFilter.class }),
-// @Filter(type = FilterType.ASSIGNABLE_TYPE, value = TestConfig.class)})
 @EnableTransactionManagement
 public class CLIProcessingConfig {
 
@@ -188,7 +185,7 @@ public class CLIProcessingConfig {
 	public ComputeUniqueValueJob computeUniqueValueJob() {
 		return new ComputeUniqueValueJob();
 	}
-	
+
 	@Bean
 	public UpdateJob updateJob() {
 		return new UpdateJob();
@@ -237,17 +234,17 @@ public class CLIProcessingConfig {
 	public ItemTaskIF recordImportTask() {
 		return new RecordImportTask();
 	}
-	
+
 	@Bean
 	public ItemTaskIF computeUniqueValueTask() {
 		return new ComputeUniqueValueTask();
 	}
-	
+
 	@Bean
 	public ItemTaskIF postProcessOccurrenceTask() {
 		return new PostProcessOccurrenceTask();
 	}
-		
+
 	// ---PROCESSOR wiring---
 	@Bean(name = "lineProcessor")
 	public ItemProcessorIF<OccurrenceRawModel, OccurrenceRawModel> lineProcessor() {

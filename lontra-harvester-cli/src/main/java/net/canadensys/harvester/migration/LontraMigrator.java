@@ -24,7 +24,12 @@ public class LontraMigrator {
 	private CLIMinimalConfig config;
 
 	public void migrate() {
-
+		try {
+			LiquibaseHelper.migrate(config.dataSource().getConnection());
+		}
+		catch (LiquibaseException | SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

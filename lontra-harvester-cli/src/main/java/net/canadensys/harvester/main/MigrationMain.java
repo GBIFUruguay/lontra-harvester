@@ -52,6 +52,10 @@ public class MigrationMain {
 
 	public void displayChangeSets() {
 		List<String> changeSets = lontraMigrator.getChangeSetList();
+
+		if (changeSets.isEmpty()) {
+			System.out.println("Database up-to-date. No change sets to apply.");
+		}
 		for (String cs : changeSets) {
 			System.out.println(cs);
 		}
