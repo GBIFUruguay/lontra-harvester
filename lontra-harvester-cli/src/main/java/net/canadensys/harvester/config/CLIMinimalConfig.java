@@ -2,8 +2,8 @@ package net.canadensys.harvester.config;
 
 import javax.sql.DataSource;
 
-import net.canadensys.harvester.diagnosis.DiagnosisRun;
-import net.canadensys.harvester.main.DiagnosisMain;
+import net.canadensys.harvester.main.MigrationMain;
+import net.canadensys.harvester.migration.LontraMigrator;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
@@ -58,13 +58,13 @@ public class CLIMinimalConfig {
 	}
 
 	@Bean
-	public DiagnosisMain diagnosisMain() {
-		return new DiagnosisMain();
+	public MigrationMain diagnosisMain() {
+		return new MigrationMain();
 	}
 
 	@Bean
-	public DiagnosisRun diagnosisRun() {
-		return new DiagnosisRun();
+	public LontraMigrator lontraMigrator() {
+		return new LontraMigrator();
 	}
 
 }

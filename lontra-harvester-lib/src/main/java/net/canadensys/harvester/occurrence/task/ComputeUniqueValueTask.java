@@ -25,9 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
  * ElasticSearch ...) Task to pre-compute all possible unique values and their
  * counts for some fields. To ensure maximum performance we run this once, after
  * moving the data to public schema.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class ComputeUniqueValueTask implements ItemTaskIF {
 
@@ -41,6 +41,7 @@ public class ComputeUniqueValueTask implements ItemTaskIF {
 	private static String ABSTRACT_INSERT = "INSERT INTO unique_values (key,occurrence_count,value,unaccented_value) VALUES (:key,:occ_count,:value,:unaccented_value)";
 	private static String ABSTRACT_SELECT = "SELECT COUNT(%field) occurrence_count,%field FROM occurrence WHERE %field IS NOT NULL AND %field <> '' GROUP BY %field";
 
+	// name of columns from the occurrence table to index in the unique_values
 	// must fit with SearchServiceConfig (Explorer)
 	private static List<String> columns = new ArrayList<String>();
 	static {
@@ -86,8 +87,8 @@ public class ComputeUniqueValueTask implements ItemTaskIF {
 					currentValue = cursor.get();
 					if (((String) currentValue[1]).length() < MAX_VALUE_LENGTH) {
 						session.createSQLQuery(ABSTRACT_INSERT).setParameter("key", currCol).setParameter("occ_count", currentValue[0])
-								.setParameter("value", currentValue[1])
-								.setParameter("unaccented_value", StringUtils.unaccent(((String) currentValue[1]).toLowerCase())).executeUpdate();
+						.setParameter("value", currentValue[1])
+						.setParameter("unaccented_value", StringUtils.unaccent(((String) currentValue[1]).toLowerCase())).executeUpdate();
 					}
 				}
 				cursor.close();
