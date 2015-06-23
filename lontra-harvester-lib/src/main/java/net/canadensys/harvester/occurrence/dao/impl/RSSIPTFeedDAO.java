@@ -15,7 +15,13 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
-public class HibernateIPTFeedDAO implements IPTFeedDAO {
+/**
+ * IPTFeedDAO implementation using RSS
+ * 
+ * @author cgendreau
+ *
+ */
+public class RSSIPTFeedDAO implements IPTFeedDAO {
 
 	@Override
 	public List<IPTFeedModel> getIPTFeed(URL iptFeedURL) {

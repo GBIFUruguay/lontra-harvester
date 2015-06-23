@@ -18,7 +18,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
  * @author cgendreau
  * 
  */
-public class CLIMinimalConfig {
+public class CLIMigrationConfig {
 
 	@Value("${harvester.library.version:?}")
 	private String currentVersion;

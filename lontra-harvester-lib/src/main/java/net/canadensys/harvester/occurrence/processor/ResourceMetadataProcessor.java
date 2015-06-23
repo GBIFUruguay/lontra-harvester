@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import net.canadensys.dataportal.occurrence.dao.ResourceMetadataDAO;
 import net.canadensys.dataportal.occurrence.model.ContactModel;
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.exception.ProcessException;
@@ -43,20 +44,20 @@ public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceM
 
 		ResourceMetadataModel metadata = null;
 
-		String gbifPackageId = (String) sharedParameters.get(SharedParameterEnum.GBIF_PACKAGE_ID);
+		DwcaResourceModel resourceModel = (DwcaResourceModel) sharedParameters.get(SharedParameterEnum.RESOURCE_MODEL);
 		Integer resourceId = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
-		if (gbifPackageId == null || resourceId == null) {
-			LOGGER.fatal("Misconfigured ResourceInformationProcessor: gbifPackageId and resource_id are required");
+		if (resourceModel == null || resourceId == null) {
+			LOGGER.fatal("Misconfigured ResourceInformationProcessor: resourceModel and resource_id are required");
 			throw new TaskExecutionException("Misconfigured ResourceInformationProcessor");
 		}
 
 		// Guid represents the packageId from the EML minus the version part.
 		String guid = eml.getGuid();
 
-		if (!guid.equalsIgnoreCase(gbifPackageId)) {
+		if (!guid.equalsIgnoreCase(resourceModel.getGbif_package_id())) {
 			// if the gbif_package_id inside the archive is different than what was set in the UI, do not harvest.
 			throw new ProcessException("The extracted package_id from the EML file doesn't match the provided one");
-		}	
+		}
 
 		metadata = new ResourceMetadataModel();
 		metadata.setDwca_resource_id(resourceId);

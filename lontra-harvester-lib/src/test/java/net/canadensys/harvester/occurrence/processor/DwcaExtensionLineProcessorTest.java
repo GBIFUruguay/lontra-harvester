@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;
@@ -43,7 +44,8 @@ public class DwcaExtensionLineProcessorTest {
 		OccurrenceExtensionModel rawModel = new OccurrenceExtensionModel();
 		OccurrenceExtensionModel occModel = ProcessorRunner.runItemProcessor(extLineProcessor, rawModel, sharedParameters);
 
-		assertEquals(sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID), occModel.getSourcefileid());
+		DwcaResourceModel resourceModel = (DwcaResourceModel) sharedParameters.get(SharedParameterEnum.RESOURCE_MODEL);
+		assertEquals(resourceModel.getSourcefileid(), occModel.getSourcefileid());
 		assertEquals(GbifTerm.Distribution.simpleName(), occModel.getExt_type());
 		assertTrue(occModel.getAuto_id() > 0);
 	}

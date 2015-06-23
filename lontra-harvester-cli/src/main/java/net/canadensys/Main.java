@@ -2,6 +2,7 @@ package net.canadensys;
 
 import java.util.Scanner;
 
+import net.canadensys.harvester.main.JobInitiatorMain;
 import net.canadensys.harvester.main.MigrationMain;
 import net.canadensys.harvester.main.MigrationMain.Mode;
 
@@ -25,6 +26,9 @@ public class Main {
 	private static final String MIGRATE_SHORT_OPTION = "m";
 	private static final String MIGRATE_OPTION = "migrate";
 
+	private static final String STATUS_SHORT_OPTION = "s";
+	private static final String STATUS_OPTION = "status";
+
 	private static final String MIGRATE_OPTION_DRYRUN = "dryrun";
 	private static final String MIGRATE_OPTION_APPLY = "apply";
 
@@ -32,6 +36,7 @@ public class Main {
 		cmdLineOptions = new Options();
 		cmdLineOptions.addOption(new Option(MIGRATE_SHORT_OPTION, MIGRATE_OPTION, true, "Migrate database '" + MIGRATE_OPTION_DRYRUN + "' or '"
 				+ MIGRATE_OPTION_APPLY + "'"));
+		cmdLineOptions.addOption(new Option(STATUS_SHORT_OPTION, STATUS_OPTION, false, "List status of resources"));
 	}
 
 	/**
@@ -40,8 +45,6 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// cmdLineOptions.addOption("r", true, "sourcefileid to harvest");
-
 		CommandLineParser parser = new PosixParser();
 		CommandLine cmdLine = null;
 		try {
@@ -71,6 +74,9 @@ public class Main {
 				else {
 					printHelp();
 				}
+			}
+			else if (cmdLine.hasOption(STATUS_OPTION)) {
+				JobInitiatorMain.startStatusMain();
 			}
 			else {
 				printHelp();

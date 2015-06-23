@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import net.canadensys.harvester.mapper.DefaultBeanMapper;
 import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.message.DefaultMessage;
 import net.canadensys.harvester.occurrence.mock.MockHabitObject;
+import net.canadensys.harvester.occurrence.mock.MockSharedParameters;
 import net.canadensys.harvester.occurrence.mock.writer.MockObjectWriter;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
 import net.canadensys.harvester.occurrence.step.async.GenericAsyncStep;
@@ -35,7 +37,8 @@ public class GenericStreamStepTest {
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-vascan-checklist");
 		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE, GbifTerm.Description);
-		sharedParameters.put(SharedParameterEnum.GBIF_PACKAGE_ID, "1");
+		sharedParameters.put(SharedParameterEnum.RESOURCE_MODEL,
+				MockSharedParameters.getDwcaResourceModel(1, UUID.randomUUID().toString(), "dwca-vascan-checklist"));
 
 		// setup reader
 		DwcaExtensionReader<MockHabitObject> extReader = new DwcaExtensionReader<MockHabitObject>();

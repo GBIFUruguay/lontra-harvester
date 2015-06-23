@@ -2,7 +2,7 @@ package net.canadensys.harvester.main;
 
 import java.util.List;
 
-import net.canadensys.harvester.config.CLIMinimalConfig;
+import net.canadensys.harvester.config.CLIMigrationConfig;
 import net.canadensys.harvester.migration.LontraMigrator;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class MigrationMain {
 	 * @param args
 	 */
 	public static void main(Mode mode) {
-		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(CLIMinimalConfig.class);
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(CLIMigrationConfig.class);
 		MigrationMain mm = ctx.getBean(MigrationMain.class);
 
 		switch (mode) {

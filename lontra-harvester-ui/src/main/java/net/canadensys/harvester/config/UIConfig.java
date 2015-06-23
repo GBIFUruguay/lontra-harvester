@@ -36,7 +36,7 @@ import net.canadensys.harvester.occurrence.controller.NodeStatusController;
 import net.canadensys.harvester.occurrence.controller.StepController;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
-import net.canadensys.harvester.occurrence.dao.impl.HibernateIPTFeedDAO;
+import net.canadensys.harvester.occurrence.dao.impl.RSSIPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
@@ -141,8 +141,6 @@ public class UIConfig {
 	// optional
 	@Value("${ipt.rss:}")
 	private String iptRssAddress;
-	@Value("${harvester.import.allow_localfile:false}")
-	private Boolean allowLocalFileImport;
 
 	// --- Main ---
 	@Bean
@@ -304,9 +302,7 @@ public class UIConfig {
 	// ---TASK wiring---
 	@Bean
 	public ItemTaskIF prepareDwcaTask() {
-		PrepareDwcaTask pdwca = new PrepareDwcaTask();
-		pdwca.setAllowDatasetShortnameExtraction(allowLocalFileImport);
-		return pdwca;
+		return new PrepareDwcaTask();
 	}
 
 	@Bean
@@ -434,7 +430,7 @@ public class UIConfig {
 	// ---DAO---
 	@Bean
 	public IPTFeedDAO iptFeedDAO() {
-		return new HibernateIPTFeedDAO();
+		return new RSSIPTFeedDAO();
 	}
 
 	@Bean

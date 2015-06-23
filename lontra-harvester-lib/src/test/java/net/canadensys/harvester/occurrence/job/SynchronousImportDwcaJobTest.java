@@ -1,5 +1,6 @@
 package net.canadensys.harvester.occurrence.job;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
@@ -11,6 +12,7 @@ import net.canadensys.harvester.TestDataHelper;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
+import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessEmlContentStep;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessOccurrenceStep;
 
@@ -70,7 +72,7 @@ public class SynchronousImportDwcaJobTest {
 				"DELETE FROM buffer.contact",
 				"DELETE FROM contact",
 				"DELETE FROM buffer.resource_metadata",
-				"DELETE FROM resource_metadata" });
+		"DELETE FROM resource_metadata" });
 	}
 
 	@Configuration
@@ -112,6 +114,7 @@ public class SynchronousImportDwcaJobTest {
 				String.class);
 		assertTrue("Collection entomologique Ouellet-Robert (QMOR)".equals(alternateIdentifier));
 
+		assertEquals(jobStatusModel.getCurrentStatus(), JobStatus.DONE);
 		assertTrue(new Integer(EXPECTED_NUMBER_OF_RESULTS).equals(count));
 	}
 

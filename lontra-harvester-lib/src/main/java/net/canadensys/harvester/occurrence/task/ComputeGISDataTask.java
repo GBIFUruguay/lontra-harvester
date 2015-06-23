@@ -2,6 +2,7 @@ package net.canadensys.harvester.occurrence.task;
 
 import java.util.Map;
 
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.exception.TaskExecutionException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
@@ -17,9 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Task to compute all GIS related data in our PostGIS enabled table.
  * To ensure maximum performance we run this once at the end of the import
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class ComputeGISDataTask implements ItemTaskIF {
 
@@ -36,13 +37,15 @@ public class ComputeGISDataTask implements ItemTaskIF {
 	@Transactional("bufferTransactionManager")
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
-		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
-		Session session = sessionFactory.getCurrentSession();
+		DwcaResourceModel resourceModel = (DwcaResourceModel) sharedParameters.get(SharedParameterEnum.RESOURCE_MODEL);
 
-		if (sourceFileId == null) {
-			LOGGER.fatal("Misconfigured task : needs  sourceFileId");
+		if (resourceModel == null) {
+			LOGGER.fatal("Misconfigured task : needs  resourceModel");
 			throw new TaskExecutionException("Misconfigured task");
 		}
+
+		Session session = sessionFactory.getCurrentSession();
+		String sourceFileId = resourceModel.getSourcefileid();
 		// update the_geom
 		SQLQuery query = session
 				.createSQLQuery("UPDATE buffer.occurrence SET the_geom = st_geometryfromtext('POINT('||decimallongitude||' '|| decimallatitude ||')',4326) "

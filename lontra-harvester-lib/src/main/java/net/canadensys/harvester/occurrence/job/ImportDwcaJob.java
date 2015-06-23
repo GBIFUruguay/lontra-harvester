@@ -21,12 +21,12 @@ import org.springframework.context.ApplicationContext;
 /**
  * This job allows to give a resource ID, stream the content into JMS messages and waiting for completion.
  * At the end of this job, the content of the DarwinCore archive will be in the database as raw and processed data.
- * 
+ *
  * The GetResourceInfoTask is optional if you plan to work from directly from an archive or folder. In this case, the DATASET_SHORTNAME will be
  * extracted from the file name which could lead to unwanted behavior since the name of the file could conflict with another resource.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgressListenerIF {
 
@@ -93,23 +93,23 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 
 		jobStatusModel.setCurrentStatusExplanation("Waiting for completion");
 
-		ItemTaskIF checkOccurrenceRecords = createCheckCompletenessTask("occurrence_raw", SharedParameterEnum.SOURCE_FILE_ID,
+		ItemTaskIF checkOccurrenceRecords = createCheckCompletenessTask("occurrence_raw",
 				dwcContent.getNumberOfRecord());
 		checkOccurrenceRecords.execute(sharedParameters);
 	}
 
 	/**
 	 * Dynamically create ItemTaskIF
-	 * 
+	 *
 	 * @param context
 	 * @param identifier
 	 * @param numberOfRecords
 	 * @return
 	 */
-	public ItemTaskIF createCheckCompletenessTask(String context, SharedParameterEnum identifier, int numberOfRecords) {
+	public ItemTaskIF createCheckCompletenessTask(String context, int numberOfRecords) {
 		CheckHarvestingCompletenessTask chcTask = (CheckHarvestingCompletenessTask) appContext.getBean("checkProcessingCompletenessTask");
 		chcTask.addItemProgressListenerIF(this);
-		chcTask.configure("occurrence_raw", SharedParameterEnum.SOURCE_FILE_ID, new Integer(numberOfRecords));
+		chcTask.configure("occurrence_raw", new Integer(numberOfRecords));
 		return chcTask;
 	}
 

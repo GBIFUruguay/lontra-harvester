@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 import java.util.Map;
 
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
@@ -44,13 +45,14 @@ public class ComputeMultimediaDataTaskTest {
 		jdbcTemplate.update("DELETE FROM buffer.occurrence");
 
 		Map<SharedParameterEnum, Object> sharedParameters = MockSharedParameters.getQMORSharedParameters();
+		DwcaResourceModel resourceModel = (DwcaResourceModel) sharedParameters.get(SharedParameterEnum.RESOURCE_MODEL);
 
 		// Insert mock data
 		jdbcTemplate.update("INSERT INTO buffer.occurrence (auto_id, dwca_id,resource_id,sourcefileid,hasmedia) VALUES (?,?,?,?,?)",
-				1, "1", sharedParameters.get(SharedParameterEnum.RESOURCE_ID), sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID), false);
+				1, "1", sharedParameters.get(SharedParameterEnum.RESOURCE_ID), resourceModel.getSourcefileid(), false);
 
 		jdbcTemplate.update("INSERT INTO buffer.occurrence_extension (auto_id, dwca_id,resource_id,sourcefileid,ext_type) VALUES (?,?,?,?,?)",
-				1, "1", sharedParameters.get(SharedParameterEnum.RESOURCE_ID), sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID),
+				1, "1", sharedParameters.get(SharedParameterEnum.RESOURCE_ID), resourceModel.getSourcefileid(),
 				"Multimedia");
 
 		computeMultimediaDataTask.execute(sharedParameters);

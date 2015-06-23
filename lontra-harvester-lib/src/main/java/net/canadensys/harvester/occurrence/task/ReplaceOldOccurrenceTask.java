@@ -3,6 +3,7 @@ package net.canadensys.harvester.occurrence.task;
 import java.util.List;
 import java.util.Map;
 
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.config.DatabaseConfig;
 import net.canadensys.harvester.exception.TaskExecutionException;
@@ -44,14 +45,17 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
 		Session session = sessionFactory.getCurrentSession();
 
-		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
-		String gbifPackageId = (String) sharedParameters.get(SharedParameterEnum.GBIF_PACKAGE_ID);
+		DwcaResourceModel resourceModel = (DwcaResourceModel) sharedParameters.get(SharedParameterEnum.RESOURCE_MODEL);
+		// String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
+		// String gbifPackageId = (String) sharedParameters.get(SharedParameterEnum.GBIF_PACKAGE_ID);
 		Integer resourceID = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
 
-		if (sourceFileId == null || gbifPackageId == null || resourceID == null) {
-			LOGGER.fatal("Misconfigured task : sourceFileId, gbifPackageId and resourceID are required");
+		if (resourceModel == null || resourceID == null) {
+			LOGGER.fatal("Misconfigured task : resourceModel and resourceID are required");
 			throw new TaskExecutionException("Misconfigured ReplaceOldOccurrenceTask");
 		}
+
+		String sourceFileId = resourceModel.getSourcefileid();
 
 		/**
 		 * Important: observe if the fields are in the same order and have the same
@@ -76,7 +80,7 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query.executeUpdate();
 
 			query = session.createSQLQuery("DELETE FROM resource_metadata WHERE gbif_package_id=?");
-			query.setString(0, gbifPackageId);
+			query.setString(0, resourceModel.getGbif_package_id());
 			query.executeUpdate();
 
 			// get public occurrence table columns names
@@ -101,7 +105,7 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query.executeUpdate();
 
 			query = session.createSQLQuery("INSERT INTO resource_metadata (SELECT * FROM buffer.resource_metadata WHERE gbif_package_id = ?)");
-			query.setString(0, gbifPackageId);
+			query.setString(0, resourceModel.getGbif_package_id());
 			query.executeUpdate();
 			query = session.createSQLQuery("INSERT INTO contact (SELECT * FROM buffer.contact WHERE resource_metadata_fkey=?)");
 			query.setInteger(0, resourceID);
@@ -123,7 +127,7 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 			query.setInteger(0, resourceID);
 			query.executeUpdate();
 			query = session.createSQLQuery("DELETE FROM buffer.resource_metadata WHERE gbif_package_id=?");
-			query.setString(0, gbifPackageId);
+			query.setString(0, resourceModel.getGbif_package_id());
 			query.executeUpdate();
 
 			sharedParameters.put(SharedParameterEnum.NUMBER_OF_RECORDS, numberOfRecords);

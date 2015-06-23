@@ -36,7 +36,7 @@ public class PrepareDwcaTask implements ItemTaskIF {
 	private static final String WORKING_FOLDER = "work";
 
 	// see setAllowDatasetShortnameExtraction method comments
-	private boolean allowDatasetShortnameExtraction = false;
+	// private boolean allowDatasetShortnameExtraction = false;
 
 	/**
 	 * Allow to find the Darwin Core archive location from the sharedParameters.
@@ -145,10 +145,10 @@ public class PrepareDwcaTask implements ItemTaskIF {
 		}
 
 		// if SharedParameterEnum.DWCA_PATH was previously there, we replace it
-		sharedParameters.put(SharedParameterEnum.DWCA_PATH, dwcaFileLocation);
-		if (allowDatasetShortnameExtraction && sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID) == null) {
-			sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, dwcaIdentifier);
-		}
+		// sharedParameters.put(SharedParameterEnum.DWCA_PATH, dwcaFileLocation);
+		// if (allowDatasetShortnameExtraction && sharedParameters.get(SharedParameterEnum.RESOURCE_ID) == null) {
+		// sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, dwcaIdentifier);
+		// }
 	}
 
 	/**
@@ -194,19 +194,19 @@ public class PrepareDwcaTask implements ItemTaskIF {
 		return success;
 	}
 
-	public boolean isAllowDatasetShortnameExtraction() {
-		return allowDatasetShortnameExtraction;
-	}
-
-	/**
-	 * Should we allow this task to set the SharedParameterEnum.SOURCE_FILE_ID using the name of the file
-	 * in case this parameter is not set?
-	 *
-	 * @param allowDatasetShortnameExtraction
-	 */
-	public void setAllowDatasetShortnameExtraction(boolean allowDatasetShortnameExtraction) {
-		this.allowDatasetShortnameExtraction = allowDatasetShortnameExtraction;
-	}
+	// public boolean isAllowDatasetShortnameExtraction() {
+	// return allowDatasetShortnameExtraction;
+	// }
+	//
+	// /**
+	// * Should we allow this task to set the SharedParameterEnum.SOURCE_FILE_ID using the name of the file
+	// * in case this parameter is not set?
+	// *
+	// * @param allowDatasetShortnameExtraction
+	// */
+	// public void setAllowDatasetShortnameExtraction(boolean allowDatasetShortnameExtraction) {
+	// this.allowDatasetShortnameExtraction = allowDatasetShortnameExtraction;
+	// }
 
 	@Override
 	public String getTitle() {

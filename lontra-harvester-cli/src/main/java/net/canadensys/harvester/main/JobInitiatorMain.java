@@ -2,6 +2,7 @@ package net.canadensys.harvester.main;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +15,7 @@ import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
+import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -31,6 +33,39 @@ public class JobInitiatorMain {
 
 	@Autowired
 	private JobServiceIF jobService;
+
+	@Autowired
+	private ResourceStatusNotifierIF resourceStatusNotifier;
+
+	/**
+	 * JobInitiator Entry point
+	 * 
+	 * @param args
+	 */
+	public static void main(String sourcefileid) {
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(CLIProcessingConfig.class);
+		JobInitiatorMain jim = ctx.getBean(JobInitiatorMain.class);
+		jim.initiateApp(sourcefileid);
+	}
+
+	/**
+	 * JobInitiator Entry point
+	 * 
+	 * @param args
+	 */
+	public static void startStatusMain() {
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(CLIProcessingConfig.class);
+		JobInitiatorMain jim = ctx.getBean(JobInitiatorMain.class);
+		jim.displayResourceStatus();
+	}
+
+	private void displayResourceStatus() {
+		List<DwcaResourceModel> harvestRequiredList = resourceStatusNotifier.getHarvestRequiredList();
+
+		for (DwcaResourceModel resource : harvestRequiredList) {
+			System.out.println("[" + resource.getId() + "] " + resource.getName());
+		}
+	}
 
 	public void initiateApp(final String sourcefileid) {
 
@@ -70,17 +105,6 @@ public class JobInitiatorMain {
 		// moveToPublicSchemaJob.doJob(jobStatusModel);
 		//
 		// computeUniqueValueJob.doJob(jobStatusModel);
-	}
-
-	/**
-	 * JobInitiator Entry point
-	 * 
-	 * @param args
-	 */
-	public static void main(String sourcefileid) {
-		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(CLIProcessingConfig.class);
-		JobInitiatorMain jim = ctx.getBean(JobInitiatorMain.class);
-		jim.initiateApp(sourcefileid);
 	}
 
 	/**

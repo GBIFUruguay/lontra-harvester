@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
@@ -43,7 +44,7 @@ public class SynchronousProcessEmlContentStepTest {
 	@Test
 	public void testSynchronousProcessEmlContentStep() {
 		Map<SharedParameterEnum, Object> sharedParameters = MockSharedParameters.getQMORSharedParameters();
-		String gbifPackageId = (String) sharedParameters.get(SharedParameterEnum.GBIF_PACKAGE_ID);
+		DwcaResourceModel resourceModel = (DwcaResourceModel) sharedParameters.get(SharedParameterEnum.RESOURCE_MODEL);
 
 		synchronousProcessEmlContentStep.preStep(sharedParameters);
 		synchronousProcessEmlContentStep.doStep();
@@ -53,12 +54,13 @@ public class SynchronousProcessEmlContentStepTest {
 		assertTrue(count >= 1);
 
 		String alternateIdentifier = jdbcTemplate.queryForObject("SELECT alternate_identifier FROM buffer.resource_metadata where gbif_package_id='"
-				+ gbifPackageId + "'", String.class);
+				+ resourceModel.getGbif_package_id() + "'", String.class);
 		assertTrue("Collection entomologique Ouellet-Robert (QMOR)".equals(alternateIdentifier));
 
 		// Test if the foreign key is being set:
 		Integer fkey = jdbcTemplate.queryForObject("SELECT resource_metadata_fkey FROM buffer.contact where role='contact'", Integer.class);
-		Integer auto_id = jdbcTemplate.queryForObject("SELECT dwca_resource_id FROM buffer.resource_metadata where gbif_package_id='" + gbifPackageId
+		Integer auto_id = jdbcTemplate.queryForObject(
+				"SELECT dwca_resource_id FROM buffer.resource_metadata where gbif_package_id='" + resourceModel.getGbif_package_id()
 				+ "'", Integer.class);
 		assertTrue(fkey == auto_id);
 	}

@@ -41,32 +41,27 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 	private final AtomicBoolean taskCanceled = new AtomicBoolean(false);
 
 	private String targetedTable;
-	private SharedParameterEnum identifier;
 	private Integer expectedNumberOfRecords;
 
 	/**
-	 * @param sharedParameters SharedParameterEnum.NUMBER_OF_RECORDS, SharedParameterEnum.SOURCE_FILE_ID required
+	 * @param sharedParametersSharedParameterEnum
+	 *            .RESOURCE_ID required
 	 */
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
 		final Integer _expectedNumberOfRecords = expectedNumberOfRecords;
 
-		if(_expectedNumberOfRecords == null){
-			LOGGER.fatal("Misconfigured task : needs numberOfRecords, sourceFileId");
+		if (_expectedNumberOfRecords == null || sharedParameters.get(SharedParameterEnum.RESOURCE_ID) == null) {
+			LOGGER.fatal("Misconfigured task : resourceId and numberOfRecords are required");
 			throw new TaskExecutionException("Misconfigured task");
 		}
-		if (identifier != SharedParameterEnum.SOURCE_FILE_ID && identifier != SharedParameterEnum.RESOURCE_ID) {
-			LOGGER.fatal("Misconfigured task : identifier can only be SOURCE_FILE_ID or RESOURCE_ID");
-			throw new TaskExecutionException("Misconfigured task");
-		}
-		if(StringUtils.isBlank(targetedTable) || identifier == null){
-			LOGGER.fatal("Misconfigured task : check completeness details are required");
+		if (StringUtils.isBlank(targetedTable)) {
+			LOGGER.fatal("Misconfigured task : targetedTable is required");
 			throw new TaskExecutionException("Misconfigured task");
 		}
 
-		final String identifierColumn = (identifier == SharedParameterEnum.SOURCE_FILE_ID) ? OccurrenceFieldConstants.SOURCE_FILE_ID
-				: OccurrenceFieldConstants.RESOURCE_ID;
-		final String sourceFileId = (String)sharedParameters.get(identifier);
+		final String identifierColumn = OccurrenceFieldConstants.RESOURCE_ID;
+		final Integer resourceId = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
 
 		Thread checkThread = new Thread(new Runnable() {
 			private int previousCount = 0;
@@ -74,7 +69,7 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 			public void run() {
 				Session session = sessionFactory.openSession();
 				SQLQuery query = session.createSQLQuery("SELECT count(*) FROM buffer." + targetedTable + " WHERE " + identifierColumn + "=?");
-				query.setString(0, sourceFileId);
+				query.setInteger(0, resourceId);
 				try{
 					Number currNumberOfResult = (Number)query.uniqueResult();
 					while(!taskCanceled.get() && (currNumberOfResult.intValue() < _expectedNumberOfRecords.intValue())){
@@ -162,12 +157,13 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 
 	/**
 	 * Set SQL query details to check if the completeness
-	 * @param targetedTable in which we want to count the rows
-	 * @param identifier SharedParameterEnum used as identifier for the check
+	 *
+	 * @param targetedTable
+	 *            in which we want to count the rows
+	 * @param expectedNumberOfRecords
 	 */
-	public void configure(String targetedTable, SharedParameterEnum identifier, Integer expectedNumberOfRecords){
+	public void configure(String targetedTable, Integer expectedNumberOfRecords) {
 		this.targetedTable = targetedTable;
-		this.identifier = identifier;
 		this.expectedNumberOfRecords = expectedNumberOfRecords;
 	}
 

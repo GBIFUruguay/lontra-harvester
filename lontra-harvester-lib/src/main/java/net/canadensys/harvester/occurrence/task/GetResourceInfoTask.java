@@ -40,11 +40,9 @@ public class GetResourceInfoTask implements ItemTaskIF {
 			throw new TaskExecutionException("ResourceID " + resourceId + " not found");
 		}
 
-		// TODO store the model instead of all its variable!
 		sharedParameters.put(SharedParameterEnum.DWCA_URL, resourceModel.getArchive_url());
-		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, resourceModel.getSourcefileid());
-		sharedParameters.put(SharedParameterEnum.GBIF_PACKAGE_ID, resourceModel.getGbif_package_id());
-		sharedParameters.put(SharedParameterEnum.RESOURCE_ID, resourceId);
+		sharedParameters.put(SharedParameterEnum.RESOURCE_MODEL, resourceModel);
+		// sharedParameters.put(SharedParameterEnum.GBIF_PACKAGE_ID, resourceModel.getGbif_package_id());
 	}
 
 	public void setSessionFactory(SessionFactory sessionFactory) {

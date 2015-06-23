@@ -3,6 +3,7 @@ package net.canadensys.harvester.occurrence.task;
 import java.util.Date;
 import java.util.Map;
 
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.exception.TaskExecutionException;
@@ -33,23 +34,23 @@ public class RecordImportTask implements ItemTaskIF {
 
 	/**
 	 * @param sharedParameters
-	 *            SharedParameterEnum.NUMBER_OF_RECORDS, SharedParameterEnum.SOURCE_FILE_ID required
+	 *            SharedParameterEnum.NUMBER_OF_RECORDS, SharedParameterEnum.RESOURCE_MODEL required
 	 */
 	@Transactional("publicTransactionManager")
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
 		Session session = sessionFactory.getCurrentSession();
 		ImportLogModel importLogModel = new ImportLogModel();
-		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
-		String gbifPackageId = (String) sharedParameters.get(SharedParameterEnum.GBIF_PACKAGE_ID);
+
+		DwcaResourceModel resourceModel = (DwcaResourceModel) sharedParameters.get(SharedParameterEnum.RESOURCE_MODEL);
 		Integer numberOfRecords = (Integer) sharedParameters.get(SharedParameterEnum.NUMBER_OF_RECORDS);
 
-		if (sourceFileId == null || numberOfRecords == null || gbifPackageId == null) {
-			LOGGER.fatal("Misconfigured task : sourceFileId, gbifPackageId and numberOfRecords are required");
+		if (resourceModel == null || numberOfRecords == null) {
+			LOGGER.fatal("Misconfigured task : resourceModel and numberOfRecords are required");
 			throw new TaskExecutionException("Misconfigured task");
 		}
-		importLogModel.setSourcefileid(sourceFileId);
-		importLogModel.setGbif_package_id(gbifPackageId);
+		importLogModel.setSourcefileid(resourceModel.getSourcefileid());
+		importLogModel.setGbif_package_id(resourceModel.getGbif_package_id());
 		// this is only core records
 		importLogModel.setRecord_quantity(numberOfRecords);
 		importLogModel.setUpdated_by(CURRENT_USER);

@@ -3,6 +3,7 @@ package net.canadensys.harvester.occurrence.processor;
 import java.util.List;
 import java.util.Map;
 
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.exception.ProcessException;
@@ -64,12 +65,12 @@ public class DwcaExtensionLineProcessor implements ItemProcessorIF<OccurrenceExt
 	@Override
 	public OccurrenceExtensionModel process(OccurrenceExtensionModel data, Map<SharedParameterEnum, Object> sharedParameters) throws ProcessException {
 
-		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
+		DwcaResourceModel resourceModel = (DwcaResourceModel) sharedParameters.get(SharedParameterEnum.RESOURCE_MODEL);
 		Integer resourceId = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
 		Term extensionType = (Term) sharedParameters.get(SharedParameterEnum.DWCA_EXTENSION_TYPE);
 
-		if (sourceFileId == null) {
-			LOGGER.fatal("Misconfigured processor : sourceFileId required");
+		if (resourceModel == null) {
+			LOGGER.fatal("Misconfigured processor : resourceModel required");
 			throw new TaskExecutionException("Misconfigured DwcaExtensionLineProcessor");
 		}
 		if (resourceId == null) {
@@ -81,7 +82,7 @@ public class DwcaExtensionLineProcessor implements ItemProcessorIF<OccurrenceExt
 			throw new TaskExecutionException("Misconfigured DwcaExtensionLineProcessor");
 		}
 
-		data.setSourcefileid(sourceFileId);
+		data.setSourcefileid(resourceModel.getSourcefileid());
 		data.setResource_id(resourceId);
 		data.setExt_type(extensionType.simpleName());
 		if (nextId == null || idPoll.isEmpty()) {

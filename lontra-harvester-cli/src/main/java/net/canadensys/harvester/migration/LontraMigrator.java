@@ -6,7 +6,7 @@ import java.util.List;
 import liquibase.changelog.ChangeSet;
 import liquibase.exception.LiquibaseException;
 import net.canadensys.dataportal.occurrence.migration.LiquibaseHelper;
-import net.canadensys.harvester.config.CLIMinimalConfig;
+import net.canadensys.harvester.config.CLIMigrationConfig;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 public class LontraMigrator {
 
 	@Autowired
-	private CLIMinimalConfig config;
+	private CLIMigrationConfig config;
 
 	public void migrate() {
 		try {

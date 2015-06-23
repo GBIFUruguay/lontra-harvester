@@ -3,6 +3,7 @@ package net.canadensys.harvester.occurrence.processor;
 import java.util.List;
 import java.util.Map;
 
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.exception.TaskExecutionException;
@@ -66,15 +67,15 @@ public class DwcaLineProcessor implements ItemProcessorIF<OccurrenceRawModel, Oc
 	@Override
 	public OccurrenceRawModel process(OccurrenceRawModel occModel, Map<SharedParameterEnum, Object> sharedParameters) {
 
-		String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
+		DwcaResourceModel resourceModel = (DwcaResourceModel) sharedParameters.get(SharedParameterEnum.RESOURCE_MODEL);
 		Integer resourceId = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
 
-		if (sourceFileId == null || resourceId == null) {
+		if (resourceModel == null || resourceId == null) {
 			LOGGER.fatal("Misconfigured processor : sourceFileId and resourceId are required");
 			throw new TaskExecutionException("Misconfigured processor");
 		}
 
-		occModel.setSourcefileid(sourceFileId);
+		occModel.setSourcefileid(resourceModel.getSourcefileid());
 		occModel.setResource_id(resourceId);
 
 		if (nextId == null || idPoll.isEmpty()) {

@@ -3,13 +3,14 @@ package net.canadensys.harvester.occurrence.processor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
+import net.canadensys.harvester.occurrence.mock.MockSharedParameters;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,14 +30,13 @@ public class DwcaLineProcessorTest {
 
 	@Test
 	public void testDwcALineProcessor() {
-		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
-		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "MySourceFileId");
-		sharedParameters.put(SharedParameterEnum.RESOURCE_ID, 1);
+		Map<SharedParameterEnum, Object> sharedParameters = MockSharedParameters.getQMORSharedParameters();
 
 		OccurrenceRawModel rawModel = new OccurrenceRawModel();
 		OccurrenceRawModel occModel = ProcessorRunner.runItemProcessor(lineProcessor, rawModel, sharedParameters);
 
-		assertEquals("MySourceFileId", occModel.getSourcefileid());
+		DwcaResourceModel resourceModel = (DwcaResourceModel) sharedParameters.get(SharedParameterEnum.RESOURCE_MODEL);
+		assertEquals(resourceModel.getSourcefileid(), occModel.getSourcefileid());
 		assertTrue(occModel.getAuto_id() > 0);
 	}
 }

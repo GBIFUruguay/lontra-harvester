@@ -13,6 +13,7 @@ import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
+import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
@@ -24,16 +25,20 @@ import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.impl.JobServiceImpl;
 import net.canadensys.harvester.main.JobInitiatorMain;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
-import net.canadensys.harvester.occurrence.dao.impl.HibernateIPTFeedDAO;
+import net.canadensys.harvester.occurrence.dao.impl.RSSIPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.job.UpdateJob;
+import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
+import net.canadensys.harvester.occurrence.notification.impl.DefaultResourceStatusNotifier;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceMetadataProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaEmlReader;
+import net.canadensys.harvester.occurrence.reader.DwcaExtensionInfoReader;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
+import net.canadensys.harvester.occurrence.step.HandleDwcaExtensionsStep;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessEmlContentStep;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessOccurrenceStep;
 import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
@@ -48,12 +53,16 @@ import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.ResourceMetadataHibernateWriter;
 
+import org.gbif.dwc.terms.Term;
 import org.gbif.metadata.eml.Eml;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
@@ -68,6 +77,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @Configuration
 @EnableTransactionManagement
+@ImportResource("classpath:taskDefinitions.xml")
 public class CLIProcessingConfig {
 
 	@Bean
@@ -88,6 +98,8 @@ public class CLIProcessingConfig {
 	private String username;
 	@Value("${database.password}")
 	private String password;
+	@Value("${database.select_column_names}")
+	private String selectColumnNamesSQL;
 
 	@Value("${hibernate.dialect}")
 	private String hibernateDialect;
@@ -100,10 +112,6 @@ public class CLIProcessingConfig {
 
 	@Value("${occurrence.idGenerationSQL}")
 	private String idGenerationSQL;
-
-	// optional
-	@Value("${harvester.import.allow_localfile:false}")
-	private Boolean allowLocalFileImport;
 
 	@Bean
 	public JobInitiatorMain jobInitiatorMain() {
@@ -129,7 +137,8 @@ public class CLIProcessingConfig {
 	public LocalSessionFactoryBean bufferSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, ContactModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class,
+				ImportLogModel.class, DwcaResourceModel.class, ContactModel.class, PublisherModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -145,7 +154,8 @@ public class CLIProcessingConfig {
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
-		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class, ImportLogModel.class, DwcaResourceModel.class });
+		sb.setAnnotatedClasses(new Class[] { OccurrenceRawModel.class, OccurrenceModel.class,
+				ImportLogModel.class, DwcaResourceModel.class, ContactModel.class, PublisherModel.class });
 
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
@@ -168,6 +178,11 @@ public class CLIProcessingConfig {
 		HibernateTransactionManager htmgr = new HibernateTransactionManager();
 		htmgr.setSessionFactory(publicSessionFactory().getObject());
 		return htmgr;
+	}
+
+	@Bean
+	public NamedParameterJdbcTemplate namedParameterJdbcTemplate() {
+		return new NamedParameterJdbcTemplate(dataSource());
 	}
 
 	// ---JOB---
@@ -202,12 +217,16 @@ public class CLIProcessingConfig {
 		return new SynchronousProcessOccurrenceStep();
 	}
 
+	@Bean
+	@Scope("prototype")
+	public StepIF handleDwcaExtensionsStep() {
+		return new HandleDwcaExtensionsStep();
+	}
+
 	// ---TASK wiring---
 	@Bean
 	public ItemTaskIF prepareDwcaTask() {
-		PrepareDwcaTask pdwca = new PrepareDwcaTask();
-		pdwca.setAllowDatasetShortnameExtraction(allowLocalFileImport);
-		return pdwca;
+		return new PrepareDwcaTask();
 	}
 
 	@Bean
@@ -274,6 +293,12 @@ public class CLIProcessingConfig {
 		return new DwcaEmlReader();
 	}
 
+	@Bean
+	@Scope("prototype")
+	public ItemReaderIF<Term> dwcaExtensionInfoReader() {
+		return new DwcaExtensionInfoReader();
+	}
+
 	// ---WRITER wiring---
 	@Bean(name = "rawOccurrenceWriter")
 	public ItemWriterIF<OccurrenceRawModel> rawOccurrenceWriter() {
@@ -290,10 +315,22 @@ public class CLIProcessingConfig {
 		return new ResourceMetadataHibernateWriter();
 	}
 
+	@Bean
+	public DatabaseConfig databaseConfig() {
+		DatabaseConfig databaseConfig = new DatabaseConfig();
+		databaseConfig.setSelectColumnNamesSQL(selectColumnNamesSQL);
+		return databaseConfig;
+	}
+
+	@Bean
+	public ResourceStatusNotifierIF resourceStatusNotifierIF() {
+		return new DefaultResourceStatusNotifier();
+	}
+
 	// ---DAO---
 	@Bean
 	public IPTFeedDAO iptFeedDAO() {
-		return new HibernateIPTFeedDAO();
+		return new RSSIPTFeedDAO();
 	}
 
 	@Bean

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.harvester.ItemProcessorIF;
@@ -14,6 +15,7 @@ import net.canadensys.harvester.message.ProcessingMessageIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.mapper.OccurrenceExtensionMapper;
 import net.canadensys.harvester.occurrence.message.DefaultMessage;
+import net.canadensys.harvester.occurrence.mock.MockSharedParameters;
 import net.canadensys.harvester.occurrence.mock.writer.MockMessageWriter;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
 
@@ -54,10 +56,11 @@ public class StreamDwcExtensionContentStepTest {
 		streamExtStep.setDwcaLineProcessor(extLineProcessor);
 
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
-		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "dwca-vascan-checklist");
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-vascan-checklist");
 		sharedParameters.put(SharedParameterEnum.DWCA_EXTENSION_TYPE, GbifTerm.Description);
 		sharedParameters.put(SharedParameterEnum.RESOURCE_ID, 1);
+		sharedParameters.put(SharedParameterEnum.RESOURCE_MODEL,
+				MockSharedParameters.getDwcaResourceModel(1, UUID.randomUUID().toString(), "dwca-vascan-checklist"));
 
 		streamExtStep.preStep(sharedParameters);
 		streamExtStep.doStep();

@@ -8,10 +8,12 @@ import static org.junit.Assert.assertNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
+import net.canadensys.harvester.occurrence.mock.MockSharedParameters;
 
 import org.junit.Test;
 
@@ -28,7 +30,8 @@ public class DwcaReaderTest {
 	public void testDwcaItemReader() {
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
-		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
+		sharedParameters.put(SharedParameterEnum.RESOURCE_MODEL,
+				MockSharedParameters.getDwcaResourceModel(1, UUID.randomUUID().toString(), "qmor-specimens"));
 		int count = 0;
 
 		ItemReaderIF<OccurrenceRawModel> dwcaItemReader = new DwcaItemReader();
@@ -61,7 +64,8 @@ public class DwcaReaderTest {
 	public void testDwcaItemReaderIdColumn() {
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens-id");
-		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
+		sharedParameters.put(SharedParameterEnum.RESOURCE_MODEL,
+				MockSharedParameters.getDwcaResourceModel(1, UUID.randomUUID().toString(), "qmor-specimens"));
 
 		ItemReaderIF<OccurrenceRawModel> dwcaItemReader = new DwcaItemReader();
 		dwcaItemReader.openReader(sharedParameters);
@@ -75,7 +79,8 @@ public class DwcaReaderTest {
 	public void testDwcaItemReaderAbort() {
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
-		sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, "qmor-specimens");
+		sharedParameters.put(SharedParameterEnum.RESOURCE_MODEL,
+				MockSharedParameters.getDwcaResourceModel(1, UUID.randomUUID().toString(), "qmor-specimens"));
 
 		ItemReaderIF<OccurrenceRawModel> dwcaItemReader = new DwcaItemReader();
 		dwcaItemReader.openReader(sharedParameters);

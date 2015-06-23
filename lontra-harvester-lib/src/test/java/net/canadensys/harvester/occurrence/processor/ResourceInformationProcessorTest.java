@@ -3,11 +3,13 @@ package net.canadensys.harvester.occurrence.processor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
+import net.canadensys.harvester.occurrence.mock.MockSharedParameters;
 
 import org.gbif.metadata.eml.Eml;
 import org.junit.Test;
@@ -25,10 +27,11 @@ public class ResourceInformationProcessorTest {
 	 */
 	@Test
 	public void testProcessingMechanism() {
-		HashMap<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
+		Map<SharedParameterEnum, Object> sharedParameters = MockSharedParameters.getQMORSharedParameters();
+		DwcaResourceModel resourceModel = (DwcaResourceModel) sharedParameters.get(SharedParameterEnum.RESOURCE_MODEL);
+
 		String uuid = UUID.randomUUID().toString();
-		sharedParameters.put(SharedParameterEnum.GBIF_PACKAGE_ID, uuid);
-		sharedParameters.put(SharedParameterEnum.RESOURCE_ID, 1);
+		resourceModel.setGbif_package_id(uuid);
 
 		ResourceMetadataProcessor informationProcessor = new ResourceMetadataProcessor();
 		Eml eml = new Eml();
