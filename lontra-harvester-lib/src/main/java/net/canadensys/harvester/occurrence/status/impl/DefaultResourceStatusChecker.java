@@ -1,4 +1,4 @@
-package net.canadensys.harvester.occurrence.notification.impl;
+package net.canadensys.harvester.occurrence.status.impl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,7 +14,7 @@ import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
-import net.canadensys.harvester.occurrence.notification.ResourceStatusCheckerIF;
+import net.canadensys.harvester.occurrence.status.ResourceStatusCheckerIF;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -33,11 +33,13 @@ public class DefaultResourceStatusChecker implements ResourceStatusCheckerIF {
 	private static final Logger LOGGER = Logger.getLogger(DefaultResourceStatusChecker.class);
 	private static final String IPT_RSS_SUFFIX = "/rss.do";
 
+	private ResourceStatusLocationStrategy resourceStatusLocationStrategy;
+
 	// very simple cache to avoid parsing the RSS feed on each resources
 	private final Map<String, List<IPTFeedModel>> feedModelByIPTAddress;
 
 	@Autowired
-	private DwcaResourceDAO resourceDAO;
+	private DwcaResourceDAO dwcaResourceDAO;
 
 	@Autowired
 	private IPTFeedDAO iptFeedDAO;
@@ -47,6 +49,7 @@ public class DefaultResourceStatusChecker implements ResourceStatusCheckerIF {
 
 	public DefaultResourceStatusChecker() {
 		feedModelByIPTAddress = new HashMap<String, List<IPTFeedModel>>();
+		resourceStatusLocationStrategy = new IPTResourceStatusLocationStrategy();
 	}
 
 	@Override
@@ -54,14 +57,13 @@ public class DefaultResourceStatusChecker implements ResourceStatusCheckerIF {
 	public List<DwcaResourceStatusModel> getHarvestRequiredList() {
 
 		List<DwcaResourceStatusModel> resourceToHarvest = new ArrayList<DwcaResourceStatusModel>();
-		List<DwcaResourceModel> resourcesList = resourceDAO.loadResources();
+		List<DwcaResourceModel> resourcesList = dwcaResourceDAO.loadResources();
 
 		String iptAddress;
 		URL iptURL;
 
 		for (DwcaResourceModel currResource : resourcesList) {
-			// we deduce the RSS feed address from the archive URL. This may become a problem in the future.
-			iptAddress = StringUtils.substringBeforeLast(currResource.getArchive_url(), "/") + IPT_RSS_SUFFIX;
+			iptAddress = resourceStatusLocationStrategy.getStatusInformationLocation(currResource);
 			if (!feedModelByIPTAddress.containsKey(iptAddress)) {
 				try {
 					iptURL = new URL(iptAddress);
@@ -102,6 +104,44 @@ public class DefaultResourceStatusChecker implements ResourceStatusCheckerIF {
 			}
 		}
 		return resourceToHarvest;
+	}
+
+	/**
+	 * Load resource status information from a static location.
+	 * This should be used for testing purpose or if only a single IPT requires to be accessed.
+	 *
+	 * @param resourceLocation
+	 */
+	public void useStaticResourceStatusLocationStrategy(final String resourceLocation) {
+		this.resourceStatusLocationStrategy = new ResourceStatusLocationStrategy() {
+			@Override
+			public String getStatusInformationLocation(DwcaResourceModel currResource) {
+				return resourceLocation;
+			}
+		};
+	}
+
+	/**
+	 * Nested interface to allow different strategy to determine resource status location.
+	 *
+	 * @author cgendreau
+	 *
+	 */
+	private static interface ResourceStatusLocationStrategy {
+		public String getStatusInformationLocation(DwcaResourceModel currResource);
+	}
+
+	/**
+	 * This strategy uses the archive URL and determine the RSS address. It assumes the archive is coming from an IPT.
+	 *
+	 * @author cgendreau
+	 *
+	 */
+	private static class IPTResourceStatusLocationStrategy implements ResourceStatusLocationStrategy {
+		@Override
+		public String getStatusInformationLocation(DwcaResourceModel currResource) {
+			return StringUtils.substringBeforeLast(currResource.getArchive_url(), "/") + IPT_RSS_SUFFIX;
+		}
 	}
 
 }

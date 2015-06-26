@@ -1,4 +1,4 @@
-package net.canadensys.harvester.occurrence.notification;
+package net.canadensys.harvester.occurrence.status;
 
 import java.util.List;
 
