@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<rss xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:ipt="http://ipt.gbif.org/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>Canadensys repository</title>
+    <link>http://data.canadensys.net/ipt</link>
+    <atom:link href="http://data.canadensys.net/ipt/rss.do" rel="self" type="application/rss+xml"/>
+    <description>Resource metadata of Canadensys repository</description>
+    <language>en-us</language>
+    <!-- RFC-822 date-time  / Wed, 02 Oct 2010 13:00:00 GMT -->
+    <pubDate>Tue, 10 May 2011 16:19:55 -0400</pubDate>
+    <lastBuildDate>Tue, 09 Jun 2015 12:59:58 -0400</lastBuildDate>
+    <generator>GBIF IPT 2.1.1-r4640</generator>
+    <webMaster>david.shorthouse@umontreal.ca () ()</webMaster>
+    <docs>http://cyber.law.harvard.edu/rss/rss.html</docs>
+    <ttl>15</ttl>
+    <geo:Point>
+      <geo:lat>45.5579</geo:lat>
+      <geo:long>-73.5562</geo:long>
+    </geo:Point>
+    <item>
+      <title>
+      Ouellet-Robert entomological collection (QMOR) - Version 12
+      </title>
+      <link>
+      http://data.canadensys.net/ipt/resource.do?r=qmor-specimens
+      </link>
+      <description>
+      The Ouellet-Robert entomological collection (QMOR) is one of the larger Canadian university entomological collections and the second largest in Quebec. It comprises 1.5 million specimens, covering more than 20,000 species. Aquatic insects from many regions of the world are particularly well-represented. This dataset includes 38,295 digitized lots from the collection (192,000+ individuals), representing the orders Odonata, Trichoptera and Ephemeroptera. <a href="http://data.canadensys.net/ipt/eml.do?r=qmor-specimens">EML</a>
+      </description>
+      <ipt:eml>
+      http://data.canadensys.net/ipt/eml.do?r=qmor-specimens
+      </ipt:eml>
+      <dc:publisher>
+      Colin Favret Universit&#xE9; de Montr&#xE9;al Biodiversity Centre
+      </dc:publisher>
+      <dc:creator>
+      Peter Desmet Universit&#xE9; de Montr&#xE9;al Biodiversity Centre
+      </dc:creator>
+      <ipt:dwca>
+      http://data.canadensys.net/ipt/archive.do?r=qmor-specimens
+      </ipt:dwca>
+      <pubDate>Fri, 11 Jul 2014 18:52:05 -0400</pubDate>
+      <guid isPermaLink="false">ada5d0b1-07de-4dc0-83d4-e312f0fb81cb/v12</guid>
+    </item>
+  </channel>
+</rss>
