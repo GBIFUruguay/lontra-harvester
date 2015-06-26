@@ -18,9 +18,9 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
+import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
@@ -31,9 +31,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * Main UI to control the harvester.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
@@ -114,11 +114,11 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 	 * Display in text area resource that should be (re)harvested.
 	 */
 	private void checkForOutdatedResources() {
-		List<DwcaResourceModel> outdatedResources = stepController
+		List<DwcaResourceStatusModel> outdatedResources = stepController
 				.getResourceToHarvest();
-		for (DwcaResourceModel currResourceModel : outdatedResources) {
+		for (DwcaResourceStatusModel currResourceModel : outdatedResources) {
 			resourcesPanel.appendConsoleText(Messages.getString("view.info.harvestRequired")
-					+ currResourceModel.getSourcefileid() + "\n");
+					+ currResourceModel.getDwcaResourceModel().getSourcefileid() + "\n");
 		}
 	}
 
@@ -158,7 +158,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 	/**
 	 * Returns a initialized panel with import log information
-	 * 
+	 *
 	 * @return
 	 */
 	private JPanel importLogPanel() {
@@ -175,7 +175,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 	/**
 	 * Returns a initialized panel with IPT RSS feed information
-	 * 
+	 *
 	 * @return
 	 */
 	private JPanel RSSFeedPanel() {
@@ -194,7 +194,8 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		if (JobStatusModel.CURRENT_STATUS_EXPLANATION_PROPERTY.equals(evt
 				.getPropertyName())) {
 			resourcesPanel.appendConsoleText(">" + (String) evt.getNewValue() + END_LINE);
-		} else if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt.getPropertyName())) {
+		}
+		else if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt.getPropertyName())) {
 			resourcesPanel.appendConsoleText("STATUS:" + evt.getNewValue() + END_LINE);
 			resourcesPanel.onJobStatusChanged((JobStatus) evt.getNewValue());
 		}

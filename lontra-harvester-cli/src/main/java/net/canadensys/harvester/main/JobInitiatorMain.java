@@ -14,8 +14,9 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
+import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
-import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
+import net.canadensys.harvester.occurrence.notification.ResourceStatusCheckerIF;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -35,7 +36,7 @@ public class JobInitiatorMain {
 	private JobServiceIF jobService;
 
 	@Autowired
-	private ResourceStatusNotifierIF resourceStatusNotifier;
+	private ResourceStatusCheckerIF resourceStatusNotifier;
 
 	/**
 	 * JobInitiator Entry point
@@ -60,9 +61,11 @@ public class JobInitiatorMain {
 	}
 
 	private void displayResourceStatus() {
-		List<DwcaResourceModel> harvestRequiredList = resourceStatusNotifier.getHarvestRequiredList();
+		List<DwcaResourceStatusModel> harvestRequiredList = resourceStatusNotifier.getHarvestRequiredList();
 
-		for (DwcaResourceModel resource : harvestRequiredList) {
+		DwcaResourceModel resource;
+		for (DwcaResourceStatusModel resourceStatus : harvestRequiredList) {
+			resource = resourceStatus.getDwcaResourceModel();
 			System.out.println("[" + resource.getId() + "] " + resource.getName());
 		}
 	}

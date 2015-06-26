@@ -12,8 +12,9 @@ import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
+import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
-import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
+import net.canadensys.harvester.occurrence.notification.ResourceStatusCheckerIF;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -21,15 +22,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Default implementation of ResourceStatusNotifierIF that is using the IPT RSS
+ * Default implementation of ResourceStatusCheckerIF that is using the IPT RSS
  * feed to get the last publication date. The date is then used to compare with
  * the last import event of each resources.
  *
  * @author cgendreau
  *
  */
-public class DefaultResourceStatusNotifier implements ResourceStatusNotifierIF {
-	private static final Logger LOGGER = Logger.getLogger(DefaultResourceStatusNotifier.class);
+public class DefaultResourceStatusChecker implements ResourceStatusCheckerIF {
+	private static final Logger LOGGER = Logger.getLogger(DefaultResourceStatusChecker.class);
 	private static final String IPT_RSS_SUFFIX = "/rss.do";
 
 	// very simple cache to avoid parsing the RSS feed on each resources
@@ -44,15 +45,15 @@ public class DefaultResourceStatusNotifier implements ResourceStatusNotifierIF {
 	@Autowired
 	private ImportLogDAO importLogDAO;
 
-	public DefaultResourceStatusNotifier() {
+	public DefaultResourceStatusChecker() {
 		feedModelByIPTAddress = new HashMap<String, List<IPTFeedModel>>();
 	}
 
 	@Override
 	@Transactional("publicTransactionManager")
-	public List<DwcaResourceModel> getHarvestRequiredList() {
+	public List<DwcaResourceStatusModel> getHarvestRequiredList() {
 
-		List<DwcaResourceModel> resourceToHarvest = new ArrayList<DwcaResourceModel>();
+		List<DwcaResourceStatusModel> resourceToHarvest = new ArrayList<DwcaResourceStatusModel>();
 		List<DwcaResourceModel> resourcesList = resourceDAO.loadResources();
 
 		String iptAddress;
@@ -72,25 +73,32 @@ public class DefaultResourceStatusNotifier implements ResourceStatusNotifierIF {
 			}
 
 			List<IPTFeedModel> feedEntryList = feedModelByIPTAddress.get(iptAddress);
-			String resourceKey;
+			// String resourceLink;
 			ImportLogModel lastImportLog;
 
 			if (StringUtils.isNotBlank(currResource.getGbif_package_id())) {
 				for (IPTFeedModel currFeed : feedEntryList) {
+					// FIXME
 					// strip the version from the URI
-					resourceKey = StringUtils.substringBeforeLast(currFeed.getUri(), "/");
+					// resourceKey = StringUtils.substringBeforeLast(currFeed.getUri(), "/");
 
-					if (currResource.getGbif_package_id().equals(resourceKey)) {
+					// resourceLink = currFeed.getLink();
+
+					if (currResource.getGbif_package_id().equalsIgnoreCase(currFeed.extractGbifPackageId())) {
 						lastImportLog = importLogDAO.loadLastFrom(currResource.getSourcefileid());
+						DwcaResourceStatusModel dwcaResourceStatusModel = new DwcaResourceStatusModel(currResource);
+						dwcaResourceStatusModel.setLastPublishedDate(currFeed.getPublishedDate());
+
 						if (lastImportLog != null) {
 							// compare date
 							if (currFeed.getPublishedDate().after(lastImportLog.getEvent_end_date_time())) {
-								resourceToHarvest.add(currResource);
+								dwcaResourceStatusModel.setLastHarvestDate(lastImportLog.getEvent_end_date_time());
+								resourceToHarvest.add(dwcaResourceStatusModel);
 							}
 						}
 						// if it was never imported, add it to the list
 						else {
-							resourceToHarvest.add(currResource);
+							resourceToHarvest.add(dwcaResourceStatusModel);
 						}
 					}
 				}

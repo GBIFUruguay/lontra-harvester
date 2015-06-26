@@ -30,8 +30,8 @@ import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.job.UpdateJob;
-import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
-import net.canadensys.harvester.occurrence.notification.impl.DefaultResourceStatusNotifier;
+import net.canadensys.harvester.occurrence.notification.ResourceStatusCheckerIF;
+import net.canadensys.harvester.occurrence.notification.impl.DefaultResourceStatusChecker;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceMetadataProcessor;
@@ -323,8 +323,8 @@ public class CLIProcessingConfig {
 	}
 
 	@Bean
-	public ResourceStatusNotifierIF resourceStatusNotifierIF() {
-		return new DefaultResourceStatusNotifier();
+	public ResourceStatusCheckerIF resourceStatusNotifierIF() {
+		return new DefaultResourceStatusChecker();
 	}
 
 	// ---DAO---

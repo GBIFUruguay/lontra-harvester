@@ -9,6 +9,8 @@ import java.util.List;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 
+import org.apache.log4j.Logger;
+
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
@@ -17,11 +19,12 @@ import com.sun.syndication.io.XmlReader;
 
 /**
  * IPTFeedDAO implementation using RSS
- * 
+ *
  * @author cgendreau
  *
  */
 public class RSSIPTFeedDAO implements IPTFeedDAO {
+	private static final Logger LOGGER = Logger.getLogger(RSSIPTFeedDAO.class);
 
 	@Override
 	public List<IPTFeedModel> getIPTFeed(URL iptFeedURL) {
@@ -33,23 +36,23 @@ public class RSSIPTFeedDAO implements IPTFeedDAO {
 			for (SyndEntry currEntry : feedEntries) {
 				IPTFeedModel feedModel = new IPTFeedModel();
 				feedModel.setTitle(currEntry.getTitle());
-				feedModel.setUri(currEntry.getUri());
+				feedModel.setGuid(currEntry.getUri());
 				feedModel.setLink(currEntry.getLink());
 				feedModel.setPublishedDate(currEntry.getPublishedDate());
 				feedList.add(feedModel);
 			}
 		}
 		catch (IllegalArgumentException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 		catch (MalformedURLException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 		catch (FeedException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 		return feedList;
 	}

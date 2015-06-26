@@ -14,31 +14,33 @@ import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 
 /**
  * Display IPT RSS feed information.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class RSSFeedPanel extends JPanel {
 
 	private static final long serialVersionUID = -2655708810547434951L;
 
 	public RSSFeedPanel(Vector<String> headers, List<IPTFeedModel> iptFeedModelList) {
-		
+
 		// Vertical alignment reference index:
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.CENTER;
 		JTable table = new JTable(loadData(iptFeedModelList), headers) {
-            // Remove table edition:
-            public boolean isCellEditable(int rowIndex, int vColIndex) {
-                    return false;
-            }
-            @Override
-			public Dimension getPreferredScrollableViewportSize() 
+			// Remove table edition:
+			@Override
+			public boolean isCellEditable(int rowIndex, int vColIndex) {
+				return false;
+			}
+
+			@Override
+			public Dimension getPreferredScrollableViewportSize()
 			{
-			    int width = 750;
-			    int height = 480;
-			    return new Dimension(width, height);
+				int width = 750;
+				int height = 480;
+				return new Dimension(width, height);
 			}
 		};
 		this.add(new JScrollPane(table), c);
@@ -51,7 +53,7 @@ public class RSSFeedPanel extends JPanel {
 			Vector<Object> row = new Vector<Object>();
 			row.add(currIPTFeedModel.getTitle());
 			row.add(currIPTFeedModel.getLink());
-			row.add(currIPTFeedModel.getUri());
+			row.add(currIPTFeedModel.extractGbifPackageId());
 			row.add(currIPTFeedModel.getPublishedDate());
 			rowData.add(row);
 		}

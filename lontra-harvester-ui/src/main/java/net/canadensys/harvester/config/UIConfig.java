@@ -42,8 +42,8 @@ import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.job.UpdateJob;
 import net.canadensys.harvester.occurrence.mapper.OccurrenceExtensionMapper;
-import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
-import net.canadensys.harvester.occurrence.notification.impl.DefaultResourceStatusNotifier;
+import net.canadensys.harvester.occurrence.notification.ResourceStatusCheckerIF;
+import net.canadensys.harvester.occurrence.notification.impl.DefaultResourceStatusChecker;
 import net.canadensys.harvester.occurrence.processor.DwcaExtensionLineProcessor;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
@@ -449,8 +449,8 @@ public class UIConfig {
 	}
 
 	@Bean
-	public ResourceStatusNotifierIF resourceStatusNotifierIF() {
-		return new DefaultResourceStatusNotifier();
+	public ResourceStatusCheckerIF resourceStatusNotifierIF() {
+		return new DefaultResourceStatusChecker();
 	}
 
 	/**

@@ -1,7 +1,8 @@
 package net.canadensys.harvester.occurrence.model;
 
+import java.util.Date;
+
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
-import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 
 /**
  * Model that encapsulate a DwcaResourceModel and hold status related information.
@@ -12,30 +13,41 @@ import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 public class DwcaResourceStatusModel {
 
 	private final DwcaResourceModel dwcaResourceModel;
-	private IPTFeedModel iptFeedModel;
-	private ImportLogModel lastImportEvent;
+	private Date lastPublishedDate;
+	private Date lastHarvestDate;
 
 	public DwcaResourceStatusModel(DwcaResourceModel dwcaResourceModel) {
 		this.dwcaResourceModel = dwcaResourceModel;
 	}
 
-	public IPTFeedModel getIptFeedModel() {
-		return iptFeedModel;
+	/**
+	 * Date at when the resource was last published at its original location (e.g. IPT)
+	 *
+	 * @return last date the resource was published or null
+	 */
+	public Date getLastPublishedDate() {
+		return lastPublishedDate;
 	}
 
-	public void setIptFeedModel(IPTFeedModel iptFeedModel) {
-		this.iptFeedModel = iptFeedModel;
+	public void setLastPublishedDate(Date lastPublishedDate) {
+		this.lastPublishedDate = lastPublishedDate;
 	}
 
-	public ImportLogModel getLastImportEvent() {
-		return lastImportEvent;
+	/**
+	 *
+	 * @return last date the resource was harvested or null
+	 */
+	public Date getLastHarvestDate() {
+		return lastHarvestDate;
 	}
 
-	public void setLastImportEvent(ImportLogModel lastImportEvent) {
-		this.lastImportEvent = lastImportEvent;
+	public void setLastHarvestDate(Date lastHarvestDate) {
+		this.lastHarvestDate = lastHarvestDate;
 	}
 
 	public DwcaResourceModel getDwcaResourceModel() {
 		return dwcaResourceModel;
 	}
+
+
 }

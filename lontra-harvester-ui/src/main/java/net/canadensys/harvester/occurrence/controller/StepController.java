@@ -19,9 +19,10 @@ import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.job.UpdateJob;
+import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
-import net.canadensys.harvester.occurrence.notification.ResourceStatusNotifierIF;
+import net.canadensys.harvester.occurrence.notification.ResourceStatusCheckerIF;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 
 import org.hibernate.Criteria;
@@ -67,7 +68,7 @@ public class StepController implements StepControllerIF {
 	private PublisherDAO publisherDAO;
 
 	@Autowired
-	private ResourceStatusNotifierIF notifier;
+	private ResourceStatusCheckerIF resourceStatusChecker;
 
 	@Autowired
 	private MoveToPublicSchemaJob moveToPublicSchemaJob;
@@ -213,8 +214,8 @@ public class StepController implements StepControllerIF {
 	}
 
 	@Override
-	public List<DwcaResourceModel> getResourceToHarvest() {
-		return notifier.getHarvestRequiredList();
+	public List<DwcaResourceStatusModel> getResourceToHarvest() {
+		return resourceStatusChecker.getHarvestRequiredList();
 	}
 
 	@Override

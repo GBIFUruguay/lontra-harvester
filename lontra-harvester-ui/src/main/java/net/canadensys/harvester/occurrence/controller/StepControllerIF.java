@@ -5,6 +5,7 @@ import java.util.List;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.PublisherModel;
+import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 
@@ -16,7 +17,12 @@ public interface StepControllerIF {
 
 	public List<PublisherModel> getPublisherModelList();
 
-	public List<DwcaResourceModel> getResourceToHarvest();
+	/**
+	 * Get list of DwcaResourceStatusModel that require to be harvested.
+	 * 
+	 * @return
+	 */
+	public List<DwcaResourceStatusModel> getResourceToHarvest();
 
 	public List<ImportLogModel> getSortedImportLogModelList();
 
