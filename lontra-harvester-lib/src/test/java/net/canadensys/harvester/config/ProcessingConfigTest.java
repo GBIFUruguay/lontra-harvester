@@ -2,6 +2,7 @@ package net.canadensys.harvester.config;
 
 import static org.junit.Assert.fail;
 
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -10,6 +11,10 @@ import javax.sql.DataSource;
 
 import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
+import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
+import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
+import net.canadensys.dataportal.occurrence.dao.impl.HibernateDwcaResourceDAO;
+import net.canadensys.dataportal.occurrence.dao.impl.HibernateImportLogDAO;
 import net.canadensys.dataportal.occurrence.migration.LiquibaseHelper;
 import net.canadensys.dataportal.occurrence.model.ContactModel;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
@@ -28,6 +33,8 @@ import net.canadensys.harvester.LongRunningTaskIF;
 import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.jms.JMSWriter;
 import net.canadensys.harvester.jms.control.JMSControlProducer;
+import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
+import net.canadensys.harvester.occurrence.dao.impl.RSSIPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
@@ -41,6 +48,8 @@ import net.canadensys.harvester.occurrence.reader.DwcaEmlReader;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionInfoReader;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
+import net.canadensys.harvester.occurrence.status.ResourceStatusCheckerIF;
+import net.canadensys.harvester.occurrence.status.impl.DefaultResourceStatusChecker;
 import net.canadensys.harvester.occurrence.step.HandleDwcaExtensionsStep;
 import net.canadensys.harvester.occurrence.step.InsertResourceInformationStep;
 import net.canadensys.harvester.occurrence.step.StreamEmlContentStep;
@@ -81,6 +90,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @ImportResource("classpath:taskDefinitions.xml")
 public class ProcessingConfigTest {
+
+	private static final String TEST_IPT_RSS = "/ipt_rss.xml";
 
 	@Bean
 	public static PropertyPlaceholderConfigurer properties() {
@@ -161,7 +172,7 @@ public class ProcessingConfigTest {
 		return sb;
 	}
 
-	@Bean(name = "publicSessionFactory")
+	@Bean(name = { "publicSessionFactory", "sessionFactory" })
 	public LocalSessionFactoryBean publicSessionFactory() {
 		LocalSessionFactoryBean sb = new LocalSessionFactoryBean();
 		sb.setDataSource(dataSource());
@@ -383,6 +394,30 @@ public class ProcessingConfigTest {
 	@Bean(name = "occurrenceExtensionWriter")
 	public ItemWriterIF<OccurrenceExtensionModel> occurrenceExtensionWriter() {
 		return new GenericHibernateWriter<OccurrenceExtensionModel>();
+	}
+
+	// -- DAO --
+	@Bean
+	public DwcaResourceDAO dwcaResourceDAO() {
+		return new HibernateDwcaResourceDAO();
+	}
+
+	@Bean
+	public ImportLogDAO IimportLogDAO() {
+		return new HibernateImportLogDAO();
+	}
+
+	@Bean
+	public IPTFeedDAO iptFeedDAO() {
+		return new RSSIPTFeedDAO();
+	}
+
+	@Bean
+	public ResourceStatusCheckerIF resourceStatusChecker() {
+		URL iptRssFile = this.getClass().getResource(TEST_IPT_RSS);
+		DefaultResourceStatusChecker defaultResourceStatusChecker = new DefaultResourceStatusChecker();
+		defaultResourceStatusChecker.useStaticResourceStatusLocationStrategy(iptRssFile.toString());
+		return defaultResourceStatusChecker;
 	}
 
 	/**

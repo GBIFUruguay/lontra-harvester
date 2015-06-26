@@ -16,7 +16,7 @@ import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
-import net.canadensys.harvester.occurrence.notification.ResourceStatusCheckerIF;
+import net.canadensys.harvester.occurrence.status.ResourceStatusCheckerIF;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

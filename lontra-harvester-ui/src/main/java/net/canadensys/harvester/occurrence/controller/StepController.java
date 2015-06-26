@@ -22,7 +22,7 @@ import net.canadensys.harvester.occurrence.job.UpdateJob;
 import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
-import net.canadensys.harvester.occurrence.notification.ResourceStatusCheckerIF;
+import net.canadensys.harvester.occurrence.status.ResourceStatusCheckerIF;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 
 import org.hibernate.Criteria;
