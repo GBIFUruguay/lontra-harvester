@@ -2,6 +2,8 @@ package net.canadensys.harvester.main;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -66,8 +68,24 @@ public class JobInitiatorMain {
 		DwcaResourceModel resource;
 		for (DwcaResourceStatusModel resourceStatus : harvestRequiredList) {
 			resource = resourceStatus.getDwcaResourceModel();
-			System.out.println("[" + resource.getId() + "] " + resource.getName());
+			System.out.println("[" + resource.getId() + "] " + resource.getName() +
+					"=> lastHarvest: " + getDateAsString(resourceStatus.getLastHarvestDate()) +
+					", lastPublication: " + getDateAsString(resourceStatus.getLastPublishedDate()));
 		}
+	}
+
+	/**
+	 * Get Date object as String utility function for command line display.
+	 * 
+	 * @param date
+	 * @return the date as String or "?" in case the date is null
+	 */
+	private String getDateAsString(Date date) {
+		if (date == null) {
+			return "?";
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+		return sdf.format(date);
 	}
 
 	public void initiateApp(final String sourcefileid) {

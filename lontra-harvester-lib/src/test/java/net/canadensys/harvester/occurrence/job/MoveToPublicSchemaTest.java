@@ -94,8 +94,8 @@ public class MoveToPublicSchemaTest {
 		assertTrue(new Integer(2).equals(count));
 
 		// validate import log
-		Integer record_quantity_log = jdbcTemplate.queryForObject("SELECT record_quantity FROM import_log where sourcefileid = 'qmor-specimens'",
-				Integer.class);
+		Integer record_quantity_log = jdbcTemplate.queryForObject("SELECT record_quantity FROM import_log where sourcefileid = 'qmor-specimens' "
+				+ "AND id = (SELECT MAX(id) FROM import_log)", Integer.class);
 		assertTrue(new Integer(2).equals(record_quantity_log));
 	}
 }
