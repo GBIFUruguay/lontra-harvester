@@ -609,9 +609,7 @@ public class ResourcesPanel extends JPanel {
 		// Add an item for each resource name:
 		ArrayList<String> names = new ArrayList<String>();
 		for (DwcaResourceModel resource : resources) {
-			// Display only unharvested records:
-			if (resource.getRecord_count() == 0)
-				names.add(resource.getName());
+			names.add(resource.getName());
 		}
 		// Reorder alphabetically:
 		Collections.sort(names);

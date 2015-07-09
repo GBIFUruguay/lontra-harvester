@@ -144,11 +144,8 @@ public class PrepareDwcaTask implements ItemTaskIF {
 			throw new TaskExecutionException("dwcaIdentifier cannot be empty");
 		}
 
-		// if SharedParameterEnum.DWCA_PATH was previously there, we replace it
-		// sharedParameters.put(SharedParameterEnum.DWCA_PATH, dwcaFileLocation);
-		// if (allowDatasetShortnameExtraction && sharedParameters.get(SharedParameterEnum.RESOURCE_ID) == null) {
-		// sharedParameters.put(SharedParameterEnum.SOURCE_FILE_ID, dwcaIdentifier);
-		// }
+		// set the path for the Dwc-A
+		sharedParameters.put(SharedParameterEnum.DWCA_PATH, dwcaFileLocation);
 	}
 
 	/**

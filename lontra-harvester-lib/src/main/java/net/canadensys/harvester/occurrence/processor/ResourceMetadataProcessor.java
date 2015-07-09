@@ -56,7 +56,8 @@ public class ResourceMetadataProcessor implements ItemProcessorIF<Eml, ResourceM
 
 		if (!guid.equalsIgnoreCase(resourceModel.getGbif_package_id())) {
 			// if the gbif_package_id inside the archive is different than what was set in the UI, do not harvest.
-			throw new ProcessException("The extracted package_id from the EML file doesn't match the provided one");
+			throw new ProcessException("The extracted package_id from the EML file doesn't match the provided one. [" + guid + "] != ["
+					+ resourceModel.getGbif_package_id() + "]");
 		}
 
 		metadata = new ResourceMetadataModel();
