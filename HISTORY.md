@@ -1,8 +1,11 @@
 Version History
 ===============
 
+Version 1.1 2015-07-09
+* New features in lontra-harvester-cli project
+
 Version 1.0 2015-06-09
- * First release from WingLongitude
+* First release from WingLongitude
 
 Version 0.3 2014-07-20
 * Added new module (component) for the node
