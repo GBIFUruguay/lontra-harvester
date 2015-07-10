@@ -130,13 +130,9 @@ public class ProcessingConfigTest {
 
 	@Bean(name = "datasource")
 	public DataSource dataSource() {
-		DataSource ds = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).addScript("classpath:h2/h2setup.sql")
-				// those 2 scripts are loaded from liger-data-access
-				.addScript("/script/occurrence/create_occurrence_tables.sql")
-				.addScript("/script/occurrence/create_occurrence_tables_buffer_schema.sql").build();
+		DataSource ds = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).addScript("classpath:h2/h2setup.sql").build();
 
 		Connection conn;
-
 		try {
 			conn = ds.getConnection();
 			LiquibaseHelper.migrate(conn);
