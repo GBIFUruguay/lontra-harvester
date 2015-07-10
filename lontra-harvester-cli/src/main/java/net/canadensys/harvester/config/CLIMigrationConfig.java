@@ -20,6 +20,9 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
  */
 public class CLIMigrationConfig {
 
+	// use a default location
+	private static FileSystemResource configFile = new FileSystemResource("config/harvester-config.properties");
+
 	@Value("${harvester.library.version:?}")
 	private String currentVersion;
 
@@ -35,10 +38,19 @@ public class CLIMigrationConfig {
 	@Value("${hibernate.dialect}")
 	private String hibernateDialect;
 
+	/**
+	 * Allows to use a different configuration file.
+	 * 
+	 * @param newLocation
+	 */
+	public static void setConfigFileLocation(String location) {
+		configFile = new FileSystemResource(location);
+	}
+
 	@Bean
 	public static PropertyPlaceholderConfigurer properties() {
 		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-		ppc.setLocation(new FileSystemResource("config/harvester-config.properties"));
+		ppc.setLocation(configFile);
 		return ppc;
 	}
 

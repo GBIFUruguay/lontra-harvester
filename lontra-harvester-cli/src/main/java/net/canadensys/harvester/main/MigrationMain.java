@@ -5,6 +5,7 @@ import java.util.List;
 import net.canadensys.harvester.config.CLIMigrationConfig;
 import net.canadensys.harvester.migration.LontraMigrator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -28,7 +29,11 @@ public class MigrationMain {
 	 * 
 	 * @param args
 	 */
-	public static void main(Mode mode) {
+	public static void main(Mode mode, String configFileLocation) {
+		if (StringUtils.isNotBlank(configFileLocation)) {
+			CLIMigrationConfig.setConfigFileLocation(configFileLocation);
+		}
+
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(CLIMigrationConfig.class);
 		MigrationMain mm = ctx.getBean(MigrationMain.class);
 

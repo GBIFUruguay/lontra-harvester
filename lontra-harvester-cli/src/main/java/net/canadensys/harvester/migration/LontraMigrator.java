@@ -44,6 +44,11 @@ public class LontraMigrator {
 			for (ChangeSet cs : changeSets) {
 				changeSetList.add("[" + cs.getId() + "]=>" + cs.getComments());
 			}
+
+			changeSets = LiquibaseHelper.listUnrunBufferChangeSets(config.dataSource().getConnection());
+			for (ChangeSet cs : changeSets) {
+				changeSetList.add("[" + cs.getId() + "]=>" + cs.getComments());
+			}
 		}
 		catch (LiquibaseException | SQLException e) {
 			e.printStackTrace();

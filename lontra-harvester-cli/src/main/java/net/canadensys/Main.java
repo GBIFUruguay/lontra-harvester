@@ -23,6 +23,10 @@ import org.apache.commons.cli.PosixParser;
 public class Main {
 
 	private static Options cmdLineOptions;
+
+	private static final String CONFIG_SHORT_OPTION = "c";
+	private static final String CONFIG_OPTION = "config";
+
 	private static final String MIGRATE_SHORT_OPTION = "m";
 	private static final String MIGRATE_OPTION = "migrate";
 
@@ -34,6 +38,7 @@ public class Main {
 
 	static {
 		cmdLineOptions = new Options();
+		cmdLineOptions.addOption(new Option(CONFIG_SHORT_OPTION, CONFIG_OPTION, false, "Location of configuration file"));
 		cmdLineOptions.addOption(new Option(MIGRATE_SHORT_OPTION, MIGRATE_OPTION, true, "Migrate database '" + MIGRATE_OPTION_DRYRUN + "' or '"
 				+ MIGRATE_OPTION_APPLY + "'"));
 		cmdLineOptions.addOption(new Option(STATUS_SHORT_OPTION, STATUS_OPTION, false, "List status of resources"));
@@ -55,11 +60,14 @@ public class Main {
 		}
 
 		if (cmdLine != null) {
+
+			String configOptionValue = cmdLine.getOptionValue(CONFIG_OPTION);
+
 			// handle migration
 			if (cmdLine.hasOption(MIGRATE_OPTION)) {
 				String optionValue = cmdLine.getOptionValue(MIGRATE_OPTION);
 				if (MIGRATE_OPTION_DRYRUN.equalsIgnoreCase(optionValue)) {
-					MigrationMain.main(Mode.DRYRUN);
+					MigrationMain.main(Mode.DRYRUN, configOptionValue);
 				}
 				else if (MIGRATE_OPTION_APPLY.equalsIgnoreCase(optionValue)) {
 					Scanner sc = new Scanner(System.in);
@@ -67,7 +75,7 @@ public class Main {
 					System.out.println("Are you sure you want to apply database migration? (yes/no)");
 
 					if ("yes".equalsIgnoreCase(sc.nextLine())) {
-						MigrationMain.main(Mode.APPLY);
+						MigrationMain.main(Mode.APPLY, configOptionValue);
 					}
 					sc.close();
 				}
