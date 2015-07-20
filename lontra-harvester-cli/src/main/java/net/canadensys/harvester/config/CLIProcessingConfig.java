@@ -19,10 +19,10 @@ import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.ItemWriterIF;
-import net.canadensys.harvester.JobServiceIF;
+import net.canadensys.harvester.CLIService;
 import net.canadensys.harvester.LongRunningTaskIF;
 import net.canadensys.harvester.StepIF;
-import net.canadensys.harvester.impl.JobServiceImpl;
+import net.canadensys.harvester.impl.DefaultCLIService;
 import net.canadensys.harvester.main.JobInitiatorMain;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.dao.impl.RSSIPTFeedDAO;
@@ -119,8 +119,8 @@ public class CLIProcessingConfig {
 	}
 
 	@Bean
-	public JobServiceIF jobService() {
-		return new JobServiceImpl();
+	public CLIService jobService() {
+		return new DefaultCLIService();
 	}
 
 	@Bean(name = "datasource")

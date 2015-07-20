@@ -27,12 +27,15 @@ public class Main {
 	private static final String CONFIG_SHORT_OPTION = "c";
 	private static final String CONFIG_OPTION = "config";
 
-	private static final String MIGRATE_SHORT_OPTION = "m";
-	private static final String MIGRATE_OPTION = "migrate";
-
 	private static final String STATUS_SHORT_OPTION = "s";
 	private static final String STATUS_OPTION = "status";
 
+	private static final String RESOURCE_LIST_SHORT_OPTION = "l";
+	private static final String RESOURCE_LIST_OPTION = "list";
+
+	// migration related options
+	private static final String MIGRATE_SHORT_OPTION = "m";
+	private static final String MIGRATE_OPTION = "migrate";
 	private static final String MIGRATE_OPTION_DRYRUN = "dryrun";
 	private static final String MIGRATE_OPTION_APPLY = "apply";
 
@@ -41,6 +44,7 @@ public class Main {
 		cmdLineOptions.addOption(new Option(CONFIG_SHORT_OPTION, CONFIG_OPTION, false, "Location of configuration file"));
 		cmdLineOptions.addOption(new Option(MIGRATE_SHORT_OPTION, MIGRATE_OPTION, true, "Migrate database '" + MIGRATE_OPTION_DRYRUN + "' or '"
 				+ MIGRATE_OPTION_APPLY + "'"));
+		cmdLineOptions.addOption(new Option(RESOURCE_LIST_SHORT_OPTION, RESOURCE_LIST_OPTION, false, "List all resources"));
 		cmdLineOptions.addOption(new Option(STATUS_SHORT_OPTION, STATUS_OPTION, false, "List status of resources"));
 	}
 
@@ -83,8 +87,11 @@ public class Main {
 					printHelp();
 				}
 			}
+			else if (cmdLine.hasOption(RESOURCE_LIST_OPTION)) {
+				JobInitiatorMain.startStatusMain(JobInitiatorMain.JobType.LIST_RESOURCE);
+			}
 			else if (cmdLine.hasOption(STATUS_OPTION)) {
-				JobInitiatorMain.startStatusMain();
+				JobInitiatorMain.startStatusMain(JobInitiatorMain.JobType.RESOURCE_STATUS);
 			}
 			else {
 				printHelp();
