@@ -2,6 +2,7 @@
 *.classpath
 *.project
 *.DS_Store
+*.releaseBackup
 
 # Package Files #
 *.jar
@@ -11,6 +12,7 @@
 bin/**/*
 target/**/*
 build/**/*
+*/work/*
 
 canadensys-harvester-lib/target
 canadensys-harvester-ui/target

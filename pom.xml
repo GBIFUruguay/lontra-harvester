@@ -12,6 +12,7 @@
 		<module>lontra-harvester-ui</module>
 		<module>lontra-harvester-node</module>
 		<module>lontra-harvester-cli</module>
+		<module>dist</module>
 	</modules>
 
 	<properties>
@@ -21,7 +22,7 @@
 		<compiler.target>1.7</compiler.target>
     
 		<spring.version>4.0.9.RELEASE</spring.version>
-    
+		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
 		<junit.version>4.11</junit.version>
 	</properties>
 	<scm>
