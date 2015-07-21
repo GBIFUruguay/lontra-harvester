@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.canadensys.harvester.AbstractProcessingJob;
@@ -250,6 +251,7 @@ public class UserDefinedJobTest {
 		private AbstractStreamStep genericStreamStep;
 
 		public InnerUserDefinedJob() {
+			super(UUID.randomUUID().toString());
 			sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		}
 

@@ -3,14 +3,12 @@ package net.canadensys.harvester.occurrence.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-import net.canadensys.harvester.AbstractProcessingJob;
-
 /**
  * Model responsible for job status related data.
  * It is using a PropertyChangeSupport delegate.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class JobStatusModel {
 	private final PropertyChangeSupport propertyChangeSupport;
@@ -23,7 +21,7 @@ public class JobStatusModel {
 	public static String CURRENT_STATUS_EXPLANATION_PROPERTY = "currentStatusExplanation";
 	public static String CURRENT_JOB_PROGRESS_PROPERTY = "currentJobProgress";
 
-	private AbstractProcessingJob currentJob;
+	private String currentJobId;
 	private JobStatus currentStatus;
 	private String currentStatusExplanation;
 	private String currentJobProgress;
@@ -63,12 +61,12 @@ public class JobStatusModel {
 		propertyChangeSupport.firePropertyChange(CURRENT_JOB_PROGRESS_PROPERTY, null, newCurrentJobProgress);
 	}
 
-	public AbstractProcessingJob getCurrentJob() {
-		return currentJob;
+	public String getCurrentJobId() {
+		return currentJobId;
 	}
 
-	public void setCurrentJob(AbstractProcessingJob currentJob) {
-		this.currentJob = currentJob;
+	public void setCurrentJobId(String currentJobId) {
+		this.currentJobId = currentJobId;
 	}
 
 	public JobStatus getCurrentStatus() {

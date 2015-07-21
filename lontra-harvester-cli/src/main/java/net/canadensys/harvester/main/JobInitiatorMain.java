@@ -85,7 +85,12 @@ public class JobInitiatorMain {
 
 	private void importDwca(String resourceIdentifier) {
 		DwcaResourceModel resourceModel = cliService.loadResourceModel(resourceIdentifier);
-		System.out.println("would load " + resourceModel.getName());
+		if (resourceModel != null) {
+			cliService.importDwca(resourceModel);
+		}
+		else {
+			System.out.println("Can not find resource identified by " + resourceIdentifier);
+		}
 	}
 
 	/**

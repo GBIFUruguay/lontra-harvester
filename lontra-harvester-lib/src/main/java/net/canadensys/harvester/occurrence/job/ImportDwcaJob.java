@@ -1,6 +1,7 @@
 package net.canadensys.harvester.occurrence.job;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemProgressListenerIF;
@@ -55,6 +56,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 	private JobStatusModel jobStatusModel;
 
 	public ImportDwcaJob() {
+		super(UUID.randomUUID().toString());
 		sharedParameters = new HashMap<SharedParameterEnum, Object>();
 	}
 
@@ -64,6 +66,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 	public void doJob(JobStatusModel jobStatusModel) {
 
 		this.jobStatusModel = jobStatusModel;
+		jobStatusModel.setCurrentJobId(getJobId());
 		jobStatusModel.setCurrentStatus(JobStatus.RUNNING);
 
 		// get information about resource

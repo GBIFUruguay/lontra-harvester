@@ -1,6 +1,7 @@
 package net.canadensys.harvester.occurrence.job;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemTaskIF;
@@ -16,9 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * This job allows to move all the data from the buffer schema to the public
  * one. We are creating the GIS related data inside that step.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 
@@ -41,6 +42,7 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 	private ItemTaskIF postProcessOccurrenceTask;
 
 	public MoveToPublicSchemaJob() {
+		super(UUID.randomUUID().toString());
 		sharedParameters = new HashMap<SharedParameterEnum, Object>();
 	}
 

@@ -11,18 +11,24 @@ import net.canadensys.dataportal.occurrence.dao.impl.HibernateImportLogDAO;
 import net.canadensys.dataportal.occurrence.model.ContactModel;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
+import net.canadensys.dataportal.occurrence.model.OccurrenceExtensionModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
+import net.canadensys.harvester.CLIService;
+import net.canadensys.harvester.ItemMapperIF;
 import net.canadensys.harvester.ItemProcessorIF;
 import net.canadensys.harvester.ItemReaderIF;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.ItemWriterIF;
-import net.canadensys.harvester.CLIService;
 import net.canadensys.harvester.LongRunningTaskIF;
 import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.impl.DefaultCLIService;
+import net.canadensys.harvester.jms.JMSConsumer;
+import net.canadensys.harvester.jms.JMSWriter;
+import net.canadensys.harvester.jms.control.JMSControlConsumer;
+import net.canadensys.harvester.jms.control.JMSControlProducer;
 import net.canadensys.harvester.main.JobInitiatorMain;
 import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.dao.impl.RSSIPTFeedDAO;
@@ -30,17 +36,21 @@ import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.job.UpdateJob;
+import net.canadensys.harvester.occurrence.mapper.OccurrenceExtensionMapper;
+import net.canadensys.harvester.occurrence.processor.DwcaExtensionLineProcessor;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceMetadataProcessor;
 import net.canadensys.harvester.occurrence.reader.DwcaEmlReader;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionInfoReader;
+import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
 import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
 import net.canadensys.harvester.occurrence.status.ResourceStatusCheckerIF;
 import net.canadensys.harvester.occurrence.status.impl.DefaultResourceStatusChecker;
 import net.canadensys.harvester.occurrence.step.HandleDwcaExtensionsStep;
-import net.canadensys.harvester.occurrence.step.SynchronousProcessEmlContentStep;
-import net.canadensys.harvester.occurrence.step.SynchronousProcessOccurrenceStep;
+import net.canadensys.harvester.occurrence.step.StreamEmlContentStep;
+import net.canadensys.harvester.occurrence.step.stream.StreamDwcContentStep;
+import net.canadensys.harvester.occurrence.step.stream.StreamDwcExtensionContentStep;
 import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
 import net.canadensys.harvester.occurrence.task.ComputeGISDataTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
@@ -110,8 +120,14 @@ public class CLIProcessingConfig {
 	@Value("${hibernate.jdbc.fetch_size}")
 	private String hibernateJDBCFetchSize;
 
+	@Value("${jms.broker_url}")
+	private String jmsBrokerUrl;
+
 	@Value("${occurrence.idGenerationSQL}")
 	private String idGenerationSQL;
+
+	@Value("${occurrence.extension.idGenerationSQL:}")
+	private String extIdGenerationSQL;
 
 	@Bean
 	public JobInitiatorMain jobInitiatorMain() {
@@ -209,12 +225,18 @@ public class CLIProcessingConfig {
 	// ---STEP Synchronous---
 	@Bean(name = "streamEmlContentStep")
 	public StepIF streamEmlContentStep() {
-		return new SynchronousProcessEmlContentStep();
+		return new StreamEmlContentStep();
 	}
 
 	@Bean(name = "streamDwcContentStep")
 	public StepIF StreamDwcContentStep() {
-		return new SynchronousProcessOccurrenceStep();
+		return new StreamDwcContentStep();
+	}
+
+	@Bean
+	@Scope("prototype")
+	public StepIF streamDwcExtensionContentStep() {
+		return new StreamDwcExtensionContentStep();
 	}
 
 	@Bean
@@ -272,6 +294,13 @@ public class CLIProcessingConfig {
 		return dwcaLineProcessor;
 	}
 
+	@Bean(name = "extLineProcessor")
+	public ItemProcessorIF<OccurrenceExtensionModel, OccurrenceExtensionModel> extLineProcessor() {
+		DwcaExtensionLineProcessor dwcaLineProcessor = new DwcaExtensionLineProcessor();
+		dwcaLineProcessor.setIdGenerationSQL(extIdGenerationSQL);
+		return dwcaLineProcessor;
+	}
+
 	@Bean(name = "occurrenceProcessor")
 	public ItemProcessorIF<OccurrenceRawModel, OccurrenceModel> occurrenceProcessor() {
 		return new OccurrenceProcessor();
@@ -282,13 +311,21 @@ public class CLIProcessingConfig {
 		return new ResourceMetadataProcessor();
 	}
 
+	// ---MAPPER---
+	@Bean(name = "occurrenceExtensionMapper")
+	public ItemMapperIF<OccurrenceExtensionModel> occurrenceExtensionMapper() {
+		return new OccurrenceExtensionMapper();
+	}
+
 	// ---READER wiring---
 	@Bean
+	@Scope("prototype")
 	public ItemReaderIF<OccurrenceRawModel> dwcItemReader() {
 		return new DwcaItemReader();
 	}
 
 	@Bean
+	@Scope("prototype")
 	public ItemReaderIF<Eml> dwcaEmlReader() {
 		return new DwcaEmlReader();
 	}
@@ -297,6 +334,14 @@ public class CLIProcessingConfig {
 	@Scope("prototype")
 	public ItemReaderIF<Term> dwcaExtensionInfoReader() {
 		return new DwcaExtensionInfoReader();
+	}
+
+	@Bean
+	@Scope("prototype")
+	public ItemReaderIF<OccurrenceExtensionModel> dwcaOccurrenceExtensionReader() {
+		DwcaExtensionReader<OccurrenceExtensionModel> dwcaExtReader = new DwcaExtensionReader<OccurrenceExtensionModel>();
+		dwcaExtReader.setMapper(occurrenceExtensionMapper());
+		return dwcaExtReader;
 	}
 
 	// ---WRITER wiring---
@@ -341,5 +386,31 @@ public class CLIProcessingConfig {
 	@Bean
 	public ImportLogDAO importLogDAO() {
 		return new HibernateImportLogDAO();
+	}
+
+	/**
+	 * Always return a new instance. We do not want to share JMS Writer instance.
+	 *
+	 * @return
+	 */
+	@Bean
+	@Scope("prototype")
+	public JMSWriter jmsWriter() {
+		return new JMSWriter(jmsBrokerUrl);
+	}
+
+	@Bean(name = "jmsConsumer")
+	public JMSConsumer jmsConsumer() {
+		return null;
+	}
+
+	@Bean(destroyMethod = "close")
+	public JMSControlProducer controlMessageProducer() {
+		return new JMSControlProducer(jmsBrokerUrl);
+	}
+
+	@Bean(destroyMethod = "close")
+	public JMSControlConsumer errorReceiver() {
+		return new JMSControlConsumer(jmsBrokerUrl);
 	}
 }

@@ -6,14 +6,20 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
 /**
  * Common functions for Job processing classes.
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 public abstract class AbstractProcessingJob {
 
+	private final String jobId;
+
 	// Data structure used to share parameters among steps
 	protected Map<SharedParameterEnum, Object> sharedParameters;
+
+	protected AbstractProcessingJob(String jobId) {
+		this.jobId = jobId;
+	}
 
 	// this could be needed to allow steps insertion
 	// protected List<ProcessingStepIF> stepSequence;
@@ -22,7 +28,7 @@ public abstract class AbstractProcessingJob {
 	/**
 	 * This function assumes that sharedParameters was previously created by the child class.
 	 * NullPointerException will be thrown if sharedParameters wasn't created.
-	 * 
+	 *
 	 * @param key
 	 * @param obj
 	 */
@@ -31,9 +37,24 @@ public abstract class AbstractProcessingJob {
 	}
 
 	/**
+	 * This function assumes that sharedParameters was previously created by the child class.
+	 * NullPointerException will be thrown if sharedParameters wasn't created.
+	 *
+	 * @param key
+	 * @return
+	 */
+	public Object getFromSharedParameters(SharedParameterEnum key) {
+		return sharedParameters.get(key);
+	}
+
+	public String getJobId() {
+		return jobId;
+	}
+
+	/**
 	 * Execute a step sequentially (preStep,doStep and postStep).
 	 * TODO allow steps to return result for better error reporting
-	 * 
+	 *
 	 * @param step
 	 * @param sharedParameters
 	 * @throws IllegalStateException

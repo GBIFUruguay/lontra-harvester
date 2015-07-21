@@ -53,9 +53,7 @@ import net.canadensys.harvester.occurrence.reader.DwcaItemReader;
 import net.canadensys.harvester.occurrence.status.ResourceStatusCheckerIF;
 import net.canadensys.harvester.occurrence.status.impl.DefaultResourceStatusChecker;
 import net.canadensys.harvester.occurrence.step.HandleDwcaExtensionsStep;
-import net.canadensys.harvester.occurrence.step.InsertResourceInformationStep;
 import net.canadensys.harvester.occurrence.step.StreamEmlContentStep;
-import net.canadensys.harvester.occurrence.step.async.ProcessInsertOccurrenceStep;
 import net.canadensys.harvester.occurrence.step.stream.StreamDwcContentStep;
 import net.canadensys.harvester.occurrence.step.stream.StreamDwcExtensionContentStep;
 import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
@@ -275,16 +273,6 @@ public class UIConfig {
 	@Bean(name = "streamDwcContentStep")
 	public StepIF StreamDwcContentStep() {
 		return new StreamDwcContentStep();
-	}
-
-	@Bean(name = "processInsertOccurrenceStep")
-	public StepIF processInsertOccurrenceStep() {
-		return new ProcessInsertOccurrenceStep();
-	}
-
-	@Bean(name = "insertResourceInformationStep")
-	public StepIF insertResourceInformationStep() {
-		return new InsertResourceInformationStep();
 	}
 
 	@Bean

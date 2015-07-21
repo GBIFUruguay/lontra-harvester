@@ -14,25 +14,39 @@ import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.CLIService;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
+import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
+import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * This class is NOT thread-safe
+ * 
+ * @author cgendreau
+ *
+ */
 public class DefaultCLIService implements CLIService {
 
 	@Autowired
 	private ImportDwcaJob importDwcaJob;
 
-	//
-	// @Autowired
-	// private MoveToPublicSchemaJob moveToPublicSchemaJob;
-	//
+	@Autowired
+	private MoveToPublicSchemaJob moveToPublicSchemaJob;
+
 	// @Autowired
 	// private ComputeUniqueValueJob computeUniqueValueJob;
 
 	@Autowired
 	private DwcaResourceDAO resourceDAO;
+
+	private final JobStatusModel jobStatusModel;
+
+	public DefaultCLIService() {
+		jobStatusModel = new JobStatusModel();
+		jobStatusModel.addPropertyChangeListener(new JobStatusModelListener());
+	}
 
 	@Override
 	@Transactional("publicTransactionManager")
@@ -84,8 +98,6 @@ public class DefaultCLIService implements CLIService {
 		if (resourceModel != null) {
 			ExecutorService executor = Executors.newFixedThreadPool(2);
 			importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceModel.getId());
-			final JobStatusModel jobStatusModel = new JobStatusModel();
-			jobStatusModel.addPropertyChangeListener(new JobStatusModelListener());
 
 			Runnable importJobThread = new Runnable() {
 				@Override
@@ -102,19 +114,29 @@ public class DefaultCLIService implements CLIService {
 			catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-
-			System.out.println("done");
 		}
 		else {
 			System.out.println("Nothing to import, resourceModel is null");
 			return;
 		}
+	}
 
-		// moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, datasetShortName);
-		// JobStatusModel jobStatusModel = new JobStatusModel();
-		// moveToPublicSchemaJob.doJob(jobStatusModel);
-		//
-		// computeUniqueValueJob.doJob(jobStatusModel);
+	@Override
+	public void moveToPublicSchema(DwcaResourceModel resourceModel) {
+		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceModel.getId());
+		moveToPublicSchemaJob.doJob(jobStatusModel);
+	}
+
+	private void onJobCompleted(String jobId, JobStatus jobStatus) {
+
+		if (jobId.equals(importDwcaJob.getJobId()) && JobStatus.DONE.equals(jobStatus)) {
+			System.out.println("Import Job done");
+			Integer resourceId = (Integer) importDwcaJob.getFromSharedParameters(SharedParameterEnum.RESOURCE_ID);
+			System.out.println("TODO: Move resourceId " + resourceId + " to public schema");
+		}
+		else {
+			System.out.println("Job " + jobId + " completed with status " + jobStatus);
+		}
 	}
 
 	/**
@@ -123,10 +145,19 @@ public class DefaultCLIService implements CLIService {
 	 * @author cgendreau
 	 * 
 	 */
-	private static class JobStatusModelListener implements PropertyChangeListener {
+	private class JobStatusModelListener implements PropertyChangeListener {
 		@Override
 		public void propertyChange(PropertyChangeEvent evt) {
-			System.out.println(evt.getNewValue());
+			JobStatusModel jsm = (JobStatusModel) evt.getSource();
+			if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt.getPropertyName())) {
+				JobStatus newStatus = (JobStatus) evt.getNewValue();
+				if (JobStatus.DONE == newStatus || JobStatus.ERROR == newStatus) {
+					onJobCompleted(jsm.getCurrentJobId(), newStatus);
+				}
+			}
+			else {
+				System.out.println(evt.getNewValue());
+			}
 		}
 	}
 
