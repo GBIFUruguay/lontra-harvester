@@ -14,5 +14,7 @@ public interface CLIService {
 
 	List<DwcaResourceModel> loadResourceModelList();
 
-	DwcaResourceModel loadResourceModel(String sourcefileid);
+	DwcaResourceModel loadResourceModel(String resourceIdentifier);
+
+	void importDwca(DwcaResourceModel resourceModel);
 }

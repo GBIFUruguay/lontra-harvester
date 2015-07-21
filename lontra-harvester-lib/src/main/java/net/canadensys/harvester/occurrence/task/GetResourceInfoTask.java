@@ -7,6 +7,7 @@ import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.exception.TaskExecutionException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
@@ -23,14 +24,26 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class GetResourceInfoTask implements ItemTaskIF {
 
+	// get log4j handler
+	private static final Logger LOGGER = Logger.getLogger(GetResourceInfoTask.class);
+
 	@Autowired
 	@Qualifier(value = "publicSessionFactory")
 	private SessionFactory sessionFactory;
 
+	/**
+	 * @param sharedParameters
+	 *            in:RESOURCE_ID, out:DWCA_URL,RESOURCE_MODEL
+	 */
 	@Transactional(value = "publicTransactionManager", readOnly = true)
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) throws TaskExecutionException {
+
 		Integer resourceId = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
+		if (resourceId == null) {
+			LOGGER.fatal("Misconfigured task : RESOURCE_ID is required");
+			throw new TaskExecutionException("Misconfigured task");
+		}
 
 		Criteria searchCriteria = sessionFactory.getCurrentSession().createCriteria(DwcaResourceModel.class);
 		searchCriteria.add(Restrictions.eq("id", resourceId));
@@ -42,7 +55,6 @@ public class GetResourceInfoTask implements ItemTaskIF {
 
 		sharedParameters.put(SharedParameterEnum.DWCA_URL, resourceModel.getArchive_url());
 		sharedParameters.put(SharedParameterEnum.RESOURCE_MODEL, resourceModel);
-		// sharedParameters.put(SharedParameterEnum.GBIF_PACKAGE_ID, resourceModel.getGbif_package_id());
 	}
 
 	public void setSessionFactory(SessionFactory sessionFactory) {

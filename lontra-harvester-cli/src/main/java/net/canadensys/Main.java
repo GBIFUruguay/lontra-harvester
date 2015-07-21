@@ -8,11 +8,11 @@ import net.canadensys.harvester.main.MigrationMain.Mode;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 
 /**
  * Entry point for lontra-cli
@@ -33,6 +33,11 @@ public class Main {
 	private static final String RESOURCE_LIST_SHORT_OPTION = "l";
 	private static final String RESOURCE_LIST_OPTION = "list";
 
+	private static final String HARVEST_SHORT_OPTION = "h";
+	private static final String HARVEST_OPTION = "harvest";
+	private static final String NO_NODES_SHORT_OPTION = "N";
+	private static final String NO_NODES_OPTION = "nonodes";
+
 	// migration related options
 	private static final String MIGRATE_SHORT_OPTION = "m";
 	private static final String MIGRATE_OPTION = "migrate";
@@ -46,6 +51,8 @@ public class Main {
 				+ MIGRATE_OPTION_APPLY + "'"));
 		cmdLineOptions.addOption(new Option(RESOURCE_LIST_SHORT_OPTION, RESOURCE_LIST_OPTION, false, "List all resources"));
 		cmdLineOptions.addOption(new Option(STATUS_SHORT_OPTION, STATUS_OPTION, false, "List status of resources"));
+		cmdLineOptions.addOption(new Option(HARVEST_SHORT_OPTION, HARVEST_OPTION, true, "Harvest a resource"));
+		cmdLineOptions.addOption(new Option(NO_NODES_SHORT_OPTION, NO_NODES_OPTION, false, "Harvest using no nodes"));
 	}
 
 	/**
@@ -54,7 +61,7 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		CommandLineParser parser = new PosixParser();
+		CommandLineParser parser = new DefaultParser();
 		CommandLine cmdLine = null;
 		try {
 			cmdLine = parser.parse(cmdLineOptions, args);
@@ -88,10 +95,21 @@ public class Main {
 				}
 			}
 			else if (cmdLine.hasOption(RESOURCE_LIST_OPTION)) {
-				JobInitiatorMain.startStatusMain(JobInitiatorMain.JobType.LIST_RESOURCE);
+				JobInitiatorMain.jobMain(JobInitiatorMain.JobType.LIST_RESOURCE);
 			}
 			else if (cmdLine.hasOption(STATUS_OPTION)) {
-				JobInitiatorMain.startStatusMain(JobInitiatorMain.JobType.RESOURCE_STATUS);
+				JobInitiatorMain.jobMain(JobInitiatorMain.JobType.RESOURCE_STATUS);
+			}
+			else if (cmdLine.hasOption(HARVEST_OPTION)) {
+				String optionValue = cmdLine.getOptionValue(HARVEST_OPTION);
+				boolean noNodes = cmdLine.hasOption(NO_NODES_OPTION);
+
+				if (noNodes) {
+					System.out.println("harvest " + optionValue + " with no nodes");
+				}
+				else {
+					JobInitiatorMain.jobMain(JobInitiatorMain.JobType.IMPORT_DWCA, optionValue);
+				}
 			}
 			else {
 				printHelp();

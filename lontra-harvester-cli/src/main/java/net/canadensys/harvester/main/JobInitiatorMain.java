@@ -1,7 +1,5 @@
 package net.canadensys.harvester.main;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -18,17 +16,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 public class JobInitiatorMain {
 
 	public enum JobType {
-		RESOURCE_STATUS, LIST_RESOURCE
+		RESOURCE_STATUS, LIST_RESOURCE, IMPORT_DWCA
 	}
-
-	// @Autowired
-	// private ImportDwcaJob importDwcaJob;
-	//
-	// @Autowired
-	// private MoveToPublicSchemaJob moveToPublicSchemaJob;
-	//
-	// @Autowired
-	// private ComputeUniqueValueJob computeUniqueValueJob;
 
 	@Autowired
 	private CLIService cliService;
@@ -47,12 +36,17 @@ public class JobInitiatorMain {
 	// jim.initiateApp(sourcefileid);
 	// }
 
+	public static void jobMain(JobType jobType) {
+		jobMain(jobType, null);
+	}
+
 	/**
 	 * JobInitiator Entry point
 	 * 
+	 * @param jobType
 	 * @param args
 	 */
-	public static void startStatusMain(JobType jobType) {
+	public static void jobMain(JobType jobType, String arg) {
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(CLIProcessingConfig.class);
 		JobInitiatorMain jim = ctx.getBean(JobInitiatorMain.class);
 
@@ -62,6 +56,9 @@ public class JobInitiatorMain {
 				break;
 			case LIST_RESOURCE:
 				jim.displayResourceList();
+				break;
+			case IMPORT_DWCA:
+				jim.importDwca(arg);
 				break;
 			default:
 				break;
@@ -86,6 +83,11 @@ public class JobInitiatorMain {
 		}
 	}
 
+	private void importDwca(String resourceIdentifier) {
+		DwcaResourceModel resourceModel = cliService.loadResourceModel(resourceIdentifier);
+		System.out.println("would load " + resourceModel.getName());
+	}
+
 	/**
 	 * Get Date object as String utility function for command line display.
 	 * 
@@ -100,57 +102,4 @@ public class JobInitiatorMain {
 		return sdf.format(date);
 	}
 
-	// public void initiateApp(final String sourcefileid) {
-	//
-	// DwcaResourceModel resourceModel = jobService.loadResourceModel(sourcefileid);
-	//
-	// if (resourceModel != null) {
-	//
-	// ExecutorService executor = Executors.newFixedThreadPool(2);
-	// importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceModel.getId());
-	// final JobStatusModel jobStatusModel = new JobStatusModel();
-	// jobStatusModel.addPropertyChangeListener(new JobStatusModelListener());
-	//
-	// Runnable importJobThread = new Runnable() {
-	// @Override
-	// public void run() {
-	// importDwcaJob.doJob(jobStatusModel);
-	// }
-	// };
-	//
-	// executor.execute(importJobThread);
-	// executor.shutdown();
-	// try {
-	// executor.awaitTermination(12, TimeUnit.HOURS);
-	// }
-	// catch (InterruptedException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// System.out.println("done");
-	// }
-	// else {
-	// System.out.println("Can't find the resource named [" + sourcefileid + "]");
-	// }
-	//
-	// // moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.DATASET_SHORTNAME, datasetShortName);
-	// // JobStatusModel jobStatusModel = new JobStatusModel();
-	// // moveToPublicSchemaJob.doJob(jobStatusModel);
-	// //
-	// // computeUniqueValueJob.doJob(jobStatusModel);
-	// }
-
-	/**
-	 * Simple PropertyChangeListener to send notifications about the JobStatusModel to the console.
-	 * 
-	 * @author cgendreau
-	 * 
-	 */
-	private static class JobStatusModelListener implements PropertyChangeListener {
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			System.out.println(evt.getNewValue());
-		}
-
-	}
 }

@@ -22,9 +22,6 @@ import org.springframework.context.ApplicationContext;
  * This job allows to give a resource ID, stream the content into JMS messages and waiting for completion.
  * At the end of this job, the content of the DarwinCore archive will be in the database as raw and processed data.
  *
- * The GetResourceInfoTask is optional if you plan to work from directly from an archive or folder. In this case, the DATASET_SHORTNAME will be
- * extracted from the file name which could lead to unwanted behavior since the name of the file could conflict with another resource.
- *
  * @author canadensys
  *
  */
@@ -69,11 +66,8 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 		this.jobStatusModel = jobStatusModel;
 		jobStatusModel.setCurrentStatus(JobStatus.RUNNING);
 
-		// TODO this is not optional anymore
-		// optional task, could also import a DwcA from a local path but, at your own risk.
-		if (getResourceInfoTask != null && sharedParameters.containsKey(SharedParameterEnum.RESOURCE_ID)) {
-			getResourceInfoTask.execute(sharedParameters);
-		}
+		// get information about resource
+		getResourceInfoTask.execute(sharedParameters);
 
 		// TODO move strings to properties file
 		jobStatusModel.setCurrentStatusExplanation("Preparing DwcA");
