@@ -39,7 +39,13 @@ import org.gbif.nameparser.UnparsableException;
 import com.google.common.base.CharMatcher;
 
 /**
- * Processing each OccurrenceRawModel into OccurrenceModel.
+ * Process each OccurrenceRawModel into OccurrenceModel.
+ * This class mainly use the narwhal-processor to process the data that are not domain/project specific.
+ * All interpretations/validations about the data that are specific to the Explorer are held here.
+ * Some part of this class should be moved to narwhal itself (e.g. processScientificName) while other could
+ * be implemented as extensions of narwhal (e.g. processDate).
+ *
+ * Some functions should be replaced by those from dwca-validator (e.g. validateStartDate).
  *
  * @author canadensys
  *
@@ -93,12 +99,10 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 
 		OccurrenceModel processedModel = new OccurrenceModel();
 
-		// keep the same auto_id
+		// keep the same identifiers
 		processedModel.setAuto_id(rawModel.getAuto_id());
 		processedModel.setDwcaid(rawModel.getDwcaid());
 		processedModel.setSourcefileid(rawModel.getSourcefileid());
-
-		// see https://github.com/WingLongitude/liger-data-access/issues/24
 		processedModel.setResource_id(rawModel.getResource_id());
 
 		processedModel.setBasisofrecord(rawModel.getBasisofrecord());
@@ -120,33 +124,10 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 		Country country = countryProcessor.process(rawModel.getCountry(), null);
 
 		// Continent processing
-		if (!StringUtils.isBlank(rawModel.getContinent())) {
-			processedModel.setContinent(rawModel.getContinent());
-		}
-		else { // try to find continent based on country
-			Continent continent = null;
-			try {
-				if (country != null) {
-					// set continent:
-					continent = countryContinentProcessor.process(country.getIso2LetterCode(), null);
-					if (continent != null) {
-						processedModel.setContinent(continent.getTitle());
-					}
-				}
-			}
-			catch (IllegalArgumentException ignore) {
-			}
-		}
+		processContinent(rawModel, processedModel, country);
 
 		// state or province processing
-		if (country != null && stateProvinceProcessorMap.get(country.getIso2LetterCode()) != null) {
-			// 2 phases processing [raw -> ISO] and [ISO -> common name]
-			String stateProvinceISO = stateProvinceProcessorMap.get(country.getIso2LetterCode()).process(rawModel.getStateprovince(), null);
-			processedModel.setStateprovince(iso3166_2ProcessorMap.get(country.getIso2LetterCode()).process(stateProvinceISO, null));
-		}
-		else {// if we can't process it, copy it
-			processedModel.setStateprovince(rawModel.getStateprovince());
-		}
+		processStateProvince(rawModel, processedModel, country);
 
 		processedModel.setCounty(rawModel.getCounty());
 		processedModel.setMunicipality(rawModel.getMunicipality());
@@ -251,6 +232,50 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 		catch (UnparsableException uEx) {
 			System.out.println("NameParser " + uEx.getMessage());
 		}
+	}
+
+	/**
+	 * Handle continent and set it if not provided by rawModel and we have a valid country.
+	 *
+	 * @param rawModel
+	 * @param occModel
+	 * @param country
+	 */
+	private void processContinent(OccurrenceRawModel rawModel, OccurrenceModel occModel, Country country) {
+		// if a continent is provided, use it as is
+		if (StringUtils.isNotBlank(rawModel.getContinent())) {
+			occModel.setContinent(rawModel.getContinent());
+			return;
+		}
+
+		if (country == null) {
+			return;
+		}
+
+		// if no continent is provided but we do have a valid country, infer continent
+		Continent continent = countryContinentProcessor.process(country.getIso2LetterCode(), null);
+		if (continent != null) {
+			occModel.setContinent(continent.getTitle());
+		}
+	}
+
+	/**
+	 * Handle stateProvince if we we have a valid country and a matching stateProvince Processor for that country.
+	 *
+	 * @param rawModel
+	 * @param occModel
+	 * @param country
+	 */
+	private void processStateProvince(OccurrenceRawModel rawModel, OccurrenceModel occModel, Country country) {
+		// if we can't process it, copy the value from raw
+		if (country == null || stateProvinceProcessorMap.get(country.getIso2LetterCode()) == null) {
+			occModel.setStateprovince(rawModel.getStateprovince());
+			return;
+		}
+
+		// 2 phases processing [raw -> ISO] and [ISO -> common name]
+		String stateProvinceISO = stateProvinceProcessorMap.get(country.getIso2LetterCode()).process(rawModel.getStateprovince(), null);
+		occModel.setStateprovince(iso3166_2ProcessorMap.get(country.getIso2LetterCode()).process(stateProvinceISO, null));
 	}
 
 	/**
@@ -406,7 +431,7 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 	}
 
 	/**
-	 * Validate start date value and make sure they are valid. If not, remove them from occModel.
+	 * Validate start date values and make sure they are valid. If not, remove them from occModel.
 	 * TODO should be replaced by dwca-validator library
 	 *
 	 * @param occModel
