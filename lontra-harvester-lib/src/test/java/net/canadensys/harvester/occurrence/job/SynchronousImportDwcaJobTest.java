@@ -114,8 +114,9 @@ public class SynchronousImportDwcaJobTest {
 				String.class);
 		assertTrue("Collection entomologique Ouellet-Robert (QMOR)".equals(alternateIdentifier));
 
-		assertEquals(jobStatusModel.getCurrentStatus(), JobStatus.DONE);
 		assertTrue(new Integer(EXPECTED_NUMBER_OF_RESULTS).equals(count));
+		assertEquals(JobStatus.DONE, jobStatusModel.getCurrentStatus());
+
 	}
 
 }

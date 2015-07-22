@@ -95,8 +95,6 @@ public class SynchronousProcessOccurrenceStep implements StepIF {
 		List<OccurrenceRawModel> occRawList = new ArrayList<OccurrenceRawModel>(DEFAULT_FLUSH_INTERVAL);
 		int numberOfRecords = 0;
 
-		// JobStatusModel jobStatus = (JobStatusModel) sharedParameters.get(SharedParameterEnum.JOB_STATUS_MODEL);
-
 		try {
 			OccurrenceRawModel currRawModel = reader.read();
 			while (currRawModel != null) {

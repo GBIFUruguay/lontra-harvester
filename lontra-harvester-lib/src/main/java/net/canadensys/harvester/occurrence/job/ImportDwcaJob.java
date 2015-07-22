@@ -54,7 +54,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 	@Autowired
 	private LongRunningTaskIF checkProcessingCompletenessTask;
 
-	private JobStatusModel jobStatusModel;
+	private volatile JobStatusModel jobStatusModel;
 
 	public ImportDwcaJob() {
 		super(UUID.randomUUID().toString());

@@ -156,7 +156,7 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 	}
 
 	/**
-	 * Set SQL query details to check if the completeness
+	 * Set SQL query details to check completeness.
 	 *
 	 * @param targetedTable
 	 *            in which we want to count the rows

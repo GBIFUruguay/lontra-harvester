@@ -21,7 +21,7 @@ public class MigrationMain {
 	private LontraMigrator lontraMigrator;
 
 	public enum Mode {
-		DRYRUN, APPLY
+		DRYRUN, APPLY, CREATE
 	}
 
 	/**
