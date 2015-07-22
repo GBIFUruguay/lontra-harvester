@@ -13,6 +13,7 @@ import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.CLIService;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
+import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
@@ -35,8 +36,8 @@ public class DefaultCLIService implements CLIService {
 	@Autowired
 	private MoveToPublicSchemaJob moveToPublicSchemaJob;
 
-	// @Autowired
-	// private ComputeUniqueValueJob computeUniqueValueJob;
+	@Autowired
+	private ComputeUniqueValueJob computeUniqueValueJob;
 
 	@Autowired
 	private DwcaResourceDAO resourceDAO;
@@ -127,14 +128,21 @@ public class DefaultCLIService implements CLIService {
 		moveToPublicSchemaJob.doJob(jobStatusModel);
 	}
 
+	@Override
+	public void computeUniqueValueJob() {
+		computeUniqueValueJob.doJob(jobStatusModel);
+	}
+
 	private void onJobCompleted(String jobId, JobStatus jobStatus) {
 
+		// importJob completed
 		if (jobId.equals(importDwcaJob.getJobId()) && JobStatus.DONE.equals(jobStatus)) {
 			DwcaResourceModel dwcaResourceModel = (DwcaResourceModel) importDwcaJob.getFromSharedParameters(SharedParameterEnum.RESOURCE_MODEL);
 			moveToPublicSchema(dwcaResourceModel);
 		}
-		else {
-			System.out.println("Job " + jobId + " completed with status " + jobStatus);
+		// moveToPublicSchemaJob completed
+		else if (jobId.equals(moveToPublicSchemaJob.getJobId()) && JobStatus.DONE.equals(jobStatus)) {
+			computeUniqueValueJob();
 		}
 	}
 
@@ -155,7 +163,7 @@ public class DefaultCLIService implements CLIService {
 				}
 			}
 			else {
-				System.out.println(evt.getNewValue());
+				System.out.println(">" + evt.getNewValue());
 			}
 		}
 	}

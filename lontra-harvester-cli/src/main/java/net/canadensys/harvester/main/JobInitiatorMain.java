@@ -10,32 +10,27 @@ import net.canadensys.harvester.config.CLIProcessingConfig;
 import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.status.ResourceStatusCheckerIF;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class JobInitiatorMain {
 
 	public enum JobType {
-		RESOURCE_STATUS, LIST_RESOURCE, IMPORT_DWCA
+		RESOURCE_STATUS, LIST_RESOURCE, HARVEST
 	}
 
 	@Autowired
 	private CLIService cliService;
 
 	@Autowired
-	private ResourceStatusCheckerIF resourceStatusNotifier;
+	private ResourceStatusCheckerIF resourceStatusChecker;
 
 	/**
-	 * JobInitiator Entry point
+	 * No args JobInitiator Entry point
 	 * 
-	 * @param args
+	 * @param jobType
 	 */
-	// public static void main(String sourcefileid) {
-	// AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(CLIProcessingConfig.class);
-	// JobInitiatorMain jim = ctx.getBean(JobInitiatorMain.class);
-	// jim.initiateApp(sourcefileid);
-	// }
-
 	public static void jobMain(JobType jobType) {
 		jobMain(jobType, null);
 	}
@@ -57,8 +52,13 @@ public class JobInitiatorMain {
 			case LIST_RESOURCE:
 				jim.displayResourceList();
 				break;
-			case IMPORT_DWCA:
-				jim.importDwca(arg);
+			case HARVEST:
+				if (StringUtils.isNotBlank(arg)) {
+					jim.harvest(arg);
+				}
+				else {
+					jim.harvestRequired();
+				}
 				break;
 			default:
 				break;
@@ -66,7 +66,7 @@ public class JobInitiatorMain {
 	}
 
 	private void displayResourceStatus() {
-		List<DwcaResourceStatusModel> harvestRequiredList = resourceStatusNotifier.getHarvestRequiredList();
+		List<DwcaResourceStatusModel> harvestRequiredList = resourceStatusChecker.getHarvestRequiredList();
 		DwcaResourceModel resource;
 		for (DwcaResourceStatusModel resourceStatus : harvestRequiredList) {
 			resource = resourceStatus.getDwcaResourceModel();
@@ -83,13 +83,32 @@ public class JobInitiatorMain {
 		}
 	}
 
-	private void importDwca(String resourceIdentifier) {
+	/**
+	 * Harvest a specific resource.
+	 * 
+	 * @param resourceIdentifier
+	 */
+	private void harvest(String resourceIdentifier) {
 		DwcaResourceModel resourceModel = cliService.loadResourceModel(resourceIdentifier);
 		if (resourceModel != null) {
 			cliService.importDwca(resourceModel);
 		}
 		else {
 			System.out.println("Can not find resource identified by " + resourceIdentifier);
+		}
+	}
+
+	/**
+	 * Harvest a resource that requires to be harvested as determined by resourceStatusChecker.
+	 */
+	private void harvestRequired() {
+		List<DwcaResourceStatusModel> harvestRequiredList = resourceStatusChecker.getHarvestRequiredList();
+		if (!harvestRequiredList.isEmpty()) {
+			DwcaResourceModel resourceModel = harvestRequiredList.get(0).getDwcaResourceModel();
+			cliService.importDwca(resourceModel);
+		}
+		else {
+			System.out.println("No harvest required");
 		}
 	}
 

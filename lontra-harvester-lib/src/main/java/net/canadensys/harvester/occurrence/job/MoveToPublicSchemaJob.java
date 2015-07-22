@@ -7,6 +7,7 @@ import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
+import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 import net.canadensys.harvester.occurrence.task.ComputeGISDataTask;
 import net.canadensys.harvester.occurrence.task.PostProcessOccurrenceTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
@@ -49,6 +50,8 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 	public void doJob(JobStatusModel jobStatusModel) {
 
 		getResourceInfoTask.execute(sharedParameters);
+		jobStatusModel.setCurrentJobId(getJobId());
+		jobStatusModel.setCurrentStatus(JobStatus.RUNNING);
 
 		jobStatusModel.setCurrentStatusExplanation("Compute GIS data");
 		computeGISDataTask.execute(sharedParameters);
@@ -66,6 +69,8 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 		// log the import event
 		jobStatusModel.setCurrentStatusExplanation("Log import event");
 		recordImportTask.execute(sharedParameters);
+
+		jobStatusModel.setCurrentStatus(JobStatus.DONE);
 	}
 
 	public void setComputeGISDataTask(ComputeGISDataTask computeGISDataTask) {

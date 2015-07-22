@@ -15,7 +15,7 @@ public interface ResourceStatusCheckerIF {
 	/**
 	 * Get all resources that require a harvest.
 	 *
-	 * @return
+	 * @return list of DwcaResourceStatusModel that require harvest or empty list, never null.
 	 */
 	public List<DwcaResourceStatusModel> getHarvestRequiredList();
 

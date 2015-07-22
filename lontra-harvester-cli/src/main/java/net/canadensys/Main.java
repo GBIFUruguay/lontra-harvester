@@ -51,7 +51,11 @@ public class Main {
 				+ MIGRATE_OPTION_APPLY + "'"));
 		cmdLineOptions.addOption(new Option(RESOURCE_LIST_SHORT_OPTION, RESOURCE_LIST_OPTION, false, "List all resources"));
 		cmdLineOptions.addOption(new Option(STATUS_SHORT_OPTION, STATUS_OPTION, false, "List status of resources"));
-		cmdLineOptions.addOption(new Option(HARVEST_SHORT_OPTION, HARVEST_OPTION, true, "Harvest a resource"));
+		cmdLineOptions.addOption(Option.builder(HARVEST_SHORT_OPTION).longOpt(HARVEST_OPTION)
+				.desc("Harvest a specific resource or a resource that requires to be harvested if no <resource idenfifier> is provided")
+				.argName("resource idenfifier").hasArg()
+				.optionalArg(true)
+				.build());
 		cmdLineOptions.addOption(new Option(NO_NODES_SHORT_OPTION, NO_NODES_OPTION, false, "Harvest using no nodes"));
 	}
 
@@ -108,7 +112,7 @@ public class Main {
 					System.out.println("harvest " + optionValue + " with no nodes");
 				}
 				else {
-					JobInitiatorMain.jobMain(JobInitiatorMain.JobType.IMPORT_DWCA, optionValue);
+					JobInitiatorMain.jobMain(JobInitiatorMain.JobType.HARVEST, optionValue);
 				}
 			}
 			else {

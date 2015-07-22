@@ -3,6 +3,7 @@ package net.canadensys.harvester.occurrence.job;
 import java.util.HashMap;
 import java.util.UUID;
 
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemProgressListenerIF;
 import net.canadensys.harvester.ItemTaskIF;
@@ -71,6 +72,9 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 
 		// get information about resource
 		getResourceInfoTask.execute(sharedParameters);
+
+		DwcaResourceModel resourceModel = (DwcaResourceModel) sharedParameters.get(SharedParameterEnum.RESOURCE_MODEL);
+		jobStatusModel.setCurrentStatusExplanation("Working on resource " + resourceModel.getId() + ":" + resourceModel.getName());
 
 		// TODO move strings to properties file
 		jobStatusModel.setCurrentStatusExplanation("Preparing DwcA");

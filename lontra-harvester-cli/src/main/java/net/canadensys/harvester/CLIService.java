@@ -5,7 +5,7 @@ import java.util.List;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 
 /**
- * CLI servive layer interface.
+ * CLI service layer interface.
  * 
  * @author cgendreau
  *
@@ -19,4 +19,6 @@ public interface CLIService {
 	void importDwca(DwcaResourceModel resourceModel);
 
 	void moveToPublicSchema(DwcaResourceModel resourceModel);
+
+	void computeUniqueValueJob();
 }

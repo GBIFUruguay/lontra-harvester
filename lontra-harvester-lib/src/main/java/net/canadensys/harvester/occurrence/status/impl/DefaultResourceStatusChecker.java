@@ -107,6 +107,16 @@ public class DefaultResourceStatusChecker implements ResourceStatusCheckerIF {
 	}
 
 	/**
+	 * Nested interface to allow different strategy to determine resource status location.
+	 *
+	 * @author cgendreau
+	 *
+	 */
+	private static interface ResourceStatusLocationStrategy {
+		public String getStatusInformationLocation(DwcaResourceModel currResource);
+	}
+
+	/**
 	 * Load resource status information from a static location.
 	 * This should be used for testing purpose or if only a single IPT requires to be accessed.
 	 *
@@ -119,16 +129,6 @@ public class DefaultResourceStatusChecker implements ResourceStatusCheckerIF {
 				return resourceLocation;
 			}
 		};
-	}
-
-	/**
-	 * Nested interface to allow different strategy to determine resource status location.
-	 *
-	 * @author cgendreau
-	 *
-	 */
-	private static interface ResourceStatusLocationStrategy {
-		public String getStatusInformationLocation(DwcaResourceModel currResource);
 	}
 
 	/**
