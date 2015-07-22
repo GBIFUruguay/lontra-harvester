@@ -22,6 +22,7 @@
 		<compiler.target>1.7</compiler.target>
     
 		<spring.version>4.0.9.RELEASE</spring.version>
+		<commons-cli.version>1.3.1</commons-cli.version>
 		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
 		<junit.version>4.11</junit.version>
 	</properties>

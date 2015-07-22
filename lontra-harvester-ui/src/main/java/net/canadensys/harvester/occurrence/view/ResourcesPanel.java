@@ -26,7 +26,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
-import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 
@@ -436,22 +435,13 @@ public class ResourcesPanel extends JPanel {
 			@Override
 			public Boolean doInBackground() {
 
-				String publisherName = "";
-				// Publisher information:
-				// Avoid cases when a publisher is not associated to the
-				// resource:
-				PublisherModel publisher = resourceToImport.getPublisher();
-				if (publisher != null) {
-					publisherName = publisher.getName();
-				}
-
 				// Check if the indexing is supposed to process unique values or
 				// not:
 				if (uniqueValuesChkBox.getSelectedObjects() != null) {
-					stepController.moveToPublicSchema(resourceToImport.getId(), resourceToImport.getName(), publisherName, true);
+					stepController.moveToPublicSchema(resourceToImport.getId(), true);
 				}
 				else {
-					stepController.moveToPublicSchema(resourceToImport.getId(), resourceToImport.getName(), publisherName, false);
+					stepController.moveToPublicSchema(resourceToImport.getId(), false);
 				}
 				return true;
 			}
@@ -519,15 +509,6 @@ public class ResourcesPanel extends JPanel {
 			// Start resource edition panel
 			ResourceDialog erd = new ResourceDialog(this, stepController, resourceToEdit, true);
 			int resourceId = resourceToEdit.getId();
-			String resourceName = resourceToEdit.getName();
-			String publisherName = "";
-			// Publisher information:
-			// Avoid cases when a publisher is not associated to the
-			// resource:
-			PublisherModel publisher = resourceToEdit.getPublisher();
-			if (publisher != null) {
-				publisherName = publisher.getName();
-			}
 
 			if (erd.getExitValue() == JOptionPane.OK_OPTION) {
 				updateStatusLabel(Messages.getString("view.info.status.updating"));
@@ -539,7 +520,8 @@ public class ResourcesPanel extends JPanel {
 				else {
 					// Resource has been changed successfully, update database:
 					// Update database after move
-					stepController.updateStep(resourceId, resourceName, publisherName);
+					// C.G. disabled, see comments in refreshResource
+					stepController.refreshResource(resourceId);
 				}
 				return true;
 			}

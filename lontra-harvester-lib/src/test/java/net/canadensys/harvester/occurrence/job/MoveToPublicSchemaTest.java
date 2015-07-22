@@ -80,8 +80,6 @@ public class MoveToPublicSchemaTest {
 		JobStatusModel jobStatusModel = new JobStatusModel();
 
 		moveJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, 1);
-		moveJob.addToSharedParameters(SharedParameterEnum.RESOURCE_NAME, "resource");
-		moveJob.addToSharedParameters(SharedParameterEnum.PUBLISHER_NAME, "publisher");
 		moveJob.doJob(jobStatusModel);
 
 		String state = jdbcTemplate.queryForObject("SELECT stateprovince FROM occurrence where dwca_id='3'", String.class);

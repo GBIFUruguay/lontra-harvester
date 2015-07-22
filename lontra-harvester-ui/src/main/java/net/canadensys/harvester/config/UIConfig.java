@@ -40,7 +40,6 @@ import net.canadensys.harvester.occurrence.dao.impl.RSSIPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
-import net.canadensys.harvester.occurrence.job.UpdateJob;
 import net.canadensys.harvester.occurrence.mapper.OccurrenceExtensionMapper;
 import net.canadensys.harvester.occurrence.processor.DwcaExtensionLineProcessor;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
@@ -257,11 +256,6 @@ public class UIConfig {
 	@Bean
 	public ComputeUniqueValueJob computeUniqueValueJob() {
 		return new ComputeUniqueValueJob();
-	}
-
-	@Bean
-	public UpdateJob updateJob() {
-		return new UpdateJob();
 	}
 
 	// ---STEP---

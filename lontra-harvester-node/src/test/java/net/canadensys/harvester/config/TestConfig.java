@@ -23,7 +23,6 @@ import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
-import net.canadensys.harvester.occurrence.job.UpdateJob;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
 import net.canadensys.harvester.occurrence.processor.ResourceMetadataProcessor;
@@ -177,11 +176,6 @@ public class TestConfig {
 	}
 
 	@Bean
-	public UpdateJob updateJob() {
-		return new UpdateJob();
-	}
-
-	@Bean
 	public ImportLogDAO importLogDAO() {
 		return null;
 	}
@@ -202,7 +196,7 @@ public class TestConfig {
 	/**
 	 * Always return a new instance. We do not want to share JMS Writer
 	 * instance.
-	 * 
+	 *
 	 * @return
 	 */
 	@Bean

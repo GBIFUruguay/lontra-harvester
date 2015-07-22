@@ -33,7 +33,7 @@ public class GetResourceInfoTask implements ItemTaskIF {
 
 	/**
 	 * @param sharedParameters
-	 *            in:RESOURCE_ID, out:DWCA_URL,RESOURCE_MODEL
+	 *            in:RESOURCE_ID, out:DWCA_URL,RESOURCE_MODEL, PUBLISHER_NAME(optional)
 	 */
 	@Transactional(value = "publicTransactionManager", readOnly = true)
 	@Override
@@ -51,6 +51,10 @@ public class GetResourceInfoTask implements ItemTaskIF {
 
 		if (resourceModel == null) {
 			throw new TaskExecutionException("ResourceID " + resourceId + " not found");
+		}
+
+		if (resourceModel.getPublisher() != null) {
+			sharedParameters.put(SharedParameterEnum.PUBLISHER_NAME, resourceModel.getName());
 		}
 
 		sharedParameters.put(SharedParameterEnum.DWCA_URL, resourceModel.getArchive_url());

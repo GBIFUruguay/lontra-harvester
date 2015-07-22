@@ -130,9 +130,8 @@ public class DefaultCLIService implements CLIService {
 	private void onJobCompleted(String jobId, JobStatus jobStatus) {
 
 		if (jobId.equals(importDwcaJob.getJobId()) && JobStatus.DONE.equals(jobStatus)) {
-			System.out.println("Import Job done");
-			Integer resourceId = (Integer) importDwcaJob.getFromSharedParameters(SharedParameterEnum.RESOURCE_ID);
-			System.out.println("TODO: Move resourceId " + resourceId + " to public schema");
+			DwcaResourceModel dwcaResourceModel = (DwcaResourceModel) importDwcaJob.getFromSharedParameters(SharedParameterEnum.RESOURCE_MODEL);
+			moveToPublicSchema(dwcaResourceModel);
 		}
 		else {
 			System.out.println("Job " + jobId + " completed with status " + jobStatus);

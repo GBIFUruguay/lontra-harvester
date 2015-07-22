@@ -19,7 +19,7 @@ public interface StepControllerIF {
 
 	/**
 	 * Get list of DwcaResourceStatusModel that require to be harvested.
-	 * 
+	 *
 	 * @return
 	 */
 	public List<DwcaResourceStatusModel> getResourceToHarvest();
@@ -37,7 +37,7 @@ public interface StepControllerIF {
 	 */
 	public void importDwcAFromLocalFile(String dwcaPath);
 
-	public void moveToPublicSchema(Integer resourceID, String resourceName, String publisherName, boolean computeUniqueValues);
+	public void moveToPublicSchema(Integer resourceID, boolean computeUniqueValues);
 
 	public void onNodeError();
 
@@ -59,5 +59,6 @@ public interface StepControllerIF {
 
 	public void computeUniqueValues(JobStatusModel jobStatusModel);
 
-	public void updateStep(int resourceId, String resourceName, String publisherName);
+	public void refreshResource(int resourceId);
+
 }

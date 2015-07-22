@@ -40,7 +40,6 @@ import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
-import net.canadensys.harvester.occurrence.job.UpdateJob;
 import net.canadensys.harvester.occurrence.mapper.OccurrenceExtensionMapper;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
@@ -315,11 +314,6 @@ public class TestConfig {
 	@Bean
 	public ImportDwcaJob importDwcaJob() {
 		return new ImportDwcaJob();
-	}
-
-	@Bean
-	public UpdateJob updateJob() {
-		return new UpdateJob();
 	}
 
 	// ---TASK wiring---

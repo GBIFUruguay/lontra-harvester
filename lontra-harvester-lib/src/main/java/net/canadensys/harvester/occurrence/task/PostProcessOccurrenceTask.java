@@ -3,6 +3,7 @@ package net.canadensys.harvester.occurrence.task;
 import java.math.BigInteger;
 import java.util.Map;
 
+import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceFieldConstants;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.exception.TaskExecutionException;
@@ -37,13 +38,12 @@ public class PostProcessOccurrenceTask implements ItemTaskIF {
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters)
 			throws TaskExecutionException {
-		String resourceName = (String) sharedParameters.get(SharedParameterEnum.RESOURCE_NAME);
 		String publisherName = (String) sharedParameters.get(SharedParameterEnum.PUBLISHER_NAME);
 		Integer resourceId = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
-		// String gbifPackageId = (String) sharedParameters.get(SharedParameterEnum.GBIF_PACKAGE_ID);
+		DwcaResourceModel resourceModel = (DwcaResourceModel) sharedParameters.get(SharedParameterEnum.RESOURCE_MODEL);
 
-		if (resourceName == null || resourceId == null) {
-			LOGGER.fatal("Misconfigured task : resourceName and resourceId are required.");
+		if (resourceModel == null || resourceId == null) {
+			LOGGER.fatal("Misconfigured task : resourceModel and resourceId are required.");
 			throw new TaskExecutionException("Misconfigured PostProcessOccurrenceTask");
 		}
 
@@ -54,7 +54,7 @@ public class PostProcessOccurrenceTask implements ItemTaskIF {
 			SQLQuery query = session.createSQLQuery("update buffer.occurrence set resourcename = ? where " + OccurrenceFieldConstants.RESOURCE_ID
 					+ " = ?;");
 
-			query.setString(0, resourceName);
+			query.setString(0, resourceModel.getName());
 			query.setInteger(1, resourceId);
 			query.executeUpdate();
 

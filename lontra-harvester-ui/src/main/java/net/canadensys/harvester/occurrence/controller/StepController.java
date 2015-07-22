@@ -18,7 +18,6 @@ import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
-import net.canadensys.harvester.occurrence.job.UpdateJob;
 import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
@@ -74,9 +73,6 @@ public class StepController implements StepControllerIF {
 	private MoveToPublicSchemaJob moveToPublicSchemaJob;
 
 	@Autowired
-	private UpdateJob updateJob;
-
-	@Autowired
 	private ComputeUniqueValueJob computeUniqueValueJob;
 
 	@Autowired
@@ -125,10 +121,8 @@ public class StepController implements StepControllerIF {
 	}
 
 	@Override
-	public void moveToPublicSchema(Integer resourceID, String resourceName, String publisherName, boolean computeUniqueValues) {
+	public void moveToPublicSchema(Integer resourceID, boolean computeUniqueValues) {
 		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceID);
-		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_NAME, resourceName);
-		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.PUBLISHER_NAME, publisherName);
 		JobStatusModel jobStatusModel = new JobStatusModel();
 		harvesterViewModel.encapsulateJobStatus(jobStatusModel);
 		moveToPublicSchemaJob.doJob(jobStatusModel);
@@ -139,18 +133,18 @@ public class StepController implements StepControllerIF {
 	}
 
 	/**
+	 * C.G. This does nothing for now since the old code was working on buffer schema.
+	 * Refreshing on buffer schema will not work unless we reharvest and reharvesting will update
+	 * the resource data in occurrence tables.
 	 * Updates database after resource change.
 	 */
 	@Override
-	@Transactional("bufferTransactionManager")
-	public void updateStep(int resourceId, String resourceName, String publisherName) {
-		updateJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceId);
-		updateJob.addToSharedParameters(SharedParameterEnum.RESOURCE_NAME, resourceName);
-		updateJob.addToSharedParameters(SharedParameterEnum.PUBLISHER_NAME, publisherName);
-		JobStatusModel jobStatusModel = new JobStatusModel();
-		harvesterViewModel.encapsulateJobStatus(jobStatusModel);
-		updateJob.doJob(jobStatusModel);
-		currentJob = updateJob;
+	public void refreshResource(int resourceId) {
+		// updateJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceId);
+		// JobStatusModel jobStatusModel = new JobStatusModel();
+		// harvesterViewModel.encapsulateJobStatus(jobStatusModel);
+		// updateJob.doJob(jobStatusModel);
+		// currentJob = updateJob;
 	}
 
 	@Override
