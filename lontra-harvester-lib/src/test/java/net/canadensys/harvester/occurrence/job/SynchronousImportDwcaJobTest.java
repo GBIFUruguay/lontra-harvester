@@ -7,10 +7,12 @@ import java.math.BigDecimal;
 
 import javax.sql.DataSource;
 
+import net.canadensys.harvester.LongRunningTaskIF;
 import net.canadensys.harvester.StepIF;
 import net.canadensys.harvester.TestDataHelper;
 import net.canadensys.harvester.config.ProcessingConfigTest;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
+import net.canadensys.harvester.occurrence.mock.MockCheckHarvestingCompletenessTask;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 import net.canadensys.harvester.occurrence.step.SynchronousProcessEmlContentStep;
@@ -89,6 +91,12 @@ public class SynchronousImportDwcaJobTest {
 		@Bean(name = "streamEmlContentStep")
 		public StepIF streamEmlContentStep() {
 			return new SynchronousProcessEmlContentStep();
+		}
+
+		@Override
+		@Bean
+		public LongRunningTaskIF checkProcessingCompletenessTask() {
+			return new MockCheckHarvestingCompletenessTask();
 		}
 	}
 

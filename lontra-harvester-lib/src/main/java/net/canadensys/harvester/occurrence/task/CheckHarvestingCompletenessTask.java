@@ -119,28 +119,31 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 		this.sessionFactory = sessionFactory;
 	}
 
-	private void notifyListeners(String context,int current,int total){
+	protected void notifyListeners(String context, int current, int total) {
 		if(itemListenerList != null){
 			for(ItemProgressListenerIF currListener : itemListenerList){
 				currListener.onProgress(context,current, total);
 			}
 		}
 	}
-	private void notifyListenersOnSuccess(){
+
+	protected void notifyListenersOnSuccess() {
 		if(itemListenerList != null){
 			for(ItemProgressListenerIF currListener : itemListenerList){
 				currListener.onSuccess(targetedTable);
 			}
 		}
 	}
-	private void notifyListenersOnCancel(){
+
+	protected void notifyListenersOnCancel() {
 		if(itemListenerList != null){
 			for(ItemProgressListenerIF currListener : itemListenerList){
 				currListener.onCancel(targetedTable);
 			}
 		}
 	}
-	private void notifyListenersOnFailure(Throwable t){
+
+	protected void notifyListenersOnFailure(Throwable t) {
 		if(itemListenerList != null){
 			for(ItemProgressListenerIF currListener : itemListenerList){
 				currListener.onError(targetedTable,t);
