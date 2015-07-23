@@ -21,7 +21,7 @@ public class MigrationMain {
 	private LontraMigrator lontraMigrator;
 
 	public enum Mode {
-		DRYRUN, APPLY, CREATE
+		DRYRUN, CREATE, MIGRATE
 	}
 
 	/**
@@ -41,7 +41,10 @@ public class MigrationMain {
 			case DRYRUN:
 				mm.displayChangeSets();
 				break;
-			case APPLY:
+			case CREATE:
+				mm.create();
+				break;
+			case MIGRATE:
 				mm.migrate();
 				break;
 			default:
@@ -49,6 +52,10 @@ public class MigrationMain {
 				break;
 		}
 
+	}
+
+	public void create() {
+		lontraMigrator.create();
 	}
 
 	public void migrate() {

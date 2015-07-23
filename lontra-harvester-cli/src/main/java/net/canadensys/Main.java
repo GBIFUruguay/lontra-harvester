@@ -35,20 +35,21 @@ public class Main {
 
 	private static final String HARVEST_SHORT_OPTION = "h";
 	private static final String HARVEST_OPTION = "harvest";
-	private static final String NO_NODES_SHORT_OPTION = "N";
-	private static final String NO_NODES_OPTION = "nonodes";
+	private static final String NO_MQ_SHORT_OPTION = "N";
+	private static final String NO_MQ_OPTION = "nomq";
 
 	// migration related options
 	private static final String MIGRATE_SHORT_OPTION = "m";
 	private static final String MIGRATE_OPTION = "migrate";
 	private static final String MIGRATE_OPTION_DRYRUN = "dryrun";
 	private static final String MIGRATE_OPTION_APPLY = "apply";
+	private static final String MIGRATE_OPTION_CREATE = "create";
 
 	static {
 		cmdLineOptions = new Options();
 		cmdLineOptions.addOption(new Option(CONFIG_SHORT_OPTION, CONFIG_OPTION, false, "Location of configuration file"));
-		cmdLineOptions.addOption(new Option(MIGRATE_SHORT_OPTION, MIGRATE_OPTION, true, "Migrate database '" + MIGRATE_OPTION_DRYRUN + "' or '"
-				+ MIGRATE_OPTION_APPLY + "'"));
+		cmdLineOptions.addOption(new Option(MIGRATE_SHORT_OPTION, MIGRATE_OPTION, true, "Migrate database '" + MIGRATE_OPTION_DRYRUN + "', '"
+				+ MIGRATE_OPTION_APPLY + "' or '" + MIGRATE_OPTION_CREATE + "'"));
 		cmdLineOptions.addOption(new Option(RESOURCE_LIST_SHORT_OPTION, RESOURCE_LIST_OPTION, false, "List all resources"));
 		cmdLineOptions.addOption(new Option(STATUS_SHORT_OPTION, STATUS_OPTION, false, "List status of resources"));
 		cmdLineOptions.addOption(Option.builder(HARVEST_SHORT_OPTION).longOpt(HARVEST_OPTION)
@@ -56,7 +57,7 @@ public class Main {
 				.argName("resource idenfifier").hasArg()
 				.optionalArg(true)
 				.build());
-		cmdLineOptions.addOption(new Option(NO_NODES_SHORT_OPTION, NO_NODES_OPTION, false, "Harvest using no nodes"));
+		cmdLineOptions.addOption(new Option(NO_MQ_SHORT_OPTION, NO_MQ_OPTION, false, "Harvest without using a Message Queue"));
 	}
 
 	/**
@@ -84,13 +85,16 @@ public class Main {
 				if (MIGRATE_OPTION_DRYRUN.equalsIgnoreCase(optionValue)) {
 					MigrationMain.main(Mode.DRYRUN, configOptionValue);
 				}
+				else if (MIGRATE_OPTION_CREATE.equalsIgnoreCase(optionValue)) {
+					MigrationMain.main(Mode.CREATE, configOptionValue);
+				}
 				else if (MIGRATE_OPTION_APPLY.equalsIgnoreCase(optionValue)) {
 					Scanner sc = new Scanner(System.in);
 					// ask confirmation
 					System.out.println("Are you sure you want to apply database migration? (yes/no)");
 
 					if ("yes".equalsIgnoreCase(sc.nextLine())) {
-						MigrationMain.main(Mode.APPLY, configOptionValue);
+						MigrationMain.main(Mode.MIGRATE, configOptionValue);
 					}
 					sc.close();
 				}
@@ -106,9 +110,9 @@ public class Main {
 			}
 			else if (cmdLine.hasOption(HARVEST_OPTION)) {
 				String optionValue = cmdLine.getOptionValue(HARVEST_OPTION);
-				boolean noNodes = cmdLine.hasOption(NO_NODES_OPTION);
+				boolean noMQ = cmdLine.hasOption(NO_MQ_OPTION);
 
-				if (noNodes) {
+				if (noMQ) {
 					System.out.println("harvest " + optionValue + " with no nodes");
 				}
 				else {

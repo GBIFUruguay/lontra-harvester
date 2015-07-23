@@ -81,7 +81,7 @@ public class DefaultResourceStatusChecker implements ResourceStatusCheckerIF {
 			if (StringUtils.isNotBlank(currResource.getGbif_package_id())) {
 				for (IPTFeedModel currFeed : feedEntryList) {
 					if (currResource.getGbif_package_id().equalsIgnoreCase(currFeed.extractGbifPackageId())) {
-						lastImportLog = importLogDAO.loadLastFrom(currResource.getSourcefileid());
+						lastImportLog = importLogDAO.loadLastFromPackageId(currResource.getGbif_package_id());
 						DwcaResourceStatusModel dwcaResourceStatusModel = new DwcaResourceStatusModel(currResource);
 						dwcaResourceStatusModel.setLastPublishedDate(currFeed.getPublishedDate());
 

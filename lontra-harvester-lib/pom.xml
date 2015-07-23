@@ -18,7 +18,7 @@
 		<jsch.version>0.1.51</jsch.version>
 		<activemq.version>5.10.0</activemq.version>
 		<narwhal.version>1.5.3</narwhal.version>
-		<data-access.version>2.14.0</data-access.version>
+		<data-access.version>2.15.0</data-access.version>
 		<shared-dictionaries.version>0.2</shared-dictionaries.version>
 		<commons-validator.version>1.4.1</commons-validator.version>
 

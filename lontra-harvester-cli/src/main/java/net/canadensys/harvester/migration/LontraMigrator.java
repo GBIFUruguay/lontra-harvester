@@ -23,6 +23,26 @@ public class LontraMigrator {
 	@Autowired
 	private CLIMigrationConfig config;
 
+	/**
+	 * Create the database schema from Liquibase and start using Liquibase to track changes.
+	 * 
+	 * @return database schema created or not
+	 */
+	public boolean create() {
+		try {
+			if (LiquibaseHelper.hasLiquibaseAlreadyRun(config.dataSource().getConnection())) {
+				System.out.println("Liquibase has already run on this database. Use 'apply' option.");
+				return false;
+			}
+			LiquibaseHelper.migrate(config.dataSource().getConnection());
+		}
+		catch (LiquibaseException | SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
 	public void migrate() {
 		try {
 			LiquibaseHelper.migrate(config.dataSource().getConnection());
