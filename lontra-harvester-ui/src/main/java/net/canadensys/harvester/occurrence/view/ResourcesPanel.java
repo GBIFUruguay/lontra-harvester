@@ -317,6 +317,18 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 		}
 	}
 
+	private void onMoveStarted() {
+		// use invokeLater since this method could be called from the outside
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				moveToPublicBtn.setEnabled(false);
+				updateStatusLabel(Messages.getString("view.info.status.moving"));
+				statusLbl.setIcon(loadingImg);
+			}
+		});
+	}
+
 	private void onMoveDone(JobStatus status) {
 		statusLbl.setIcon(null);
 		if (JobStatus.DONE == status) {
@@ -429,9 +441,8 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 	 * SwingWorker.
 	 */
 	private void onMoveToPublic() {
-		moveToPublicBtn.setEnabled(false);
-		updateStatusLabel(Messages.getString("view.info.status.moving"));
-		statusLbl.setIcon(loadingImg);
+		onMoveStarted();
+
 		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
 			@Override
 			public Boolean doInBackground() {
@@ -610,10 +621,10 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 			JobStatus jobStatus = (JobStatus) evt.getNewValue();
 			appendConsoleText("STATUS:" + jobStatus + END_LINE);
 
-			if (jobStatus.isJobCompleted()) {
-				JobStatusModel jsm = (JobStatusModel) evt.getSource();
-				JobType jobType = stepController.getJobType(jsm.getCurrentJobId());
+			JobStatusModel jsm = (JobStatusModel) evt.getSource();
+			JobType jobType = stepController.getJobType(jsm.getCurrentJobId());
 
+			if (jobStatus.isJobCompleted()) {
 				switch (jobType) {
 					case IMPORT_DWC:
 						onImportDwcDone(jobStatus);
@@ -628,6 +639,10 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 						break;
 				}
 			}
+			else if (JobStatus.RUNNING == jobStatus && JobType.MOVE_TO_PUBLIC == jobType) {
+				onMoveStarted();
+			}
+			// TODO handle import started the same way
 		}
 	}
 

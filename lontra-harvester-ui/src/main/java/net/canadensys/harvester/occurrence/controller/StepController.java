@@ -245,23 +245,26 @@ public class StepController implements StepControllerIF {
 	 */
 	private void onJobCompleted(String jobId, JobStatus jobStatus) {
 
-		JobType jobType = getJobType(jobId);
-		switch (jobType) {
-			case IMPORT_DWC:
-				DwcaResourceModel dwcaResourceModel = (DwcaResourceModel) importDwcaJob.getFromSharedParameters(SharedParameterEnum.RESOURCE_MODEL);
-				if (moveToPublicSchema) {
-					moveToPublicSchema(dwcaResourceModel.getId(), computeUniqueValues);
-					moveToPublicSchema = false;
-				}
-				break;
-			case MOVE_TO_PUBLIC:
-				if (computeUniqueValues) {
-					computeUniqueValues();
-					computeUniqueValues = false;
-				}
-				break;
-			default:
-				break;
+		if (JobStatus.DONE == jobStatus) {
+			JobType jobType = getJobType(jobId);
+			switch (jobType) {
+				case IMPORT_DWC:
+					DwcaResourceModel dwcaResourceModel = (DwcaResourceModel) importDwcaJob
+							.getFromSharedParameters(SharedParameterEnum.RESOURCE_MODEL);
+					if (moveToPublicSchema) {
+						moveToPublicSchema(dwcaResourceModel.getId(), computeUniqueValues);
+						moveToPublicSchema = false;
+					}
+					break;
+				case MOVE_TO_PUBLIC:
+					if (computeUniqueValues) {
+						computeUniqueValues();
+						computeUniqueValues = false;
+					}
+					break;
+				default:
+					break;
+			}
 		}
 	}
 
