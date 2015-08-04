@@ -6,10 +6,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -27,7 +28,10 @@ import javax.swing.SwingWorker;
 
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
+import net.canadensys.harvester.occurrence.controller.StepControllerIF.JobType;
+import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
+import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 
 /**
  * Resources panel for tabbed pane
@@ -35,9 +39,10 @@ import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
  * @author Canadensys, Pedro Guimarães
  *
  */
-public class ResourcesPanel extends JPanel {
+public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 
 	private static final long serialVersionUID = 1093812890375L;
+	private final String END_LINE = System.getProperty("line.separator");
 
 	private DwcaResourceModel resourceToImport = null;
 	private ImageIcon loadingImg = null;
@@ -58,8 +63,11 @@ public class ResourcesPanel extends JPanel {
 
 	private List<DwcaResourceModel> knownResources;
 
-	public ResourcesPanel(StepControllerIF stepController) {
+	public ResourcesPanel(StepControllerIF stepController, HarvesterViewModel harvesterViewModel) {
 		this.stepController = stepController;
+		// register to receive all updates to the model
+		harvesterViewModel.addPropertyChangeListener(this);
+
 		knownResources = stepController.getResourceModelList();
 
 		this.setLayout(new GridBagLayout());
@@ -70,7 +78,6 @@ public class ResourcesPanel extends JPanel {
 		// Vertical alignment reference index:
 		int lineIdx = 0;
 		GridBagConstraints c = new GridBagConstraints();
-		;
 
 		// Resource label:
 		c.insets = new Insets(5, 5, 5, 5);
@@ -284,49 +291,14 @@ public class ResourcesPanel extends JPanel {
 		});
 	}
 
-	public void onMoveDone(JobStatus status) {
-		statusLbl.setIcon(null);
-		if (JobStatus.DONE == status) {
-			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.moveCompleted"), Messages.getString("view.info.status.info"),
-					JOptionPane.INFORMATION_MESSAGE);
-			bufferSchemaTxt.setText("");
-			statusLbl.setText(Messages.getString("view.info.status.moveDone"));
-			statusLbl.setForeground(Color.BLUE);
-		}
-		else {
-			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.error.details"), Messages.getString("view.info.status.error"),
-					JOptionPane.ERROR_MESSAGE);
-			statusLbl.setText(Messages.getString("view.info.status.error.moveError"));
-		}
-	}
-
-	public void onUpdateDone(JobStatus status) {
-		statusLbl.setIcon(null);
-		if (JobStatus.DONE == status) {
-			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.updateDone"), Messages.getString("view.info.status.info"),
-					JOptionPane.INFORMATION_MESSAGE);
-			bufferSchemaTxt.setText("");
-			statusLbl.setText(Messages.getString("view.info.status.updateDone"));
-			statusLbl.setForeground(Color.BLUE);
-		}
-		else {
-			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.error.details"), Messages.getString("view.info.status.error"),
-					JOptionPane.ERROR_MESSAGE);
-			statusLbl.setText(Messages.getString("view.info.status.error.updateError"));
-		}
-	}
-
-	public void onJobStatusChanged(JobStatus newStatus) {
-		switch (newStatus) {
+	private void onImportDwcDone(JobStatus status) {
+		switch (status) {
 			case DONE:
 				statusLbl.setIcon(null);
 				bufferSchemaTxt.setText(resourceToImport.getSourcefileid());
 				updateStatusLabel(Messages.getString("view.info.status.importDone"));
 				// If auto move is set, start move:
-				if (moveChkBox.getSelectedObjects() != null) {
-					onMoveToPublic();
-				}
-				else {
+				if (moveChkBox.getSelectedObjects() == null) {
 					moveToPublicBtn.setEnabled(true);
 				}
 				break;
@@ -342,6 +314,38 @@ public class ResourcesPanel extends JPanel {
 				break;
 			default:
 				break;
+		}
+	}
+
+	private void onMoveDone(JobStatus status) {
+		statusLbl.setIcon(null);
+		if (JobStatus.DONE == status) {
+			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.moveCompleted"), Messages.getString("view.info.status.info"),
+					JOptionPane.INFORMATION_MESSAGE);
+			bufferSchemaTxt.setText("");
+			statusLbl.setText(Messages.getString("view.info.status.moveDone"));
+			statusLbl.setForeground(Color.BLUE);
+		}
+		else {
+			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.error.details"), Messages.getString("view.info.status.error"),
+					JOptionPane.ERROR_MESSAGE);
+			statusLbl.setText(Messages.getString("view.info.status.error.moveError"));
+		}
+	}
+
+	private void onUpdateDone(JobStatus status) {
+		statusLbl.setIcon(null);
+		if (JobStatus.DONE == status) {
+			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.updateDone"), Messages.getString("view.info.status.info"),
+					JOptionPane.INFORMATION_MESSAGE);
+			bufferSchemaTxt.setText("");
+			statusLbl.setText(Messages.getString("view.info.status.updateDone"));
+			statusLbl.setForeground(Color.BLUE);
+		}
+		else {
+			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.error.details"), Messages.getString("view.info.status.error"),
+					JOptionPane.ERROR_MESSAGE);
+			statusLbl.setText(Messages.getString("view.info.status.error.updateError"));
 		}
 	}
 
@@ -399,10 +403,7 @@ public class ResourcesPanel extends JPanel {
 					public Void doInBackground() {
 						try {
 							if (resourceToImport != null) {
-								stepController.importDwcA(resourceToImport.getId());
-							}
-							else {
-								stepController.importDwcAFromLocalFile((String) (resourcesCmbBox.getSelectedItem()));
+								stepController.importDwcA(resourceToImport.getId(), moveChkBox.isSelected(), uniqueValuesChkBox.isSelected());
 							}
 						}
 						catch (Exception e) {
@@ -448,20 +449,6 @@ public class ResourcesPanel extends JPanel {
 
 			@Override
 			protected void done() {
-				try {
-					if (get()) {
-						onMoveDone(JobStatus.DONE);
-					}
-					else {
-						onMoveDone(JobStatus.ERROR);
-					}
-				}
-				catch (InterruptedException e) {
-					onMoveDone(JobStatus.ERROR);
-				}
-				catch (ExecutionException e) {
-					onMoveDone(JobStatus.ERROR);
-				}
 			}
 		};
 		swingWorker.execute();
@@ -568,7 +555,7 @@ public class ResourcesPanel extends JPanel {
 				statusLbl.setForeground(Color.ORANGE);
 				updateStatusLabel(Messages.getString("view.info.status.compute.unique.values"));
 				// Call compute unique values task:
-				stepController.computeUniqueValues(null);
+				stepController.computeUniqueValues();
 				return true;
 			}
 
@@ -599,4 +586,49 @@ public class ResourcesPanel extends JPanel {
 			resourcesCmbBox.addItem(name);
 		}
 	}
+
+	private void updateProgressText(final String text) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				updateStatusLabel(text);
+			}
+		});
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		if (JobStatusModel.CURRENT_STATUS_EXPLANATION_PROPERTY.equals(evt
+				.getPropertyName())) {
+			appendConsoleText(">" + (String) evt.getNewValue() + END_LINE);
+		}
+		else if (JobStatusModel.CURRENT_JOB_PROGRESS_PROPERTY.equals(evt
+				.getPropertyName())) {
+			updateProgressText((String) evt.getNewValue());
+		}
+		else if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt.getPropertyName())) {
+			JobStatus jobStatus = (JobStatus) evt.getNewValue();
+			appendConsoleText("STATUS:" + jobStatus + END_LINE);
+
+			if (jobStatus.isJobCompleted()) {
+				JobStatusModel jsm = (JobStatusModel) evt.getSource();
+				JobType jobType = stepController.getJobType(jsm.getCurrentJobId());
+
+				switch (jobType) {
+					case IMPORT_DWC:
+						onImportDwcDone(jobStatus);
+						break;
+					case MOVE_TO_PUBLIC:
+						onMoveDone(jobStatus);
+						break;
+					case COMPUTE_UNIQUE:
+						break;
+
+					default:
+						break;
+				}
+			}
+		}
+	}
+
 }

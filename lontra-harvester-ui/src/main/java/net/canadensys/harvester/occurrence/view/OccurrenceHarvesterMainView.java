@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -16,14 +14,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
 
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
-import net.canadensys.harvester.occurrence.model.JobStatusModel;
-import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +30,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author canadensys
  *
  */
-public class OccurrenceHarvesterMainView implements PropertyChangeListener {
+public class OccurrenceHarvesterMainView {
 
-	private final String END_LINE = System.getProperty("line.separator");
 	private JFrame harvesterFrame = null;
 	private JTabbedPane tabbedPane = null;
 	private JPanel mainPanel = null;
@@ -54,7 +48,7 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 	public void initView() {
 
 		// Initialize the resources panel:
-		resourcesPanel = new ResourcesPanel(stepController);
+		resourcesPanel = new ResourcesPanel(stepController, harvesterViewModel);
 
 		// Initialize the publishers panel:
 		publishersPanel = new PublishersPanel(stepController);
@@ -104,9 +98,6 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 		redirectSystemStreams();
 
-		// register to receive all updates to the model
-		harvesterViewModel.addPropertyChangeListener(this);
-
 		checkForOutdatedResources();
 	}
 
@@ -147,15 +138,6 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 		System.setErr(new PrintStream(out, true));
 	}
 
-	public void updateProgressText(final String text) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				resourcesPanel.updateStatusLabel(text);
-			}
-		});
-	}
-
 	/**
 	 * Returns a initialized panel with import log information
 	 *
@@ -187,21 +169,5 @@ public class OccurrenceHarvesterMainView implements PropertyChangeListener {
 
 		List<IPTFeedModel> importLogModelList = stepController.getIPTFeed();
 		return new RSSFeedPanel(headers, importLogModelList);
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if (JobStatusModel.CURRENT_STATUS_EXPLANATION_PROPERTY.equals(evt
-				.getPropertyName())) {
-			resourcesPanel.appendConsoleText(">" + (String) evt.getNewValue() + END_LINE);
-		}
-		else if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt.getPropertyName())) {
-			resourcesPanel.appendConsoleText("STATUS:" + evt.getNewValue() + END_LINE);
-			resourcesPanel.onJobStatusChanged((JobStatus) evt.getNewValue());
-		}
-		else if (JobStatusModel.CURRENT_JOB_PROGRESS_PROPERTY.equals(evt
-				.getPropertyName())) {
-			updateProgressText((String) evt.getNewValue());
-		}
 	}
 }

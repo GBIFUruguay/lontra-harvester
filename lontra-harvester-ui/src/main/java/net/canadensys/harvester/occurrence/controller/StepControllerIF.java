@@ -7,9 +7,12 @@ import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
-import net.canadensys.harvester.occurrence.model.JobStatusModel;
 
 public interface StepControllerIF {
+
+	public enum JobType {
+		IMPORT_DWC, MOVE_TO_PUBLIC, COMPUTE_UNIQUE;
+	};
 
 	public List<IPTFeedModel> getIPTFeed();
 
@@ -26,18 +29,20 @@ public interface StepControllerIF {
 
 	public List<ImportLogModel> getSortedImportLogModelList();
 
-	public void importDwcA(Integer resourceId);
-
 	/**
-	 * This function should be used very carefully since the 'sourcefileid' will be determined from
-	 * the file name. This could lead to unwanted behavior if 2 different resource have the same name.
-	 * Using importDwcA(Integer resourceId) is always preferable.
+	 * Import the specified resource into the buffer schema.
 	 *
-	 * @param dwcaPath
+	 * @param resourceId
+	 * @param moveToPublicSchema
+	 *            should we automatically 'moveToPublicSchema'
+	 * @param computeUniqueValues
+	 *            should we automatically 'computeUniqueValues'
 	 */
-	public void importDwcAFromLocalFile(String dwcaPath);
+	public void importDwcA(Integer resourceId, boolean moveToPublicSchema, boolean computeUniqueValues);
 
 	public void moveToPublicSchema(Integer resourceID, boolean computeUniqueValues);
+
+	public void computeUniqueValues();
 
 	public void onNodeError();
 
@@ -57,8 +62,14 @@ public interface StepControllerIF {
 	 */
 	public boolean updatePublisherModel(PublisherModel publisherModel);
 
-	public void computeUniqueValues(JobStatusModel jobStatusModel);
-
 	public void refreshResource(int resourceId);
+
+	/**
+	 * Get JobType from a jobId.
+	 *
+	 * @param jobId
+	 * @return the JobType or null if the jobId is unknown.
+	 */
+	public JobType getJobType(String jobId);
 
 }

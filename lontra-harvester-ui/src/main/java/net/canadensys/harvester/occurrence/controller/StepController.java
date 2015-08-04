@@ -1,5 +1,7 @@
 package net.canadensys.harvester.occurrence.controller;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -21,6 +23,7 @@ import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
+import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 import net.canadensys.harvester.occurrence.status.ResourceStatusCheckerIF;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 
@@ -69,6 +72,11 @@ public class StepController implements StepControllerIF {
 	@Autowired
 	private ResourceStatusCheckerIF resourceStatusChecker;
 
+	// Do not use @Autowired, the object is created dynamically
+	private ImportDwcaJob importDwcaJob;
+	private boolean moveToPublicSchema;
+	private boolean computeUniqueValues;
+
 	@Autowired
 	private MoveToPublicSchemaJob moveToPublicSchemaJob;
 
@@ -77,6 +85,7 @@ public class StepController implements StepControllerIF {
 
 	@Autowired
 	private HarvesterViewModel harvesterViewModel;
+	private final JobStatusModel jobStatusModel;
 
 	@Autowired
 	private JMSControlProducer controlMessageProducer;
@@ -87,49 +96,43 @@ public class StepController implements StepControllerIF {
 	private AbstractProcessingJob currentJob;
 
 	public StepController() {
+		// we always use the same JobStatusModel object and we should be the only listener on it
+		jobStatusModel = new JobStatusModel();
+		jobStatusModel.addPropertyChangeListener(new JobStatusModelListener());
 	}
 
 	@Override
-	public void importDwcA(Integer resourceId) {
+	public void importDwcA(Integer resourceId, boolean moveToPublicSchema, boolean computeUniqueValues) {
+		this.moveToPublicSchema = moveToPublicSchema;
+		this.computeUniqueValues = computeUniqueValues;
+
 		controlMessageProducer.open();
-		// send the app verion
+		// send the app version
 		controlMessageProducer.publish(new VersionControlMessage(currentVersion));
 		controlMessageProducer.close();
 
-		ImportDwcaJob importDwcaJob = (ImportDwcaJob) appContext.getBean(IMPORT_DWCA_JOB_BEAN);
+		importDwcaJob = (ImportDwcaJob) appContext.getBean(IMPORT_DWCA_JOB_BEAN);
 		// enable node status controller
 		nodeStatusController.start();
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceId);
 		currentJob = importDwcaJob;
 
-		JobStatusModel jobStatusModel = new JobStatusModel();
-		harvesterViewModel.encapsulateJobStatus(jobStatusModel);
-		importDwcaJob.doJob(jobStatusModel);
-	}
-
-	@Override
-	public void importDwcAFromLocalFile(String dwcaFilePath) {
-		ImportDwcaJob importDwcaJob = (ImportDwcaJob) appContext.getBean(IMPORT_DWCA_JOB_BEAN);
-		// enable node status controller
-		nodeStatusController.start();
-		importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, dwcaFilePath);
-		currentJob = importDwcaJob;
-
-		JobStatusModel jobStatusModel = new JobStatusModel();
-		harvesterViewModel.encapsulateJobStatus(jobStatusModel);
+		// harvesterViewModel.encapsulateJobStatus(jobStatusModel);
 		importDwcaJob.doJob(jobStatusModel);
 	}
 
 	@Override
 	public void moveToPublicSchema(Integer resourceID, boolean computeUniqueValues) {
+		this.computeUniqueValues = computeUniqueValues;
 		moveToPublicSchemaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceID);
-		JobStatusModel jobStatusModel = new JobStatusModel();
-		harvesterViewModel.encapsulateJobStatus(jobStatusModel);
 		moveToPublicSchemaJob.doJob(jobStatusModel);
 		currentJob = moveToPublicSchemaJob;
-		if (computeUniqueValues) {
-			computeUniqueValues(jobStatusModel);
-		}
+	}
+
+	@Override
+	public void computeUniqueValues() {
+		computeUniqueValueJob.doJob(jobStatusModel);
+		currentJob = computeUniqueValueJob;
 	}
 
 	/**
@@ -213,12 +216,74 @@ public class StepController implements StepControllerIF {
 	}
 
 	@Override
-	public void computeUniqueValues(JobStatusModel jobStatusModel) {
-		if (jobStatusModel == null) {
-			jobStatusModel = new JobStatusModel();
-			harvesterViewModel.encapsulateJobStatus(jobStatusModel);
+	public JobType getJobType(String jobId) {
+		if (importDwcaJob != null) {
+			if (jobId.equals(importDwcaJob.getJobId())) {
+				return JobType.IMPORT_DWC;
+			}
 		}
-		computeUniqueValueJob.doJob(jobStatusModel);
-		currentJob = computeUniqueValueJob;
+
+		if (moveToPublicSchemaJob != null) {
+			if (jobId.equals(moveToPublicSchemaJob.getJobId())) {
+				return JobType.MOVE_TO_PUBLIC;
+			}
+		}
+
+		if (computeUniqueValueJob != null) {
+			if (jobId.equals(computeUniqueValueJob.getJobId())) {
+				return JobType.COMPUTE_UNIQUE;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Responsible to decide what to do next once a job is completed.
+	 *
+	 * @param jobId
+	 * @param jobStatus
+	 */
+	private void onJobCompleted(String jobId, JobStatus jobStatus) {
+
+		JobType jobType = getJobType(jobId);
+		switch (jobType) {
+			case IMPORT_DWC:
+				DwcaResourceModel dwcaResourceModel = (DwcaResourceModel) importDwcaJob.getFromSharedParameters(SharedParameterEnum.RESOURCE_MODEL);
+				if (moveToPublicSchema) {
+					moveToPublicSchema(dwcaResourceModel.getId(), computeUniqueValues);
+					moveToPublicSchema = false;
+				}
+				break;
+			case MOVE_TO_PUBLIC:
+				if (computeUniqueValues) {
+					computeUniqueValues();
+					computeUniqueValues = false;
+				}
+				break;
+			default:
+				break;
+		}
+	}
+
+	/**
+	 * PropertyChangeListener to handle job statuses and propagate changes to JobStatusModel.
+	 *
+	 * @author cgendreau
+	 *
+	 */
+	private class JobStatusModelListener implements PropertyChangeListener {
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			// let the view(s) know
+			harvesterViewModel.propagate(evt);
+
+			JobStatusModel jsm = (JobStatusModel) evt.getSource();
+			if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt.getPropertyName())) {
+				JobStatus newStatus = (JobStatus) evt.getNewValue();
+				if (newStatus.isJobCompleted()) {
+					onJobCompleted(jsm.getCurrentJobId(), newStatus);
+				}
+			}
+		}
 	}
 }

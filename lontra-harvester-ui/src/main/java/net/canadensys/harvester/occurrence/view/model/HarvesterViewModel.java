@@ -1,30 +1,33 @@
 package net.canadensys.harvester.occurrence.view.model;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-import net.canadensys.harvester.occurrence.model.JobStatusModel;
-
 /**
  * Harvester view model with PropertyChangeSupport.
- * 
+ * This model is also used to propagate other related PropertyChangeEvent.
+ *
  * @author canadensys
- * 
+ *
  */
 public class HarvesterViewModel {
 
 	private final PropertyChangeSupport propertyChangeSupport;
-	private JobStatusModel currentJobStatusModel;
 
 	private String databaseLocation;
 
 	public HarvesterViewModel() {
 		propertyChangeSupport = new PropertyChangeSupport(this);
-		// currentStatus = new ApplicationStatus();
+		// jobStatusModelListener = new JobStatusModelListener();
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
 		propertyChangeSupport.addPropertyChangeListener(listener);
+	}
+
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		propertyChangeSupport.removePropertyChangeListener(listener);
 	}
 
 	public String getDatabaseLocation() {
@@ -37,14 +40,11 @@ public class HarvesterViewModel {
 	}
 
 	/**
-	 * Encapsulate the JobStatusModel into this model.
-	 * All PropertyChangeListeners will also be registered to the JobStatusModel.
-	 * 
-	 * @param currentJobStatusModel
+	 * Propagate external PropertyChangeEvent through this model.
+	 *
+	 * @param evt
 	 */
-	public void encapsulateJobStatus(JobStatusModel currentJobStatusModel) {
-		// TODO we should probably unregister from previous currentJobStatusModel
-		this.currentJobStatusModel = currentJobStatusModel;
-		currentJobStatusModel.addPropertyChangeListener(propertyChangeSupport.getPropertyChangeListeners()[0]);
+	public void propagate(PropertyChangeEvent evt) {
+		propertyChangeSupport.firePropertyChange(evt);
 	}
 }

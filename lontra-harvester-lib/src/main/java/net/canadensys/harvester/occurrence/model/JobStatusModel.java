@@ -11,10 +11,26 @@ import java.beans.PropertyChangeSupport;
  *
  */
 public class JobStatusModel {
+
 	private final PropertyChangeSupport propertyChangeSupport;
 
 	public enum JobStatus {
-		RUNNING, DONE, ERROR, CANCEL
+		RUNNING(false), DONE(true), ERROR(true), CANCEL(true);
+		private boolean jobCompleted;
+
+		private JobStatus(boolean jobCompleted) {
+			this.jobCompleted = jobCompleted;
+		}
+
+		/**
+		 * Is the JobStatus should be considered as a job completed status.
+		 *
+		 * @param status
+		 * @return
+		 */
+		public boolean isJobCompleted() {
+			return jobCompleted;
+		}
 	};
 
 	public static String CURRENT_STATUS_PROPERTY = "currentStatus";
