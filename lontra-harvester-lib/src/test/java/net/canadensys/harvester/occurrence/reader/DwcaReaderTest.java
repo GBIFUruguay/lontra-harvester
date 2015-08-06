@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,12 +27,11 @@ import org.junit.Test;
  */
 public class DwcaReaderTest {
 
+	private final int QMOR_EXPECTED_NUMBER_OF_RECORDS = 11;
+
 	@Test
 	public void testDwcaItemReader() {
-		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
-		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
-		sharedParameters.put(SharedParameterEnum.RESOURCE_MODEL,
-				MockSharedParameters.getDwcaResourceModel(1, UUID.randomUUID().toString(), "qmor-specimens"));
+		Map<SharedParameterEnum, Object> sharedParameters = MockSharedParameters.getQMORSharedParameters();
 		int count = 0;
 
 		ItemReaderIF<OccurrenceRawModel> dwcaItemReader = new DwcaItemReader();
@@ -54,7 +54,29 @@ public class DwcaReaderTest {
 		}
 
 		// Ensure we read the entire file
-		assertEquals(11, count);
+		assertEquals(QMOR_EXPECTED_NUMBER_OF_RECORDS, count);
+	}
+
+	@Test
+	public void testDwcaItemReaderWithExclusionList() {
+		Map<SharedParameterEnum, Object> sharedParameters = MockSharedParameters.getQMORSharedParameters();
+		List<String> dwcaIdExclusionList = new ArrayList<String>();
+		dwcaIdExclusionList.add("4");
+		sharedParameters.put(SharedParameterEnum.DWCA_ID_EXCLUSION_LIST, dwcaIdExclusionList);
+		int count = 0;
+
+		ItemReaderIF<OccurrenceRawModel> dwcaItemReader = new DwcaItemReader();
+		dwcaItemReader.openReader(sharedParameters);
+
+		OccurrenceRawModel rawModel = dwcaItemReader.read();
+		while (rawModel != null) {
+			assertFalse("The dwcaid 4 should be skipped.", "4".equals(rawModel.getId()));
+			count++;
+			rawModel = dwcaItemReader.read();
+		}
+
+		// Ensure we read the entire file
+		assertEquals(QMOR_EXPECTED_NUMBER_OF_RECORDS - 1, count);
 	}
 
 	/**
@@ -77,10 +99,7 @@ public class DwcaReaderTest {
 
 	@Test
 	public void testDwcaItemReaderAbort() {
-		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
-		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");
-		sharedParameters.put(SharedParameterEnum.RESOURCE_MODEL,
-				MockSharedParameters.getDwcaResourceModel(1, UUID.randomUUID().toString(), "qmor-specimens"));
+		Map<SharedParameterEnum, Object> sharedParameters = MockSharedParameters.getQMORSharedParameters();
 
 		ItemReaderIF<OccurrenceRawModel> dwcaItemReader = new DwcaItemReader();
 		dwcaItemReader.openReader(sharedParameters);

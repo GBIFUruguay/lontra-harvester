@@ -8,6 +8,7 @@ import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
 public class MockSharedParameters {
 
+	public static final String QMOR_SOURCEFILE_ID = "qmor-specimens";
 	public static final String QMOR_PACKAGE_ID = "ada5d0b1-07de-4dc0-83d4-e312f0fb81cb";
 
 	/**
@@ -20,7 +21,7 @@ public class MockSharedParameters {
 		DwcaResourceModel resourceModel = new DwcaResourceModel();
 		resourceModel.setId(1);
 		resourceModel.setGbif_package_id(QMOR_PACKAGE_ID);
-		resourceModel.setSourcefileid("qmor-specimens");
+		resourceModel.setSourcefileid(QMOR_SOURCEFILE_ID);
 
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");

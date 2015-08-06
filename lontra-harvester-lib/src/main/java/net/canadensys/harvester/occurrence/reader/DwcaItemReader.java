@@ -71,6 +71,7 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 	/**
 	 * Responsible to set DWCA_USED_TERMS
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void openReader(Map<SharedParameterEnum, Object> sharedParameters) {
 		dwcaFilePath = (String) sharedParameters.get(SharedParameterEnum.DWCA_PATH);
@@ -79,6 +80,11 @@ public class DwcaItemReader extends AbstractDwcaReaderSupport implements ItemRea
 		}
 		if (StringUtils.isBlank(dwcaFilePath)) {
 			throw new IllegalStateException("sharedParameters missing: DWCA_PATH is required.");
+		}
+
+		// handle exclusion list if provided
+		if (sharedParameters.containsKey(SharedParameterEnum.DWCA_ID_EXCLUSION_LIST)) {
+			dwcaIdExcludeList.addAll((List<String>) sharedParameters.get(SharedParameterEnum.DWCA_ID_EXCLUSION_LIST));
 		}
 
 		File dwcaFile = new File(dwcaFilePath);
