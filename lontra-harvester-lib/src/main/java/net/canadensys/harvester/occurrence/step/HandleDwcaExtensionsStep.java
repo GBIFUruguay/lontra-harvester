@@ -25,9 +25,9 @@ import org.springframework.context.ApplicationContext;
  */
 public class HandleDwcaExtensionsStep implements StepIF {
 
-	public static List<String> SUPPORTED_EXTENSION = new ArrayList<String>();
+	public static List<Term> SUPPORTED_EXTENSION = new ArrayList<Term>();
 	static{
-		SUPPORTED_EXTENSION.add(GbifTerm.Multimedia.qualifiedName());
+		SUPPORTED_EXTENSION.add(GbifTerm.Multimedia);
 	}
 
 	@Autowired
