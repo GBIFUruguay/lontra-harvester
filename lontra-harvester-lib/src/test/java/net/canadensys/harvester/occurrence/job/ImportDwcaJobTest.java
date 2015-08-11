@@ -37,15 +37,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 /**
- * Test coverage : -Read a DarwinCore archive from a folder -Send the content as
- * JMS messages -Insert raw data in buffer schema -Process data and insert
- * results in buffer schema -Wait for completion -Move to public schema -Log the
- * import
- * 
+ * Test coverage :
+ * -Read a DarwinCore archive from a folder
+ * -Send the content as JMS messages (including content of the EML and dwc extension)
+ * -Process and insert resulted data in buffer schema
+ * -Insert raw data in buffer schema
+ * -Wait for completion
+ *
  * Not cover by this test : -GetResourceInfoTask -ComputeGISDataTask
- * 
+ *
  * @author canadensys
- * 
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ProcessingConfigTest.class, loader = AnnotationConfigContextLoader.class)
@@ -83,6 +85,10 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 	private JMSConsumerMessageHandlerIF insertResourceInformationStep;
 
 	@Autowired
+	@Qualifier("asyncManageOccurrenceExtensionStep")
+	private JMSConsumerMessageHandlerIF asyncManageOccurrenceExtensionStep;
+
+	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
@@ -99,10 +105,12 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 		reader = new JMSConsumer(TEST_BROKER_URL);
 		reader.registerHandler(processInsertOccurrenceStep);
 		reader.registerHandler(insertResourceInformationStep);
+		reader.registerHandler(asyncManageOccurrenceExtensionStep);
 
 		try {
 			((StepIF) processInsertOccurrenceStep).preStep(null);
 			((StepIF) insertResourceInformationStep).preStep(null);
+			((StepIF) asyncManageOccurrenceExtensionStep).preStep(null);
 		}
 		catch (IllegalStateException e) {
 			e.printStackTrace();
@@ -120,6 +128,7 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 		controlConsumer.close();
 		((StepIF) processInsertOccurrenceStep).postStep();
 		((StepIF) insertResourceInformationStep).postStep();
+		((StepIF) asyncManageOccurrenceExtensionStep).postStep();
 	}
 
 	@Test
@@ -197,9 +206,9 @@ public class ImportDwcaJobTest implements PropertyChangeListener {
 
 	/**
 	 * JMSControlConsumerMessageHandlerIF implementation for unit testing.
-	 * 
+	 *
 	 * @author canadensys
-	 * 
+	 *
 	 */
 	private class MockControlMessageHandler implements JMSControlConsumerMessageHandlerIF {
 

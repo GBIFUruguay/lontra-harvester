@@ -51,8 +51,8 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 	@Autowired
 	private StepIF handleDwcaExtensionsStep;
 
-	@Autowired
-	private LongRunningTaskIF checkProcessingCompletenessTask;
+	// Do not Autowired, it will be created dynamically
+	private LongRunningTaskIF checkJobStatus;
 
 	private volatile JobStatusModel jobStatusModel;
 
@@ -61,9 +61,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 		sharedParameters = new HashMap<SharedParameterEnum, Object>();
 	}
 
-	/**
-	 * Run the actual job.
-	 */
+	@Override
 	public void doJob(JobStatusModel jobStatusModel) {
 
 		this.jobStatusModel = jobStatusModel;
@@ -77,7 +75,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 		jobStatusModel.setCurrentStatusExplanation("Working on resource " + resourceModel.getId() + ":" + resourceModel.getName());
 
 		// TODO move strings to properties file
-		jobStatusModel.setCurrentStatusExplanation("Preparing DwcA");
+		jobStatusModel.setCurrentStatusExplanation("Preparing Dwc-A");
 		prepareDwcaTask.execute(sharedParameters);
 
 		jobStatusModel.setCurrentStatusExplanation("Cleaning buffer table");
@@ -90,32 +88,30 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 		StepResult dwcContent = executeStepSequentially(streamDwcContentStep, sharedParameters);
 
 		jobStatusModel.setCurrentStatusExplanation("Checking for DwcA extension(s)");
-		executeStepSequentially(handleDwcaExtensionsStep, sharedParameters);
+		StepResult dwcExtContent = executeStepSequentially(handleDwcaExtensionsStep, sharedParameters);
 
 		jobStatusModel.setCurrentStatusExplanation("Waiting for completion");
 
-		ItemTaskIF checkOccurrenceRecords = createCheckCompletenessTask("occurrence_raw",
-				dwcContent.getNumberOfRecord());
-		checkOccurrenceRecords.execute(sharedParameters);
+		checkJobStatus = createCheckCompletenessTask(dwcContent.getNumberOfRecord(), dwcExtContent.getNumberOfRecord());
+		checkJobStatus.execute(sharedParameters);
 	}
 
 	/**
 	 * Dynamically create ItemTaskIF
 	 *
-	 * @param context
-	 * @param identifier
+	 * @param targetedTable
 	 * @param numberOfRecords
 	 * @return
 	 */
-	public ItemTaskIF createCheckCompletenessTask(String context, int numberOfRecords) {
+	public LongRunningTaskIF createCheckCompletenessTask(int numberOfOccurrenceRecords, int numberOfExtensionRecords) {
 		CheckHarvestingCompletenessTask chcTask = (CheckHarvestingCompletenessTask) appContext.getBean("checkProcessingCompletenessTask");
 		chcTask.addItemProgressListenerIF(this);
-		chcTask.configure("occurrence_raw", new Integer(numberOfRecords));
-		return chcTask;
-	}
+		chcTask.addTarget("occurrence_raw", new Integer(numberOfOccurrenceRecords));
 
-	public void setItemProgressListener(ItemProgressListenerIF listener) {
-		((CheckHarvestingCompletenessTask) checkProcessingCompletenessTask).addItemProgressListenerIF(listener);
+		if (numberOfExtensionRecords > 0) {
+			chcTask.addTarget("occurrence_extension", new Integer(numberOfExtensionRecords));
+		}
+		return chcTask;
 	}
 
 	public void setGetResourceInfoTask(GetResourceInfoTask getResourceInfoTask) {
@@ -126,13 +122,12 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 		this.prepareDwcaTask = prepareDwcaTask;
 	}
 
-	public void setCheckProcessingCompletenessTask(CheckHarvestingCompletenessTask checkProcessingCompletenessTask) {
-		this.checkProcessingCompletenessTask = checkProcessingCompletenessTask;
-	}
-
 	@Override
 	public void cancel() {
-		checkProcessingCompletenessTask.cancel();
+		// this is the only step/task that implements 'cancel'
+		if (checkJobStatus != null) {
+			checkJobStatus.cancel();
+		}
 	}
 
 	@Override
@@ -142,7 +137,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 
 	@Override
 	public void onSuccess(String context) {
-		jobStatusModel.setCurrentStatus(JobStatus.DONE);
+		// jobStatusModel.setCurrentStatus(JobStatus.DONE);
 	}
 
 	@Override
@@ -154,6 +149,11 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 	public void onError(String context, Throwable t) {
 		jobStatusModel.setCurrentStatus(JobStatus.ERROR);
 		jobStatusModel.setCurrentStatusExplanation(t.getMessage());
+	}
+
+	@Override
+	public void onCompletion() {
+		jobStatusModel.setCurrentStatus(JobStatus.DONE);
 	}
 
 }

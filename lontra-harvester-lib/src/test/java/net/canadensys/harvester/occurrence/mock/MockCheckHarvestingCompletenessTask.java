@@ -9,7 +9,7 @@ public class MockCheckHarvestingCompletenessTask extends CheckHarvestingComplete
 
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
-		notifyListenersOnSuccess();
+		notifyCompletion();
 	}
 
 }

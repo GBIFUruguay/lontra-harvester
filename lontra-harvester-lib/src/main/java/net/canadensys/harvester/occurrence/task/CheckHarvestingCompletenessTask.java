@@ -3,8 +3,11 @@ package net.canadensys.harvester.occurrence.task;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.canadensys.dataportal.occurrence.model.OccurrenceFieldConstants;
 import net.canadensys.harvester.ItemProgressListenerIF;
@@ -12,7 +15,6 @@ import net.canadensys.harvester.LongRunningTaskIF;
 import net.canadensys.harvester.exception.TaskExecutionException;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -21,27 +23,31 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.google.common.collect.Lists;
+
 /**
  * Task to check and wait for processing completion.
  * Notification will be sent using the ItemProgressListenerIF listener.
+ *
  * @author canadensys
  *
  */
-public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
+public class CheckHarvestingCompletenessTask implements LongRunningTaskIF {
 
 	private static final int MAX_WAITING_SECONDS = 10;
 	private static final Logger LOGGER = Logger.getLogger(CheckHarvestingCompletenessTask.class);
 
 	@Autowired
-	@Qualifier(value="bufferSessionFactory")
+	@Qualifier(value = "bufferSessionFactory")
 	private SessionFactory sessionFactory;
 
 	private List<ItemProgressListenerIF> itemListenerList;
-	private int secondsWaiting = 0;
+
 	private final AtomicBoolean taskCanceled = new AtomicBoolean(false);
 
-	private String targetedTable;
-	private Integer expectedNumberOfRecords;
+	private ExecutorService threadPool;
+	private final List<CompletenessTarget> completenessTargets = Lists.newArrayList();
+	private final AtomicInteger numberOfCompletedCommand = new AtomicInteger();
 
 	/**
 	 * @param sharedParametersSharedParameterEnum
@@ -49,134 +55,215 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF{
 	 */
 	@Override
 	public void execute(Map<SharedParameterEnum, Object> sharedParameters) {
-		final Integer _expectedNumberOfRecords = expectedNumberOfRecords;
-
-		if (_expectedNumberOfRecords == null || sharedParameters.get(SharedParameterEnum.RESOURCE_ID) == null) {
-			LOGGER.fatal("Misconfigured task : resourceId and numberOfRecords are required");
+		if (sharedParameters.get(SharedParameterEnum.RESOURCE_ID) == null) {
+			LOGGER.fatal("Misconfigured task : resourceId is required");
 			throw new TaskExecutionException("Misconfigured task");
 		}
-		if (StringUtils.isBlank(targetedTable)) {
-			LOGGER.fatal("Misconfigured task : targetedTable is required");
+		if (completenessTargets.isEmpty()) {
+			LOGGER.fatal("Misconfigured task : at least one target is required");
 			throw new TaskExecutionException("Misconfigured task");
 		}
 
-		final String identifierColumn = OccurrenceFieldConstants.RESOURCE_ID;
+		// we use only one Thread for now
+		threadPool = Executors.newSingleThreadExecutor();
 		final Integer resourceId = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
-
-		Thread checkThread = new Thread(new Runnable() {
-			private int previousCount = 0;
-			@Override
-			public void run() {
-				Session session = sessionFactory.openSession();
-				SQLQuery query = session.createSQLQuery("SELECT count(*) FROM buffer." + targetedTable + " WHERE " + identifierColumn + "=?");
-				query.setInteger(0, resourceId);
-				try{
-					Number currNumberOfResult = (Number)query.uniqueResult();
-					while(!taskCanceled.get() && (currNumberOfResult.intValue() < _expectedNumberOfRecords.intValue())){
-						currNumberOfResult = (Number)query.uniqueResult();
-						//make sure we don't get stuck here is something goes wrong with the clients
-						if(previousCount == currNumberOfResult.intValue()){
-							secondsWaiting++;
-							if(secondsWaiting == MAX_WAITING_SECONDS){
-								break;
-							}
-						}
-						else{
-							secondsWaiting = 0;
-						}
-						previousCount = currNumberOfResult.intValue();
-						notifyListeners(targetedTable,currNumberOfResult.intValue(),_expectedNumberOfRecords);
-
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-							break;
-						}
-					}
-				}catch(HibernateException hEx){
-					notifyListenersOnFailure(hEx);
-				}
-				session.close();
-
-				if(taskCanceled.get()){
-					notifyListenersOnCancel();
-				}
-				else{
-					if(secondsWaiting < MAX_WAITING_SECONDS){
-						notifyListenersOnSuccess();
-					}
-					else{
-						notifyListenersOnFailure(new TimeoutException("No progress made in more than " + MAX_WAITING_SECONDS + " seconds."));
-					}
-				}
-			}
-		});
-		checkThread.start();
+		for (CompletenessTarget ct : completenessTargets) {
+			threadPool.submit(createRunnableCommand(resourceId, ct.getTargetedTable(), ct.getExpectedNumberOfRecords()));
+		}
 	}
 
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 
-	protected void notifyListeners(String context, int current, int total) {
-		if(itemListenerList != null){
-			for(ItemProgressListenerIF currListener : itemListenerList){
-				currListener.onProgress(context,current, total);
+	/**
+	 * Handle success of a command and determine if all the commands were executed.
+	 *
+	 * @param context
+	 */
+	private void handleSuccess(String context) {
+		int _numberOfCompletedCommand = numberOfCompletedCommand.incrementAndGet();
+		// notify succes for the context first
+		notifySuccess(context);
+
+		if (_numberOfCompletedCommand == completenessTargets.size()) {
+			threadPool.shutdown();
+			notifyCompletion();
+		}
+	}
+
+	/**
+	 * Responsible to shutdown the ThreadPool to avoid other thread (if any) to start.
+	 *
+	 * @param context
+	 * @param t
+	 */
+	private void handleFailure(String context, Throwable t) {
+		threadPool.shutdownNow();
+		notifyFailure(context, t);
+	}
+
+	protected void notifyProgress(String context, int current, int total) {
+		if (itemListenerList != null) {
+			for (ItemProgressListenerIF currListener : itemListenerList) {
+				currListener.onProgress(context, current, total);
 			}
 		}
 	}
 
-	protected void notifyListenersOnSuccess() {
-		if(itemListenerList != null){
-			for(ItemProgressListenerIF currListener : itemListenerList){
-				currListener.onSuccess(targetedTable);
+	protected void notifySuccess(String context) {
+		if (itemListenerList != null) {
+			for (ItemProgressListenerIF currListener : itemListenerList) {
+				currListener.onSuccess(context);
 			}
 		}
 	}
 
-	protected void notifyListenersOnCancel() {
-		if(itemListenerList != null){
-			for(ItemProgressListenerIF currListener : itemListenerList){
-				currListener.onCancel(targetedTable);
+	protected void notifyCancel(String context) {
+		if (itemListenerList != null) {
+			for (ItemProgressListenerIF currListener : itemListenerList) {
+				currListener.onCancel(context);
 			}
 		}
 	}
 
-	protected void notifyListenersOnFailure(Throwable t) {
-		if(itemListenerList != null){
-			for(ItemProgressListenerIF currListener : itemListenerList){
-				currListener.onError(targetedTable,t);
+	protected void notifyFailure(String context, Throwable t) {
+		if (itemListenerList != null) {
+			for (ItemProgressListenerIF currListener : itemListenerList) {
+				currListener.onError(context, t);
 			}
 		}
 	}
 
-	public void addItemProgressListenerIF(ItemProgressListenerIF listener){
-		if(itemListenerList == null){
+	protected void notifyCompletion() {
+		if (itemListenerList != null) {
+			for (ItemProgressListenerIF currListener : itemListenerList) {
+				currListener.onCompletion();
+			}
+		}
+	}
+
+	public void addItemProgressListenerIF(ItemProgressListenerIF listener) {
+		if (itemListenerList == null) {
 			itemListenerList = new ArrayList<ItemProgressListenerIF>();
 		}
 		itemListenerList.add(listener);
 	}
 
 	/**
-	 * Set SQL query details to check completeness.
+	 * You can add more than one target for a job but they will be check one after the other in
+	 * the same order they were added by this method.
 	 *
 	 * @param targetedTable
-	 *            in which we want to count the rows
 	 * @param expectedNumberOfRecords
 	 */
-	public void configure(String targetedTable, Integer expectedNumberOfRecords) {
-		this.targetedTable = targetedTable;
-		this.expectedNumberOfRecords = expectedNumberOfRecords;
+	public void addTarget(String targetedTable, Integer expectedNumberOfRecords) {
+		completenessTargets.add(new CompletenessTarget(targetedTable, expectedNumberOfRecords));
 	}
 
 	@Override
 	public void cancel() {
+		threadPool.shutdownNow();
 		taskCanceled.set(true);
 	}
 
 	@Override
 	public String getTitle() {
 		return "Waiting for completion";
+	}
+
+	/**
+	 * Create an instance of Runnable for a specific targetedTable (aka context).
+	 *
+	 * @param resourceId
+	 * @param targetedTable
+	 * @param expectedNumberOfRecords
+	 * @return
+	 */
+	private Runnable createRunnableCommand(final int resourceId, final String targetedTable, final int expectedNumberOfRecords) {
+		final String identifierColumn = OccurrenceFieldConstants.RESOURCE_ID;
+
+		return new Runnable() {
+			private int previousCount = 0;
+			private int secondsWaiting = 0;
+
+			@Override
+			public void run() {
+				Session session = sessionFactory.openSession();
+				SQLQuery query = session.createSQLQuery("SELECT count(*) FROM buffer." + targetedTable + " WHERE " + identifierColumn + "=?");
+				query.setInteger(0, resourceId);
+				try {
+					Number currNumberOfResult = (Number) query.uniqueResult();
+					while (!taskCanceled.get() && (currNumberOfResult.intValue() < expectedNumberOfRecords)) {
+						currNumberOfResult = (Number) query.uniqueResult();
+						// make sure we don't get stuck here is something goes wrong with the clients
+						if (previousCount == currNumberOfResult.intValue()) {
+							secondsWaiting++;
+							if (secondsWaiting == MAX_WAITING_SECONDS) {
+								break;
+							}
+						}
+						else {
+							secondsWaiting = 0;
+						}
+						previousCount = currNumberOfResult.intValue();
+						notifyProgress(targetedTable, currNumberOfResult.intValue(), expectedNumberOfRecords);
+
+						try {
+							Thread.sleep(1000);
+						}
+						catch (InterruptedException e) {
+							e.printStackTrace();
+							break;
+						}
+					}
+				}
+				catch (HibernateException hEx) {
+					handleFailure(targetedTable, hEx);
+				}
+				finally {
+					session.close();
+				}
+
+				if (taskCanceled.get()) {
+					notifyCancel(targetedTable);
+				}
+				else {
+					if (secondsWaiting < MAX_WAITING_SECONDS) {
+						// make sure to notify the progress completed
+						notifyProgress(targetedTable, expectedNumberOfRecords, expectedNumberOfRecords);
+						handleSuccess(targetedTable);
+					}
+					else {
+						handleFailure(targetedTable, new TimeoutException("No progress made in more than " + MAX_WAITING_SECONDS
+								+ " seconds."));
+					}
+				}
+			}
+		};
+	}
+
+	/**
+	 * Simple pair object to hold a targetTable and the expected number of records.
+	 *
+	 * @author cgendreau
+	 *
+	 */
+	private static class CompletenessTarget {
+		private final String targetedTable;
+		private final Integer expectedNumberOfRecords;
+
+		CompletenessTarget(String targetedTable, Integer expectedNumberOfRecords) {
+			this.targetedTable = targetedTable;
+			this.expectedNumberOfRecords = expectedNumberOfRecords;
+		}
+
+		public String getTargetedTable() {
+			return targetedTable;
+		}
+
+		public Integer getExpectedNumberOfRecords() {
+			return expectedNumberOfRecords;
+		}
 	}
 }

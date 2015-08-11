@@ -46,8 +46,6 @@ public class ReplaceOldOccurrenceTask implements ItemTaskIF {
 		Session session = sessionFactory.getCurrentSession();
 
 		DwcaResourceModel resourceModel = (DwcaResourceModel) sharedParameters.get(SharedParameterEnum.RESOURCE_MODEL);
-		// String sourceFileId = (String) sharedParameters.get(SharedParameterEnum.SOURCE_FILE_ID);
-		// String gbifPackageId = (String) sharedParameters.get(SharedParameterEnum.GBIF_PACKAGE_ID);
 		Integer resourceID = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
 
 		if (resourceModel == null || resourceID == null) {
