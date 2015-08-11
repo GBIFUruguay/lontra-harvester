@@ -16,6 +16,7 @@ import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.dataportal.occurrence.model.ResourceMetadataModel;
+import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.CLIService;
 import net.canadensys.harvester.ItemMapperIF;
 import net.canadensys.harvester.ItemProcessorIF;
@@ -202,17 +203,17 @@ public class CLIProcessingConfig {
 
 	// ---JOB---
 	@Bean
-	public ImportDwcaJob importDwcaJob() {
+	public AbstractProcessingJob importDwcaJob() {
 		return new ImportDwcaJob();
 	}
 
 	@Bean
-	public MoveToPublicSchemaJob moveToPublicSchemaJob() {
+	public AbstractProcessingJob moveToPublicSchemaJob() {
 		return new MoveToPublicSchemaJob();
 	}
 
 	@Bean
-	public ComputeUniqueValueJob computeUniqueValueJob() {
+	public AbstractProcessingJob computeUniqueValueJob() {
 		return new ComputeUniqueValueJob();
 	}
 

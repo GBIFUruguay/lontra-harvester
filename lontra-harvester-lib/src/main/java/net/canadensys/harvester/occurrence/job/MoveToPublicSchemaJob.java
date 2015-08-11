@@ -47,6 +47,7 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 		sharedParameters = new HashMap<SharedParameterEnum, Object>();
 	}
 
+	@Override
 	public void doJob(JobStatusModel jobStatusModel) {
 
 		getResourceInfoTask.execute(sharedParameters);

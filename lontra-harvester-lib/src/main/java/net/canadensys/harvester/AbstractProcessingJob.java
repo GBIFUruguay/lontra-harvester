@@ -3,6 +3,7 @@ package net.canadensys.harvester;
 import java.util.Map;
 
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
+import net.canadensys.harvester.occurrence.model.JobStatusModel;
 
 /**
  * Common functions for Job processing classes.
@@ -71,5 +72,13 @@ public abstract class AbstractProcessingJob {
 	 * Cancel the job
 	 */
 	public abstract void cancel();
+
+	/**
+	 * Run the actual job.
+	 *
+	 * @param jobStatusModel
+	 *            Object to hold the status of the job. It's a status object so it will be updated by this method.
+	 */
+	public abstract void doJob(JobStatusModel jobStatusModel);
 
 }

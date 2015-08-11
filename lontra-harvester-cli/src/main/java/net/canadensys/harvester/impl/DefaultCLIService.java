@@ -2,6 +2,9 @@ package net.canadensys.harvester.impl;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -11,14 +14,16 @@ import java.util.concurrent.TimeUnit;
 
 import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
+import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.CLIService;
+import net.canadensys.harvester.model.CliOption;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
-import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
-import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
-import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 
+import org.apache.commons.compress.utils.Charsets;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,13 +36,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class DefaultCLIService implements CLIService {
 
 	@Autowired
-	private ImportDwcaJob importDwcaJob;
+	private AbstractProcessingJob importDwcaJob;
 
 	@Autowired
-	private MoveToPublicSchemaJob moveToPublicSchemaJob;
+	private AbstractProcessingJob moveToPublicSchemaJob;
 
 	@Autowired
-	private ComputeUniqueValueJob computeUniqueValueJob;
+	private AbstractProcessingJob computeUniqueValueJob;
 
 	@Autowired
 	private DwcaResourceDAO resourceDAO;
@@ -89,16 +94,20 @@ public class DefaultCLIService implements CLIService {
 		return resourceList;
 	}
 
-	/**
-	 * 
-	 * @param resourceIdentifier
-	 *            resourceid or gbifpackageid
-	 */
 	@Override
-	public void importDwca(DwcaResourceModel resourceModel) {
+	public void importDwca(DwcaResourceModel resourceModel, CliOption harvestOption) throws IOException {
 		if (resourceModel != null) {
 			ExecutorService executor = Executors.newFixedThreadPool(2);
 			importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceModel.getId());
+
+			// exclusion list handling
+			if (StringUtils.isNotBlank(harvestOption.getExclusionFilePath())) {
+				List<String> exclusionList = loadExclusionList(harvestOption.getExclusionFilePath());
+				if (exclusionList != null && exclusionList.size() > 0) {
+					System.out.println(exclusionList.size() + " Dwc-A Id to exclude");
+					importDwcaJob.addToSharedParameters(SharedParameterEnum.DWCA_ID_EXCLUSION_LIST, exclusionList);
+				}
+			}
 
 			Runnable importJobThread = new Runnable() {
 				@Override
@@ -131,6 +140,21 @@ public class DefaultCLIService implements CLIService {
 	@Override
 	public void computeUniqueValueJob() {
 		computeUniqueValueJob.doJob(jobStatusModel);
+	}
+
+	/**
+	 * Load an exclusion list from a file. The list returned will include one element per line in the file.
+	 * 
+	 * @param exclusionFilePath
+	 * @return all lines from the file, never null
+	 * @throws IOException
+	 */
+	private List<String> loadExclusionList(String exclusionFilePath) throws IOException {
+		File exclusionFile = new File(exclusionFilePath);
+		if (!exclusionFile.exists()) {
+			throw new FileNotFoundException(exclusionFilePath);
+		}
+		return FileUtils.readLines(exclusionFile, Charsets.UTF_8);
 	}
 
 	private void onJobCompleted(String jobId, JobStatus jobStatus) {

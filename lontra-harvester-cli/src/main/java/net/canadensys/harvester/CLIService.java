@@ -1,8 +1,10 @@
 package net.canadensys.harvester;
 
+import java.io.IOException;
 import java.util.List;
 
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
+import net.canadensys.harvester.model.CliOption;
 
 /**
  * CLI service layer interface.
@@ -16,7 +18,12 @@ public interface CLIService {
 
 	DwcaResourceModel loadResourceModel(String resourceIdentifier);
 
-	void importDwca(DwcaResourceModel resourceModel);
+	/**
+	 * 
+	 * @param resourceModel
+	 * @param cliOption
+	 */
+	void importDwca(DwcaResourceModel resourceModel, CliOption cliOption) throws IOException;
 
 	void moveToPublicSchema(DwcaResourceModel resourceModel);
 

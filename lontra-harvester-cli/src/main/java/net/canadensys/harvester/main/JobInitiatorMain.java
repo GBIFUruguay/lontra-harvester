@@ -1,12 +1,13 @@
 package net.canadensys.harvester.main;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.harvester.CLIService;
-import net.canadensys.harvester.config.CLIProcessingConfig;
+import net.canadensys.harvester.model.CliOption;
 import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.status.ResourceStatusCheckerIF;
 
@@ -14,9 +15,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+/**
+ * Main class to start 'jobs'.
+ * A job here is not necessarily a real lontra job (implementing AbstractProcessingJob class).
+ * 
+ * @author cgendreau
+ *
+ */
 public class JobInitiatorMain {
 
-	public enum JobType {
+	// Type of command available
+	public enum CommandType {
 		RESOURCE_STATUS, LIST_RESOURCE, HARVEST
 	}
 
@@ -27,25 +36,16 @@ public class JobInitiatorMain {
 	private ResourceStatusCheckerIF resourceStatusChecker;
 
 	/**
-	 * No args JobInitiator Entry point
-	 * 
-	 * @param jobType
-	 */
-	public static void jobMain(JobType jobType) {
-		jobMain(jobType, null);
-	}
-
-	/**
 	 * JobInitiator Entry point
 	 * 
-	 * @param jobType
-	 * @param args
+	 * @param cliOption
+	 *            CLIProcessingConfig.class
 	 */
-	public static void jobMain(JobType jobType, String arg) {
-		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(CLIProcessingConfig.class);
+	public static void jobMain(CliOption cliOption, Class<?> configClass) {
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(configClass);
 		JobInitiatorMain jim = ctx.getBean(JobInitiatorMain.class);
 
-		switch (jobType) {
+		switch (cliOption.getCommandType()) {
 			case RESOURCE_STATUS:
 				jim.displayResourceStatus();
 				break;
@@ -53,8 +53,8 @@ public class JobInitiatorMain {
 				jim.displayResourceList();
 				break;
 			case HARVEST:
-				if (StringUtils.isNotBlank(arg)) {
-					jim.harvest(arg);
+				if (StringUtils.isNotBlank(cliOption.getResourceIdentifier())) {
+					jim.harvest(cliOption);
 				}
 				else {
 					jim.harvestRequired();
@@ -86,15 +86,20 @@ public class JobInitiatorMain {
 	/**
 	 * Harvest a specific resource.
 	 * 
-	 * @param resourceIdentifier
+	 * @param cliOption
 	 */
-	private void harvest(String resourceIdentifier) {
-		DwcaResourceModel resourceModel = cliService.loadResourceModel(resourceIdentifier);
+	private void harvest(CliOption cliOption) {
+		DwcaResourceModel resourceModel = cliService.loadResourceModel(cliOption.getResourceIdentifier());
 		if (resourceModel != null) {
-			cliService.importDwca(resourceModel);
+			try {
+				cliService.importDwca(resourceModel, cliOption);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		else {
-			System.out.println("Can not find resource identified by " + resourceIdentifier);
+			System.out.println("Can not find resource identified by " + cliOption.getResourceIdentifier());
 		}
 	}
 
@@ -105,7 +110,12 @@ public class JobInitiatorMain {
 		List<DwcaResourceStatusModel> harvestRequiredList = resourceStatusChecker.getHarvestRequiredList();
 		if (!harvestRequiredList.isEmpty()) {
 			DwcaResourceModel resourceModel = harvestRequiredList.get(0).getDwcaResourceModel();
-			cliService.importDwca(resourceModel);
+			try {
+				cliService.importDwca(resourceModel, null);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		else {
 			System.out.println("No harvest required");

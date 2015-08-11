@@ -20,6 +20,7 @@ import net.canadensys.harvester.occurrence.mock.MockHabitObject;
 import net.canadensys.harvester.occurrence.mock.MockProcessedHabitObject;
 import net.canadensys.harvester.occurrence.mock.processor.MockHabitProcessor;
 import net.canadensys.harvester.occurrence.mock.writer.MockObjectWriter;
+import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.reader.DwcaExtensionReader;
 import net.canadensys.harvester.occurrence.step.async.GenericAsyncProcessingStep;
 import net.canadensys.harvester.occurrence.step.async.GenericAsyncStep;
@@ -111,7 +112,7 @@ public class UserDefinedJobTest {
 		userDefinedJob.addToSharedParameters(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-vascan-checklist");
 		userDefinedJob.addToSharedParameters(SharedParameterEnum.DWCA_EXTENSION_TYPE, GbifTerm.Description);
 
-		userDefinedJob.doJob();
+		userDefinedJob.doJob(null);
 
 		waitAndValidateNodeResult();
 	}
@@ -259,7 +260,8 @@ public class UserDefinedJobTest {
 			this.genericStreamStep = genericStreamStep;
 		}
 
-		public void doJob() {
+		@Override
+		public void doJob(JobStatusModel jobStatusModel) {
 			genericStreamStep.preStep(sharedParameters);
 			genericStreamStep.doStep();
 			genericStreamStep.postStep();

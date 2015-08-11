@@ -27,6 +27,7 @@ public class ComputeUniqueValueJob extends AbstractProcessingJob {
 		super(UUID.randomUUID().toString());
 	}
 
+	@Override
 	public void doJob(JobStatusModel jobStatusModel) {
 		jobStatusModel.setCurrentJobId(getJobId());
 		jobStatusModel.setCurrentStatus(JobStatus.RUNNING);
