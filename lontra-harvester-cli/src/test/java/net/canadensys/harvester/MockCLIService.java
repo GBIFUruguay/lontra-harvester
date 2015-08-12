@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
+import net.canadensys.harvester.mock.MockResource;
 import net.canadensys.harvester.model.CliOption;
-import net.canadensys.harvester.occurrence.SharedParameterEnum;
-import net.canadensys.harvester.occurrence.mock.MockSharedParameters;
 
 /**
  * Mock implementation for testing purpose.
@@ -19,8 +18,7 @@ public class MockCLIService implements CLIService {
 
 	@Override
 	public List<DwcaResourceModel> getResourceList() {
-		DwcaResourceModel mockDwcaResourceModel = (DwcaResourceModel) MockSharedParameters.getQMORSharedParameters().get(
-				SharedParameterEnum.RESOURCE_MODEL);
+		DwcaResourceModel mockDwcaResourceModel = MockResource.getMockQMORResource();
 		List<DwcaResourceModel> resourceList = new ArrayList<DwcaResourceModel>();
 		resourceList.add(mockDwcaResourceModel);
 		return resourceList;
