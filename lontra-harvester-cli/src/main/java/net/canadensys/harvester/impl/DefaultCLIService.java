@@ -83,7 +83,7 @@ public class DefaultCLIService implements CLIService {
 
 	@Override
 	@Transactional("publicTransactionManager")
-	public List<DwcaResourceModel> loadResourceModelList() {
+	public List<DwcaResourceModel> getResourceList() {
 		List<DwcaResourceModel> resourceList = resourceDAO.loadResources();
 		Collections.sort(resourceList, new Comparator<DwcaResourceModel>() {
 			@Override

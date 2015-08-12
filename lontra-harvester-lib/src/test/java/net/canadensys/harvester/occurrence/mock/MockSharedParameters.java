@@ -22,6 +22,7 @@ public class MockSharedParameters {
 		resourceModel.setId(1);
 		resourceModel.setGbif_package_id(QMOR_PACKAGE_ID);
 		resourceModel.setSourcefileid(QMOR_SOURCEFILE_ID);
+		resourceModel.setName("QMOR");
 
 		Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 		sharedParameters.put(SharedParameterEnum.DWCA_PATH, "src/test/resources/dwca-qmor-specimens");

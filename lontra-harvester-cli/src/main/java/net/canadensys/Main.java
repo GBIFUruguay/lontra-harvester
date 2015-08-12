@@ -16,6 +16,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Entry point for lontra-cli
  * 
@@ -24,7 +26,8 @@ import org.apache.commons.cli.ParseException;
  */
 public class Main {
 
-	private static Class<CLIProcessingConfig> CONFIG_CLASS = CLIProcessingConfig.class;
+	@VisibleForTesting
+	protected static Class<?> CONFIG_CLASS = CLIProcessingConfig.class;
 
 	private static Options cmdLineOptions;
 

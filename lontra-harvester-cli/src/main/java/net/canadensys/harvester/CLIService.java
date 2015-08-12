@@ -14,7 +14,7 @@ import net.canadensys.harvester.model.CliOption;
  */
 public interface CLIService {
 
-	List<DwcaResourceModel> loadResourceModelList();
+	List<DwcaResourceModel> getResourceList();
 
 	DwcaResourceModel loadResourceModel(String resourceIdentifier);
 

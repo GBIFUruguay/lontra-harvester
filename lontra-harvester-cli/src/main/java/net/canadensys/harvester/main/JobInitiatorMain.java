@@ -77,7 +77,7 @@ public class JobInitiatorMain {
 	}
 
 	private void displayResourceList() {
-		List<DwcaResourceModel> resourceList = cliService.loadResourceModelList();
+		List<DwcaResourceModel> resourceList = cliService.getResourceList();
 		for (DwcaResourceModel resource : resourceList) {
 			System.out.println("[" + resource.getId() + "] " + resource.getName());
 		}
