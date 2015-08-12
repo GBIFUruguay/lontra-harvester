@@ -28,6 +28,21 @@ import com.google.common.collect.Lists;
 /**
  * Task to check and wait for processing completion.
  * Notification will be sent using the ItemProgressListenerIF listener.
+ * This class is NOT Thread Safe and the ThreadPool will always use only one Thread and check different
+ * contexts sequentially.
+ *
+ * TODO Improve this class with a better usage of the ThreadPool and maybe use
+ * Guava com.google.common.util.concurrent package.
+ *
+ * We can add a listener to be called when ALL the ListenableFuture will have finished which should be
+ * used to trigger the notifyCompletion() instead of current numberOfCompletedCommand.
+ *
+ * ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(2));
+ * //add to listenableFutures list (see service.submit())
+ * ListenableFuture<List<Boolean>> allListenableFuture = Futures.successfulAsList(listenableFutures);
+ * Futures.addCallback(allListenableFuture, new FutureCallback<List<Boolean>>() {
+ * ...
+ * });
  *
  * @author canadensys
  *
@@ -64,7 +79,9 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF {
 			throw new TaskExecutionException("Misconfigured task");
 		}
 
-		// we use only one Thread for now
+		// we use only one Thread since we only want to run the command asynchronously and then decide if we should
+		// run the next command or not. In theory, we could run all the Thread at the 'same' time but it would require
+		// a better design of the ItemProgressListenerIF implementation that are not thread safe for now.
 		threadPool = Executors.newSingleThreadExecutor();
 		final Integer resourceId = (Integer) sharedParameters.get(SharedParameterEnum.RESOURCE_ID);
 		for (CompletenessTarget ct : completenessTargets) {
@@ -83,7 +100,7 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF {
 	 */
 	private void handleSuccess(String context) {
 		int _numberOfCompletedCommand = numberOfCompletedCommand.incrementAndGet();
-		// notify succes for the context first
+		// notify success for the context first
 		notifySuccess(context);
 
 		if (_numberOfCompletedCommand == completenessTargets.size()) {

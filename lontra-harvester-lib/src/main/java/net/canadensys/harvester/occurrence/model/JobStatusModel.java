@@ -6,6 +6,7 @@ import java.beans.PropertyChangeSupport;
 /**
  * Model responsible for job status related data.
  * It is using a PropertyChangeSupport delegate.
+ * Not thread-safe
  *
  * @author canadensys
  *

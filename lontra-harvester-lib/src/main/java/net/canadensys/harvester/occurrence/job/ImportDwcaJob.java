@@ -1,6 +1,7 @@
 package net.canadensys.harvester.occurrence.job;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
@@ -19,6 +20,8 @@ import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+
+import com.google.common.collect.Maps;
 
 /**
  * This job allows to give a resource ID, stream the content into JMS messages and waiting for completion.
@@ -54,7 +57,16 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 	// Do not Autowired, it will be created dynamically
 	private LongRunningTaskIF checkJobStatus;
 
-	private volatile JobStatusModel jobStatusModel;
+	// context = table names
+	private static final String OCCURRENCE_TABLE = "occurrence_raw";
+	private static final String OCCURRENCE_EXT_TABLE = "occurrence_extension";
+	private static final Map<String, String> CONTEXT_LABEL = Maps.newHashMap();
+	static {
+		CONTEXT_LABEL.put(OCCURRENCE_TABLE, "occurrence");
+		CONTEXT_LABEL.put(OCCURRENCE_EXT_TABLE, "occurrence extension");
+	}
+
+	private JobStatusModel jobStatusModel;
 
 	public ImportDwcaJob() {
 		super(UUID.randomUUID().toString());
@@ -97,7 +109,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 	}
 
 	/**
-	 * Dynamically create ItemTaskIF
+	 * Dynamically create LongRunningTaskIF instance to check completeness task.
 	 *
 	 * @param targetedTable
 	 * @param numberOfRecords
@@ -106,10 +118,10 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 	public LongRunningTaskIF createCheckCompletenessTask(int numberOfOccurrenceRecords, int numberOfExtensionRecords) {
 		CheckHarvestingCompletenessTask chcTask = (CheckHarvestingCompletenessTask) appContext.getBean("checkProcessingCompletenessTask");
 		chcTask.addItemProgressListenerIF(this);
-		chcTask.addTarget("occurrence_raw", new Integer(numberOfOccurrenceRecords));
+		chcTask.addTarget(OCCURRENCE_TABLE, new Integer(numberOfOccurrenceRecords));
 
 		if (numberOfExtensionRecords > 0) {
-			chcTask.addTarget("occurrence_extension", new Integer(numberOfExtensionRecords));
+			chcTask.addTarget(OCCURRENCE_EXT_TABLE, new Integer(numberOfExtensionRecords));
 		}
 		return chcTask;
 	}
@@ -132,7 +144,7 @@ public class ImportDwcaJob extends AbstractProcessingJob implements ItemProgress
 
 	@Override
 	public void onProgress(String context, int current, int total) {
-		jobStatusModel.setCurrentJobProgress(current + "/" + total);
+		jobStatusModel.setCurrentJobProgress(current + "/" + total + " [" + CONTEXT_LABEL.get(context) + "]");
 	}
 
 	@Override

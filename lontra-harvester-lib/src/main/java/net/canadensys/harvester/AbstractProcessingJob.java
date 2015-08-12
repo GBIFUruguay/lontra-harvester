@@ -7,6 +7,7 @@ import net.canadensys.harvester.occurrence.model.JobStatusModel;
 
 /**
  * Common functions for Job processing classes.
+ * TODO check https://code.google.com/p/guava-libraries/wiki/ServiceExplained
  *
  * @author canadensys
  *
