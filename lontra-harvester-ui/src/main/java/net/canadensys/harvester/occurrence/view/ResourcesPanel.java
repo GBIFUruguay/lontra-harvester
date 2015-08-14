@@ -408,7 +408,10 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 				addResourceBtn.setEnabled(false);
 				editResourceBtn.setEnabled(false);
 				computeUniqueValuesBtn.setEnabled(false);
+
 				statusLbl.setIcon(loadingImg);
+				statusLbl.setText(Messages.getString("view.info.status.waiting"));
+				statusLbl.setForeground(Color.BLACK);
 
 				final SwingWorker<Void, Object> swingWorker = new SwingWorker<Void, Object>() {
 					@Override

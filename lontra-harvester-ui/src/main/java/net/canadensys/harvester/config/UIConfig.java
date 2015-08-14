@@ -293,6 +293,7 @@ public class UIConfig {
 	}
 
 	@Bean
+	@Scope("prototype")
 	public LongRunningTaskIF checkProcessingCompletenessTask() {
 		return new CheckHarvestingCompletenessTask();
 	}

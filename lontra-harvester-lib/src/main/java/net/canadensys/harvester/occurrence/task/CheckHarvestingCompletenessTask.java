@@ -167,6 +167,12 @@ public class CheckHarvestingCompletenessTask implements LongRunningTaskIF {
 		itemListenerList.add(listener);
 	}
 
+	public void purgeListeners() {
+		if (itemListenerList != null) {
+			itemListenerList.clear();
+		}
+	}
+
 	/**
 	 * You can add more than one target for a job but they will be check one after the other in
 	 * the same order they were added by this method.

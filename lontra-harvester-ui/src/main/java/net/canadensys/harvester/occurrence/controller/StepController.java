@@ -117,7 +117,6 @@ public class StepController implements StepControllerIF {
 		importDwcaJob.addToSharedParameters(SharedParameterEnum.RESOURCE_ID, resourceId);
 		currentJob = importDwcaJob;
 
-		// harvesterViewModel.encapsulateJobStatus(jobStatusModel);
 		importDwcaJob.doJob(jobStatusModel);
 	}
 
@@ -250,7 +249,7 @@ public class StepController implements StepControllerIF {
 			switch (jobType) {
 				case IMPORT_DWC:
 					DwcaResourceModel dwcaResourceModel = (DwcaResourceModel) importDwcaJob
-							.getFromSharedParameters(SharedParameterEnum.RESOURCE_MODEL);
+					.getFromSharedParameters(SharedParameterEnum.RESOURCE_MODEL);
 					if (moveToPublicSchema) {
 						moveToPublicSchema(dwcaResourceModel.getId(), computeUniqueValues);
 						moveToPublicSchema = false;

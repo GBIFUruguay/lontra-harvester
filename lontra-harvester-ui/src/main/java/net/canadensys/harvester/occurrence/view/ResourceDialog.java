@@ -37,7 +37,7 @@ public class ResourceDialog extends AbstractDialog {
 	private JTextField nameTxt;
 	private JTextField urlTxt;
 	private JTextField sfIdTxt;
-	private JTextField resourceUuidTxt;
+	private JTextField gbifPackageIdTxt;
 
 	private DwcaResourceModel resourceModel = null;
 
@@ -125,9 +125,9 @@ public class ResourceDialog extends AbstractDialog {
 		sfIdTxt.setEditable(false);
 		contentPanel.add(sfIdTxt, c);
 
-		/* Resource UUID */
-		JLabel resourceJLabel = new JLabel(Messages.getString("resourceView.resource.uuid"));
-		resourceJLabel.setToolTipText(Messages.getString("resourceView.resource.uuid.tooltip"));
+		/* Resource GBIF package_id */
+		JLabel resourceJLabel = new JLabel(Messages.getString("resourceView.resource.gbifpackageid"));
+		resourceJLabel.setToolTipText(Messages.getString("resourceView.resource.gbifpackageid.tooltip"));
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 4;
@@ -139,9 +139,9 @@ public class ResourceDialog extends AbstractDialog {
 		c.gridx = 1;
 		c.gridy = 4;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		resourceUuidTxt = new JTextField(TXT_FIELD_LENGTH);
-		resourceUuidTxt.setEditable(false);
-		contentPanel.add(resourceUuidTxt, c);
+		gbifPackageIdTxt = new JTextField(TXT_FIELD_LENGTH);
+		gbifPackageIdTxt.setEditable(false);
+		contentPanel.add(gbifPackageIdTxt, c);
 
 		/* Init publishers combo box and add it to the dialog */
 		publishersCmbBox = new JComboBox<String>();
@@ -166,12 +166,12 @@ public class ResourceDialog extends AbstractDialog {
 			nameTxt.setText(resourceModel.getName());
 			urlTxt.setText(resourceModel.getArchive_url());
 			sfIdTxt.setText(resourceModel.getSourcefileid());
-			resourceUuidTxt.setText((resourceModel.getGbif_package_id()));
+			gbifPackageIdTxt.setText((resourceModel.getGbif_package_id()));
 		}
-		// Add resource, set UUID and source file id editable:
+		// Add resource, set gbifPackageId and source file id editable:
 		else {
 			sfIdTxt.setEditable(true);
-			resourceUuidTxt.setEditable(true);
+			gbifPackageIdTxt.setEditable(true);
 		}
 		initPublishersComboBox();
 		setVisible(true);
@@ -185,7 +185,7 @@ public class ResourceDialog extends AbstractDialog {
 		String nameValue = nameTxt.getText();
 		String urlValue = urlTxt.getText();
 		String sourceFileIdValue = sfIdTxt.getText();
-		String gbifPackageId = resourceUuidTxt.getText();
+		String gbifPackageId = gbifPackageIdTxt.getText();
 		String publisherName = (String) publishersCmbBox.getSelectedItem();
 
 		// This is a new resource, initialize resourceModel
@@ -246,12 +246,12 @@ public class ResourceDialog extends AbstractDialog {
 			names.add(publisher.getName());
 		}
 		Collections.sort(names);
-		
+
 		// Add an item for each publisher name:
 		for (String name : names) {
 			publishersCmbBox.addItem(name);
 		}
-		
+
 		if (isEdition && resourceModel.getPublisher() != null) {
 			publishersCmbBox.setSelectedItem(resourceModel.getPublisher().getName());
 		}
