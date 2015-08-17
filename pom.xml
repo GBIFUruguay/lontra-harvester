@@ -4,7 +4,7 @@
 	<groupId>winglongitude</groupId>
 	<artifactId>winglongitude-lontra</artifactId>
 	<packaging>pom</packaging>
-	<version>1.2-SNAPSHOT</version>
+	<version>1.2</version>
 	<name>WingLongitude Lontra Harvester</name>
   
 	<modules>
@@ -30,7 +30,7 @@
 		<connection>scm:git:git@github.com:WingLongitude/lontra-harvester.git</connection>
 		<developerConnection>scm:git:git@github.com:WingLongitude/lontra-harvester.git</developerConnection>
 		<url>scm:git:git@github.com:WingLongitude/lontra-harvester.git</url>
-	  <tag>HEAD</tag>
+	  <tag>winglongitude-lontra-1.2</tag>
   </scm>
 
 	<issueManagement>
