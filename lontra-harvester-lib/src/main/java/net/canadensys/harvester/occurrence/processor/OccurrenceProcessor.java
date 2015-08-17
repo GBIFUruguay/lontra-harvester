@@ -6,8 +6,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.time.MonthOfYear;
-
 import net.canadensys.dataportal.occurrence.model.OccurrenceModel;
 import net.canadensys.dataportal.occurrence.model.OccurrenceRawModel;
 import net.canadensys.harvester.ItemProcessorIF;
@@ -35,6 +33,7 @@ import org.gbif.api.vocabulary.Country;
 import org.gbif.api.vocabulary.NameType;
 import org.gbif.nameparser.NameParser;
 import org.gbif.nameparser.UnparsableException;
+import org.threeten.bp.Month;
 
 import com.google.common.base.CharMatcher;
 
@@ -443,7 +442,7 @@ public class OccurrenceProcessor implements ItemProcessorIF<OccurrenceRawModel, 
 		}
 		// make sure month is valid
 		if (occModel.getSmonth() != null
-				&& (occModel.getSmonth() < MonthOfYear.JANUARY.getValue() || occModel.getSmonth() > MonthOfYear.DECEMBER.getValue())) {
+				&& (occModel.getSmonth() < Month.JANUARY.getValue() || occModel.getSmonth() > Month.DECEMBER.getValue())) {
 			occModel.setSmonth(null);
 		}
 
