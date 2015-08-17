@@ -1,5 +1,7 @@
 Version History
 ===============
+Version 1.2 2015-08-17
+ * [Code diff](https://github.com/WingLongitude/lontra-harvester/compare/winglongitude-lontra-1.1...winglongitude-lontra-1.2)
 
 Version 1.1 2015-07-09
 * New features in lontra-harvester-cli project

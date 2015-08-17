@@ -17,7 +17,7 @@
 		<postgresql.version>9.3-1102-jdbc4</postgresql.version>
 		<jsch.version>0.1.51</jsch.version>
 		<activemq.version>5.10.0</activemq.version>
-		<narwhal.version>1.5.3</narwhal.version>
+		<narwhal.version>1.6.0</narwhal.version>
 		<data-access.version>2.15.0</data-access.version>
 		<shared-dictionaries.version>0.2</shared-dictionaries.version>
 		<commons-validator.version>1.4.1</commons-validator.version>
