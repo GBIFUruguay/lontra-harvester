@@ -58,6 +58,7 @@ import net.canadensys.harvester.occurrence.task.GetResourceInfoTask;
 import net.canadensys.harvester.occurrence.task.PostProcessOccurrenceTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
+import net.canadensys.harvester.occurrence.task.RemoveDwcaResourceTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
@@ -264,6 +265,11 @@ public class CLIProcessingConfig {
 	@Bean
 	public ItemTaskIF replaceOldOccurrenceTask() {
 		return new ReplaceOldOccurrenceTask();
+	}
+	
+	@Bean
+	public ItemTaskIF removeDwcaResourceTask() {
+		return new RemoveDwcaResourceTask();
 	}
 
 	@Bean

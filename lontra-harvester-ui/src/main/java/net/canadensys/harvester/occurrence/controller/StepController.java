@@ -5,6 +5,15 @@ import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
+
+import org.hibernate.Criteria;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.dao.PublisherDAO;
@@ -20,20 +29,13 @@ import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
+import net.canadensys.harvester.occurrence.job.RemoveDwcaResourceJob;
 import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 import net.canadensys.harvester.occurrence.status.ResourceStatusCheckerIF;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
-
-import org.hibernate.Criteria;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Order;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationContext;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Main controller to initiate jobs.
@@ -82,6 +84,9 @@ public class StepController implements StepControllerIF {
 
 	@Autowired
 	private ComputeUniqueValueJob computeUniqueValueJob;
+	
+	@Autowired
+	private RemoveDwcaResourceJob removeDwcaResourceJob;
 
 	@Autowired
 	private HarvesterViewModel harvesterViewModel;
@@ -133,6 +138,13 @@ public class StepController implements StepControllerIF {
 		computeUniqueValueJob.doJob(jobStatusModel);
 		currentJob = computeUniqueValueJob;
 	}
+	
+	@Override 
+	public void removeDwcaResource(Map<SharedParameterEnum, Object> sharedParameters) {
+		removeDwcaResourceJob.setSharedParameters(sharedParameters);
+		removeDwcaResourceJob.doJob(jobStatusModel);
+		currentJob = removeDwcaResourceJob;
+	}
 
 	/**
 	 * C.G. This does nothing for now since the old code was working on buffer schema.
@@ -152,9 +164,12 @@ public class StepController implements StepControllerIF {
 	@Override
 	@Transactional("publicTransactionManager")
 	public List<DwcaResourceModel> getResourceModelList() {
-		return resourceDAO.loadResources();
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(DwcaResourceModel.class);
+		// Return results in alphabetical order
+		criteria.addOrder(Order.asc("name"));
+		return criteria.list();
 	}
-
+	
 	@Override
 	@Transactional("publicTransactionManager")
 	public List<PublisherModel> getPublisherModelList() {

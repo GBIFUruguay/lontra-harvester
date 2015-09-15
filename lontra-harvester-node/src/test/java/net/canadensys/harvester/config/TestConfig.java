@@ -37,6 +37,7 @@ import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
+import net.canadensys.harvester.occurrence.task.RemoveDwcaResourceTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
@@ -273,6 +274,11 @@ public class TestConfig {
 	@Bean
 	public ItemTaskIF replaceOldOccurrenceTask() {
 		return new ReplaceOldOccurrenceTask();
+	}
+	
+	@Bean
+	public ItemTaskIF removeDwcaResourceTask() {
+		return new RemoveDwcaResourceTask();
 	}
 
 	@Bean(name = "resourceInformationWriter")

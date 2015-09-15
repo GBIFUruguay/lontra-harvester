@@ -1,10 +1,12 @@
 package net.canadensys.harvester.occurrence.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.PublisherModel;
+import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 
@@ -17,7 +19,7 @@ public interface StepControllerIF {
 	public List<IPTFeedModel> getIPTFeed();
 
 	public List<DwcaResourceModel> getResourceModelList();
-
+	
 	public List<PublisherModel> getPublisherModelList();
 
 	/**
@@ -43,6 +45,8 @@ public interface StepControllerIF {
 	public void moveToPublicSchema(Integer resourceID, boolean computeUniqueValues);
 
 	public void computeUniqueValues();
+	
+	public void removeDwcaResource(Map<SharedParameterEnum, Object> sharedParameters);
 
 	public void onNodeError();
 

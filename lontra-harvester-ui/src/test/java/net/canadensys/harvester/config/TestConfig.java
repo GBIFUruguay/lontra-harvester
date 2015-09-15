@@ -6,6 +6,22 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.gbif.dwc.terms.Term;
+import org.gbif.metadata.eml.Eml;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.orm.hibernate4.HibernateTransactionManager;
+import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
 import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
 import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
@@ -40,6 +56,7 @@ import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
+import net.canadensys.harvester.occurrence.job.RemoveDwcaResourceJob;
 import net.canadensys.harvester.occurrence.mapper.OccurrenceExtensionMapper;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
@@ -60,27 +77,12 @@ import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
 import net.canadensys.harvester.occurrence.task.PostProcessOccurrenceTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
+import net.canadensys.harvester.occurrence.task.RemoveDwcaResourceTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.ResourceMetadataHibernateWriter;
-
-import org.gbif.dwc.terms.Term;
-import org.gbif.metadata.eml.Eml;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
-import org.springframework.context.annotation.Scope;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.orm.hibernate4.HibernateTransactionManager;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration("processingConfig")
 @EnableTransactionManagement
@@ -315,6 +317,11 @@ public class TestConfig {
 	public ImportDwcaJob importDwcaJob() {
 		return new ImportDwcaJob();
 	}
+	
+	@Bean
+	public RemoveDwcaResourceJob removeDwcaResourceJob() {
+		return new RemoveDwcaResourceJob();
+	}
 
 	// ---TASK wiring---
 
@@ -389,6 +396,11 @@ public class TestConfig {
 	@Bean
 	public ItemTaskIF replaceOldOccurrenceTask() {
 		return new ReplaceOldOccurrenceTask();
+	}
+	
+	@Bean
+	public ItemTaskIF removeDwcaResourceTask() {
+		return new RemoveDwcaResourceTask();
 	}
 
 	@Bean(name = "resourceInformationWriter")
