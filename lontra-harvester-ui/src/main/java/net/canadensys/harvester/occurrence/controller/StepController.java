@@ -29,6 +29,7 @@ import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
+import net.canadensys.harvester.occurrence.job.PublisherNameUpdateJob;
 import net.canadensys.harvester.occurrence.job.RemoveDwcaResourceJob;
 import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
@@ -89,6 +90,9 @@ public class StepController implements StepControllerIF {
 	private RemoveDwcaResourceJob removeDwcaResourceJob;
 
 	@Autowired
+	private PublisherNameUpdateJob publisherNameUpdateJob;
+	
+	@Autowired
 	private HarvesterViewModel harvesterViewModel;
 	private final JobStatusModel jobStatusModel;
 
@@ -144,6 +148,13 @@ public class StepController implements StepControllerIF {
 		removeDwcaResourceJob.setSharedParameters(sharedParameters);
 		removeDwcaResourceJob.doJob(jobStatusModel);
 		currentJob = removeDwcaResourceJob;
+	}
+	
+	@Override 
+	public void publisherNameUpdate(Map<SharedParameterEnum, Object> sharedParameters) {
+		publisherNameUpdateJob.setSharedParameters(sharedParameters);
+		publisherNameUpdateJob.doJob(jobStatusModel);
+		currentJob = publisherNameUpdateJob;
 	}
 
 	/**

@@ -104,7 +104,7 @@ public class PublishersPanel extends JPanel {
 			}
 		});
 		this.add(editPublisherBtn, c);
-		
+
 		// Add publisher button:
 		c.gridx = 3;
 		c.gridwidth = 1;
@@ -144,8 +144,7 @@ public class PublishersPanel extends JPanel {
 	 * @param publisherModelList
 	 * @return
 	 */
-	public Vector<Vector<Object>> loadData(
-			List<PublisherModel> publisherModelList) {
+	public Vector<Vector<Object>> loadData(List<PublisherModel> publisherModelList) {
 		Vector<Vector<Object>> rowData = new Vector<Vector<Object>>();
 		for (PublisherModel currPublisherModel : publisherModelList) {
 			Vector<Object> row = new Vector<Object>();
@@ -182,7 +181,7 @@ public class PublishersPanel extends JPanel {
 	 * 
 	 * @return
 	 */
-	private void initPublishersTable() {
+	public void initPublishersTable() {
 		if (publishersList == null) {
 			publishersList = new JTable() {
 				/**
@@ -199,11 +198,10 @@ public class PublishersPanel extends JPanel {
 				 * Defines the table's preferred size:
 				 */
 				@Override
-				public Dimension getPreferredScrollableViewportSize()
-				{
-				    int width = 700;
-				    int height = 150;
-				    return new Dimension(width, height);
+				public Dimension getPreferredScrollableViewportSize() {
+					int width = 700;
+					int height = 150;
+					return new Dimension(width, height);
 				}
 			};
 			// Set single selection mode only:
@@ -217,7 +215,6 @@ public class PublishersPanel extends JPanel {
 				}
 			});
 		}
-
 		// Initialize TableModel:
 		initPublishersTableModel();
 
@@ -243,8 +240,7 @@ public class PublishersPanel extends JPanel {
 			if (!stepController.updatePublisherModel(publisherModel)) {
 				JOptionPane.showMessageDialog(this, Messages.getString("publisherView.publisher.error.save.msg"),
 						Messages.getString("publisherView.publisher.error.title"), JOptionPane.ERROR_MESSAGE);
-			}
-			else {
+			} else {
 				JOptionPane.showMessageDialog(this, Messages.getString("publisherView.publisher.success.save.msg"),
 						Messages.getString("publisherView.publisher.success.title"), JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -256,8 +252,9 @@ public class PublishersPanel extends JPanel {
 	}
 
 	/**
-	 * Add publisher button action, triggers parallel execution of tasks, releasing GUI interface.
-    */
+	 * Add publisher button action, triggers parallel execution of tasks,
+	 * releasing GUI interface.
+	 */
 	private void onEditPublisher() {
 		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
 			@Override
@@ -266,7 +263,7 @@ public class PublishersPanel extends JPanel {
 				editPublisher();
 				return true;
 			}
-			
+
 			@Override
 			public void done() {
 				// Only if the name has changed
@@ -275,14 +272,14 @@ public class PublishersPanel extends JPanel {
 		};
 		swingWorker.execute();
 	}
-	
-	private void  editPublisher() {
+
+	private void editPublisher() {
 		// Get publisher from selected item in publisher table:
 		// Ensure there is a selected publisher:
 		PublisherModel publisherToEdit = null;
 		if (publishersList.getSelectedRow() != -1) {
 			int id = Integer.parseInt((String) publishersList.getValueAt(publishersList.getSelectedRow(), 0));
-			for (PublisherModel publisher: publishers) {
+			for (PublisherModel publisher : publishers) {
 				if (publisher.getAuto_id() == id) {
 					publisherToEdit = publisher;
 					break;
@@ -296,19 +293,22 @@ public class PublishersPanel extends JPanel {
 					JOptionPane.showMessageDialog(this, Messages.getString("publisherView.publisher.error.update.msg"),
 							Messages.getString("publisherView.publisher.error.title"), JOptionPane.ERROR_MESSAGE);
 				} else {
-					JOptionPane.showMessageDialog(this, Messages.getString("publisherView.publisher.success.update.msg"),
-							Messages.getString("publisherView.publisher.success.title"), JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(this,
+							Messages.getString("publisherView.publisher.success.update.msg"),
+							Messages.getString("publisherView.publisher.success.title"),
+							JOptionPane.INFORMATION_MESSAGE);
 				}
 				// reload data to ensure we have the latest changes:
 				publishers = stepController.getPublisherModelList();
 				// refresh publisher table to display new publisher:
-				updatePublishersTable();				
+				updatePublishersTable();
 			}
 		}
 	}
-	
+
 	/**
-	 * Rebuild the publishers' table if the list of available publishers is changed.
+	 * Rebuild the publishers' table if the list of available publishers is
+	 * changed.
 	 */
 	public void updatePublishersTable() {
 		initPublishersTable();
@@ -378,11 +378,10 @@ public class PublishersPanel extends JPanel {
 				 * Defines the table's preferred size:
 				 */
 				@Override
-				public Dimension getPreferredScrollableViewportSize()
-				{
-				    int width = 700;
-				    int height = 150;
-				    return new Dimension(width, height);
+				public Dimension getPreferredScrollableViewportSize() {
+					int width = 700;
+					int height = 150;
+					return new Dimension(width, height);
 				}
 			};
 			// Set single selection mode only:
@@ -400,8 +399,7 @@ public class PublishersPanel extends JPanel {
 				aux.add(r.getName());
 				if (r.getRecord_count() == null) {
 					aux.add("");
-				}
-				else {
+				} else {
 					aux.add(r.getRecord_count().toString());
 				}
 				resourcesTableModel.addRow(aux);

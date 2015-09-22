@@ -9,6 +9,7 @@ import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
+import net.canadensys.harvester.occurrence.view.PublishersPanel;
 
 public interface StepControllerIF {
 
@@ -19,7 +20,7 @@ public interface StepControllerIF {
 	public List<IPTFeedModel> getIPTFeed();
 
 	public List<DwcaResourceModel> getResourceModelList();
-	
+
 	public List<PublisherModel> getPublisherModelList();
 
 	/**
@@ -45,8 +46,10 @@ public interface StepControllerIF {
 	public void moveToPublicSchema(Integer resourceID, boolean computeUniqueValues);
 
 	public void computeUniqueValues();
-	
+
 	public void removeDwcaResource(Map<SharedParameterEnum, Object> sharedParameters);
+
+	public void publisherNameUpdate(Map<SharedParameterEnum, Object> sharedParameters);
 
 	public void onNodeError();
 

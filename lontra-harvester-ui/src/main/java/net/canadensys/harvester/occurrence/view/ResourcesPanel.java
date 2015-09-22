@@ -28,6 +28,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
+import net.canadensys.dataportal.occurrence.model.PublisherModel;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF.JobType;
@@ -65,7 +66,7 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 	private final StepControllerIF stepController;
 
 	private List<DwcaResourceModel> knownResources;
-
+	
 	public ResourcesPanel(StepControllerIF stepController, HarvesterViewModel harvesterViewModel) {
 		
 		editResourceBtn = new JButton(Messages.getString("view.button.edit.resource"));
@@ -630,6 +631,15 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 				}
 				Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
 				sharedParameters.put(SharedParameterEnum.RESOURCE_MODEL, resourceToRemove);
+				
+				// Update publisher records, in case the resource belongs to some publisher:
+				PublisherModel publisher = resourceToRemove.getPublisher();
+				//Save amount of records to be removed:
+				Integer records = resourceToRemove.getRecord_count();
+				publisher.setRecord_count(publisher.getRecord_count() - records);
+				if (publisher != null) {
+					stepController.updatePublisherModel(publisher);					
+				}
 				stepController.removeDwcaResource(sharedParameters);
 				return true;
 			}
@@ -647,6 +657,36 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 		swingWorker.execute();
 	}
 
+	public void publisherNameUpdate(final String publisherName) {
+		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
+			@Override
+			public Boolean doInBackground() {
+				// Update status:
+				updateStatusLabel(Messages.getString("view.info.status.publisherNameUpdate"));
+				// Start removing resource and dependencies
+				String selectedResource = (String) resourcesCmbBox.getSelectedItem();
+				// Get resource to be edited based on selected item:
+				DwcaResourceModel resourceToUpdate = null;
+				for (DwcaResourceModel resource : stepController.getResourceModelList()) {
+					if (resource.getName().equalsIgnoreCase(selectedResource))
+						resourceToUpdate = resource;
+				}
+
+				// Update publisher records, in case the resource belongs to some publisher:
+				Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
+				sharedParameters.put(SharedParameterEnum.PUBLISHER_NAME, publisherName);
+				sharedParameters.put(SharedParameterEnum.RESOURCE_ID, resourceToUpdate.getId());
+
+				stepController.publisherNameUpdate(sharedParameters);
+				return true;
+			}
+
+			@Override
+			protected void done() {}
+		};
+		swingWorker.execute();
+	}
+	
 	public void orderResources() {
 		// Retrieve available resources list:
 		List<DwcaResourceModel> resources = stepController.getResourceModelList();

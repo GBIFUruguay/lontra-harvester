@@ -56,6 +56,7 @@ import net.canadensys.harvester.occurrence.dao.IPTFeedDAO;
 import net.canadensys.harvester.occurrence.job.ComputeUniqueValueJob;
 import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
+import net.canadensys.harvester.occurrence.job.PublisherNameUpdateJob;
 import net.canadensys.harvester.occurrence.job.RemoveDwcaResourceJob;
 import net.canadensys.harvester.occurrence.mapper.OccurrenceExtensionMapper;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
@@ -76,6 +77,7 @@ import net.canadensys.harvester.occurrence.task.CheckHarvestingCompletenessTask;
 import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
 import net.canadensys.harvester.occurrence.task.PostProcessOccurrenceTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
+import net.canadensys.harvester.occurrence.task.PublisherNameUpdateTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
 import net.canadensys.harvester.occurrence.task.RemoveDwcaResourceTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
@@ -322,6 +324,11 @@ public class TestConfig {
 	public RemoveDwcaResourceJob removeDwcaResourceJob() {
 		return new RemoveDwcaResourceJob();
 	}
+	
+	@Bean
+	public PublisherNameUpdateJob publisherNameUpdateJob() {
+		return new PublisherNameUpdateJob();
+	}
 
 	// ---TASK wiring---
 
@@ -401,6 +408,10 @@ public class TestConfig {
 	@Bean
 	public ItemTaskIF removeDwcaResourceTask() {
 		return new RemoveDwcaResourceTask();
+	}
+	
+	@Bean ItemTaskIF publisherNameUpdateTask() {
+		return new PublisherNameUpdateTask();
 	}
 
 	@Bean(name = "resourceInformationWriter")

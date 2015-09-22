@@ -4,6 +4,21 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.gbif.dwc.terms.Term;
+import org.gbif.metadata.eml.Eml;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.hibernate4.HibernateTransactionManager;
+import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
 import net.canadensys.dataportal.occurrence.dao.DwcaResourceDAO;
 import net.canadensys.dataportal.occurrence.dao.ImportLogDAO;
 import net.canadensys.dataportal.occurrence.dao.impl.HibernateDwcaResourceDAO;
@@ -57,27 +72,13 @@ import net.canadensys.harvester.occurrence.task.ComputeUniqueValueTask;
 import net.canadensys.harvester.occurrence.task.GetResourceInfoTask;
 import net.canadensys.harvester.occurrence.task.PostProcessOccurrenceTask;
 import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
+import net.canadensys.harvester.occurrence.task.PublisherNameUpdateTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
 import net.canadensys.harvester.occurrence.task.RemoveDwcaResourceTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.RawOccurrenceHibernateWriter;
 import net.canadensys.harvester.occurrence.writer.ResourceMetadataHibernateWriter;
-
-import org.gbif.dwc.terms.Term;
-import org.gbif.metadata.eml.Eml;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
-import org.springframework.context.annotation.Scope;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.hibernate4.HibernateTransactionManager;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * Configuration class using Spring annotations.
@@ -285,6 +286,11 @@ public class CLIProcessingConfig {
 	@Bean
 	public ItemTaskIF postProcessOccurrenceTask() {
 		return new PostProcessOccurrenceTask();
+	}
+	
+	@Bean
+	public ItemTaskIF publisherNameUpdateTask() {
+		return new PublisherNameUpdateTask();
 	}
 
 	// ---PROCESSOR wiring---
