@@ -81,6 +81,7 @@ import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 import net.canadensys.harvester.occurrence.task.PublisherNameUpdateTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
 import net.canadensys.harvester.occurrence.task.RemoveDwcaResourceTask;
+import net.canadensys.harvester.occurrence.task.RemovePublisherTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
 import net.canadensys.harvester.occurrence.writer.OccurrenceHibernateWriter;
@@ -346,6 +347,10 @@ public class TestConfig {
 	@Bean(name = "insertResourceInformationStep")
 	public StepIF insertResourceInformationStep() {
 		return new InsertResourceInformationStep();
+	}
+	
+	@Bean public ItemTaskIF removePublisherTask() {
+		return new RemovePublisherTask();	
 	}
 
 	/**
