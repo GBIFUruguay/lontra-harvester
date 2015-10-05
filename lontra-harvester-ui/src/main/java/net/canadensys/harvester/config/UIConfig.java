@@ -57,6 +57,7 @@ import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.job.PublisherNameUpdateJob;
 import net.canadensys.harvester.occurrence.job.RemoveDwcaResourceJob;
+import net.canadensys.harvester.occurrence.job.RemovePublisherJob;
 import net.canadensys.harvester.occurrence.mapper.OccurrenceExtensionMapper;
 import net.canadensys.harvester.occurrence.processor.DwcaExtensionLineProcessor;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
@@ -81,6 +82,7 @@ import net.canadensys.harvester.occurrence.task.PrepareDwcaTask;
 import net.canadensys.harvester.occurrence.task.PublisherNameUpdateTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
 import net.canadensys.harvester.occurrence.task.RemoveDwcaResourceTask;
+import net.canadensys.harvester.occurrence.task.RemovePublisherTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
 import net.canadensys.harvester.occurrence.view.OccurrenceHarvesterMainView;
 import net.canadensys.harvester.occurrence.view.model.HarvesterViewModel;
@@ -271,6 +273,10 @@ public class UIConfig {
 		return new PublisherNameUpdateJob();
 	}
 	
+	@Bean RemovePublisherJob removePublisherJob() {
+		return new RemovePublisherJob();
+	}
+	
 	// ---STEP---
 	@Bean(name = "streamEmlContentStep")
 	public StepIF streamEmlContentStep() {
@@ -343,6 +349,10 @@ public class UIConfig {
 	@Bean
 	public ItemTaskIF postProcessOccurrenceTask() {
 		return new PostProcessOccurrenceTask();
+	}
+	
+	@Bean public ItemTaskIF removePublisherTask() {
+		return new RemovePublisherTask();	
 	}
 
 	// ---PROCESSOR wiring---

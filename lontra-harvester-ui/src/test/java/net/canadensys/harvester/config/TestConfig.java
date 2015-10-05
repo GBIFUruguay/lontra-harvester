@@ -58,6 +58,7 @@ import net.canadensys.harvester.occurrence.job.ImportDwcaJob;
 import net.canadensys.harvester.occurrence.job.MoveToPublicSchemaJob;
 import net.canadensys.harvester.occurrence.job.PublisherNameUpdateJob;
 import net.canadensys.harvester.occurrence.job.RemoveDwcaResourceJob;
+import net.canadensys.harvester.occurrence.job.RemovePublisherJob;
 import net.canadensys.harvester.occurrence.mapper.OccurrenceExtensionMapper;
 import net.canadensys.harvester.occurrence.processor.DwcaLineProcessor;
 import net.canadensys.harvester.occurrence.processor.OccurrenceProcessor;
@@ -328,6 +329,11 @@ public class TestConfig {
 	@Bean
 	public PublisherNameUpdateJob publisherNameUpdateJob() {
 		return new PublisherNameUpdateJob();
+	}
+	
+	@Bean
+	public RemovePublisherJob removePublisherJob() {
+		return new RemovePublisherJob();
 	}
 
 	// ---TASK wiring---

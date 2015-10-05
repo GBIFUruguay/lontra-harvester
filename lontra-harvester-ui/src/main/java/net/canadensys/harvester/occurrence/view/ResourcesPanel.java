@@ -159,7 +159,7 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 			public void actionPerformed(ActionEvent e) {
 				// Check if the user is sure, then trigger removal.
 				int response = JOptionPane.showConfirmDialog(null,
-						"Are you sure you want to remove this resource and all its data (occurrences, contact information, resource metadata, etc.)?");
+						Messages.getString("resourcePanel.deletion.confirmation.dialog"));
 				if (response == JOptionPane.YES_OPTION) {
 					onRemoveDwcaResource();
 				}
@@ -636,8 +636,9 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 				PublisherModel publisher = resourceToRemove.getPublisher();
 				//Save amount of records to be removed:
 				Integer records = resourceToRemove.getRecord_count();
-				publisher.setRecord_count(publisher.getRecord_count() - records);
+
 				if (publisher != null) {
+					publisher.setRecord_count(publisher.getRecord_count() - records);
 					stepController.updatePublisherModel(publisher);					
 				}
 				stepController.removeDwcaResource(sharedParameters);

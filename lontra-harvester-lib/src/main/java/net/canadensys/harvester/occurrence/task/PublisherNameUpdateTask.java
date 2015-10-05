@@ -1,15 +1,7 @@
 package net.canadensys.harvester.occurrence.task;
 
-import java.math.BigInteger;
 import java.util.Map;
 
-import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
-import net.canadensys.dataportal.occurrence.model.OccurrenceFieldConstants;
-import net.canadensys.harvester.ItemTaskIF;
-import net.canadensys.harvester.exception.TaskExecutionException;
-import net.canadensys.harvester.occurrence.SharedParameterEnum;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -18,6 +10,11 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
+
+import net.canadensys.dataportal.occurrence.model.OccurrenceFieldConstants;
+import net.canadensys.harvester.ItemTaskIF;
+import net.canadensys.harvester.exception.TaskExecutionException;
+import net.canadensys.harvester.occurrence.SharedParameterEnum;
 
 /**
  * Complementary task to set occurrence's publishername once a resource is associated to a publisher.

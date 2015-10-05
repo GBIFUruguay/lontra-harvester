@@ -27,5 +27,9 @@ public enum SharedParameterEnum {
 	 * Key used to provide an instance of DwcaResourceModel.
 	 */
 	RESOURCE_MODEL,
-	NUMBER_OF_RECORDS, PUBLISHER_NAME
+	NUMBER_OF_RECORDS, PUBLISHER_NAME,
+	/**
+	 * key used to provide an instance of PublisherModel
+	 */
+	PUBLISHER_MODEL
 }
