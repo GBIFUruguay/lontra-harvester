@@ -60,6 +60,7 @@ public class ComputeUniqueValueTask implements ItemTaskIF {
 		columns.add("recordedby");
 		columns.add("institutioncode");
 		columns.add("_class");
+		columns.add("genus");
 		columns.add("phylum");
 		columns.add("county");
 		columns.add("municipality");
