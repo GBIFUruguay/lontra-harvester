@@ -9,7 +9,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -25,6 +27,7 @@ import javax.swing.table.DefaultTableModel;
 
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.PublisherModel;
+import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 
 /**
@@ -36,7 +39,7 @@ import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 public class PublishersPanel extends JPanel {
 
 	private static final long serialVersionUID = 983475983470237450L;
-
+	
 	private List<PublisherModel> publishers = null;
 	private List<DwcaResourceModel> resources = null;
 
@@ -45,6 +48,7 @@ public class PublishersPanel extends JPanel {
 
 	private JButton addPublisherBtn = null;
 	private JButton editPublisherBtn = null;
+	private JButton removePublisherBtn = null;
 	private JTable publishersList = null;
 	private JTable resourcesList = null;
 	private DefaultTableModel publishersTableModel = null;
@@ -76,7 +80,7 @@ public class PublishersPanel extends JPanel {
 		// Define padding:
 		c.insets = new Insets(5, 5, 5, 5);
 		// Define grid width:
-		c.gridwidth = 4;
+		c.gridwidth = 5;
 		c.gridx = 0;
 		c.gridy = lineIdx++;
 		c.anchor = GridBagConstraints.NORTHWEST;
@@ -88,7 +92,7 @@ public class PublishersPanel extends JPanel {
 		this.add(new JScrollPane(publishersList), c);
 
 		// Edit publisher button:
-		c.gridx = 2;
+		c.gridx = 0;
 		c.gridy = lineIdx++;
 		c.gridwidth = 1;
 		c.fill = GridBagConstraints.NONE;
@@ -104,9 +108,9 @@ public class PublishersPanel extends JPanel {
 			}
 		});
 		this.add(editPublisherBtn, c);
-		
+
 		// Add publisher button:
-		c.gridx = 3;
+		c.gridx = 1;
 		c.gridwidth = 1;
 		addPublisherBtn = new JButton(Messages.getString("view.button.add.publisher"));
 		addPublisherBtn.setToolTipText(Messages.getString("view.button.add.publisher.tooltip"));
@@ -120,8 +124,23 @@ public class PublishersPanel extends JPanel {
 		});
 		this.add(addPublisherBtn, c);
 
+		// Add publisher button:
+		c.gridx = 2;
+		c.gridwidth = 1;
+		removePublisherBtn = new JButton(Messages.getString("view.button.remove.publisher"));
+		removePublisherBtn.setToolTipText(Messages.getString("view.button.remove.publisher.tooltip"));
+		removePublisherBtn.setEnabled(true);
+		removePublisherBtn.setVisible(true);
+		removePublisherBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onRemovePublisher();
+			}
+		});
+		this.add(removePublisherBtn, c);
+
 		// Resources label:
-		c.gridwidth = 4;
+		c.gridwidth = 5;
 		c.gridx = 0;
 		c.gridy = lineIdx++;
 		c.anchor = GridBagConstraints.NORTHWEST;
@@ -144,8 +163,7 @@ public class PublishersPanel extends JPanel {
 	 * @param publisherModelList
 	 * @return
 	 */
-	public Vector<Vector<Object>> loadData(
-			List<PublisherModel> publisherModelList) {
+	public Vector<Vector<Object>> loadData(List<PublisherModel> publisherModelList) {
 		Vector<Vector<Object>> rowData = new Vector<Vector<Object>>();
 		for (PublisherModel currPublisherModel : publisherModelList) {
 			Vector<Object> row = new Vector<Object>();
@@ -182,7 +200,7 @@ public class PublishersPanel extends JPanel {
 	 * 
 	 * @return
 	 */
-	private void initPublishersTable() {
+	public void initPublishersTable() {
 		if (publishersList == null) {
 			publishersList = new JTable() {
 				/**
@@ -199,11 +217,10 @@ public class PublishersPanel extends JPanel {
 				 * Defines the table's preferred size:
 				 */
 				@Override
-				public Dimension getPreferredScrollableViewportSize()
-				{
-				    int width = 700;
-				    int height = 150;
-				    return new Dimension(width, height);
+				public Dimension getPreferredScrollableViewportSize() {
+					int width = 700;
+					int height = 150;
+					return new Dimension(width, height);
 				}
 			};
 			// Set single selection mode only:
@@ -217,7 +234,6 @@ public class PublishersPanel extends JPanel {
 				}
 			});
 		}
-
 		// Initialize TableModel:
 		initPublishersTableModel();
 
@@ -243,8 +259,7 @@ public class PublishersPanel extends JPanel {
 			if (!stepController.updatePublisherModel(publisherModel)) {
 				JOptionPane.showMessageDialog(this, Messages.getString("publisherView.publisher.error.save.msg"),
 						Messages.getString("publisherView.publisher.error.title"), JOptionPane.ERROR_MESSAGE);
-			}
-			else {
+			} else {
 				JOptionPane.showMessageDialog(this, Messages.getString("publisherView.publisher.success.save.msg"),
 						Messages.getString("publisherView.publisher.success.title"), JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -256,8 +271,9 @@ public class PublishersPanel extends JPanel {
 	}
 
 	/**
-	 * Add publisher button action, triggers parallel execution of tasks, releasing GUI interface.
-    */
+	 * Add publisher button action, triggers parallel execution of tasks,
+	 * releasing GUI interface.
+	 */
 	private void onEditPublisher() {
 		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
 			@Override
@@ -266,7 +282,7 @@ public class PublishersPanel extends JPanel {
 				editPublisher();
 				return true;
 			}
-			
+
 			@Override
 			public void done() {
 				// Only if the name has changed
@@ -275,14 +291,14 @@ public class PublishersPanel extends JPanel {
 		};
 		swingWorker.execute();
 	}
-	
-	private void  editPublisher() {
+
+	private void editPublisher() {
 		// Get publisher from selected item in publisher table:
 		// Ensure there is a selected publisher:
 		PublisherModel publisherToEdit = null;
 		if (publishersList.getSelectedRow() != -1) {
 			int id = Integer.parseInt((String) publishersList.getValueAt(publishersList.getSelectedRow(), 0));
-			for (PublisherModel publisher: publishers) {
+			for (PublisherModel publisher : publishers) {
 				if (publisher.getAuto_id() == id) {
 					publisherToEdit = publisher;
 					break;
@@ -296,19 +312,75 @@ public class PublishersPanel extends JPanel {
 					JOptionPane.showMessageDialog(this, Messages.getString("publisherView.publisher.error.update.msg"),
 							Messages.getString("publisherView.publisher.error.title"), JOptionPane.ERROR_MESSAGE);
 				} else {
-					JOptionPane.showMessageDialog(this, Messages.getString("publisherView.publisher.success.update.msg"),
-							Messages.getString("publisherView.publisher.success.title"), JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(this,
+							Messages.getString("publisherView.publisher.success.update.msg"),
+							Messages.getString("publisherView.publisher.success.title"),
+							JOptionPane.INFORMATION_MESSAGE);
 				}
 				// reload data to ensure we have the latest changes:
 				publishers = stepController.getPublisherModelList();
 				// refresh publisher table to display new publisher:
-				updatePublishersTable();				
+				updatePublishersTable();
+			}
+		}
+	}
+
+	/**
+	 * Remove publisher button action
+	 */
+	private void onRemovePublisher() {
+		// If there is a row selected in the publishers table:
+		Integer selectedRow = publishersList.getSelectedRow();
+		Integer id = null;
+		if (selectedRow >= 0) {
+			id = Integer.parseInt((String) publishersList.getValueAt(selectedRow, 0));
+			int response = JOptionPane.showConfirmDialog(null,
+					Messages.getString("publisherPane.deletion.confirmation.dialog"));
+			if (response == JOptionPane.YES_OPTION) {
+				PublisherModel selectedPublisher = null;
+				for (PublisherModel p : stepController.getPublisherModelList()) {
+					if (p.getAuto_id() == id) {
+						selectedPublisher = p;
+						break;
+					}
+				}
+				// Update orphan resources:
+				updateResourcesFromDeletedPublisher(selectedPublisher);
+				// Remove publisher information on db:
+				Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
+				sharedParameters.put(SharedParameterEnum.PUBLISHER_MODEL, selectedPublisher);
+				stepController.removePublisher(sharedParameters);
+				// Update publisher list on the UI:
+				updatePublishersTable();
+			}
+		}
+	}
+
+	public void updateResourcesFromDeletedPublisher(PublisherModel publisher) {
+		// Set all resources's publisher associated to null
+		List<DwcaResourceModel> resources = stepController.getResourceModelList();
+		for (DwcaResourceModel r : resources) {
+			PublisherModel p = r.getPublisher();
+			// Avoid checking resources already without associated publishers
+			if (p != null) {
+				if (p.getName().equalsIgnoreCase(publisher.getName())) {
+					r.setPublisher(null);
+					stepController.updateResourceModel(r);
+					
+					// Update publisher records, in case the resource belongs to some
+					// publisher:
+					Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
+					sharedParameters.put(SharedParameterEnum.PUBLISHER_NAME, publisher.getName());
+					sharedParameters.put(SharedParameterEnum.RESOURCE_ID, r.getId());
+					stepController.publisherNameUpdate(sharedParameters);
+				}
 			}
 		}
 	}
 	
 	/**
-	 * Rebuild the publishers' table if the list of available publishers is changed.
+	 * Rebuild the publishers' table if the list of available publishers is
+	 * changed.
 	 */
 	public void updatePublishersTable() {
 		initPublishersTable();
@@ -378,11 +450,10 @@ public class PublishersPanel extends JPanel {
 				 * Defines the table's preferred size:
 				 */
 				@Override
-				public Dimension getPreferredScrollableViewportSize()
-				{
-				    int width = 700;
-				    int height = 150;
-				    return new Dimension(width, height);
+				public Dimension getPreferredScrollableViewportSize() {
+					int width = 700;
+					int height = 150;
+					return new Dimension(width, height);
 				}
 			};
 			// Set single selection mode only:
@@ -400,8 +471,7 @@ public class PublishersPanel extends JPanel {
 				aux.add(r.getName());
 				if (r.getRecord_count() == null) {
 					aux.add("");
-				}
-				else {
+				} else {
 					aux.add(r.getRecord_count().toString());
 				}
 				resourcesTableModel.addRow(aux);

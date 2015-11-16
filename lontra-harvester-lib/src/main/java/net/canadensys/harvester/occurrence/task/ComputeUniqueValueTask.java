@@ -55,9 +55,12 @@ public class ComputeUniqueValueTask implements ItemTaskIF {
 		columns.add("kingdom");
 		columns.add("scientificname");
 		columns.add("_order");
+		columns.add("specificepithet");
+		columns.add("infraspecificepithet");
 		columns.add("recordedby");
 		columns.add("institutioncode");
 		columns.add("_class");
+		columns.add("genus");
 		columns.add("phylum");
 		columns.add("county");
 		columns.add("municipality");

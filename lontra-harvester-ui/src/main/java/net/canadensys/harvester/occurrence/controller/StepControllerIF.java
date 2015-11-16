@@ -1,17 +1,19 @@
 package net.canadensys.harvester.occurrence.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
 import net.canadensys.dataportal.occurrence.model.ImportLogModel;
 import net.canadensys.dataportal.occurrence.model.PublisherModel;
+import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.model.DwcaResourceStatusModel;
 import net.canadensys.harvester.occurrence.model.IPTFeedModel;
 
 public interface StepControllerIF {
 
 	public enum JobType {
-		IMPORT_DWC, MOVE_TO_PUBLIC, COMPUTE_UNIQUE;
+		IMPORT_DWC, MOVE_TO_PUBLIC, COMPUTE_UNIQUE, GENERIC_JOB;
 	};
 
 	public List<IPTFeedModel> getIPTFeed();
@@ -44,7 +46,13 @@ public interface StepControllerIF {
 
 	public void computeUniqueValues();
 
+	public void removeDwcaResource(Map<SharedParameterEnum, Object> sharedParameters);
+
+	public void publisherNameUpdate(Map<SharedParameterEnum, Object> sharedParameters);
+
 	public void onNodeError();
+	
+	public void removePublisher(Map<SharedParameterEnum, Object> sharedParameters);
 
 	/**
 	 * Insert or update a ResourceModel.

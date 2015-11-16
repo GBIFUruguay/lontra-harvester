@@ -39,12 +39,16 @@ public class ResourceDialog extends AbstractDialog {
 	private JTextField sfIdTxt;
 	private JTextField gbifPackageIdTxt;
 
-	private DwcaResourceModel resourceModel = null;
+	private DwcaResourceModel resource = null;
 
-	public ResourceDialog(Component parent, StepControllerIF stepController, DwcaResourceModel selectedResource, boolean isEdition) {
+	private ResourcesPanel resourcesPanel;
+
+	public ResourceDialog(Component parent, StepControllerIF stepController, DwcaResourceModel selectedResource,
+			boolean isEdition) {
 		super(Messages.getString("resourceView.title"), stepController, isEdition);
-		this.resourceModel = selectedResource;
+		this.resource = selectedResource;
 		setLocationRelativeTo(parent);
+		resourcesPanel = (ResourcesPanel) parent;
 		displayResource();
 	}
 
@@ -157,16 +161,16 @@ public class ResourceDialog extends AbstractDialog {
 	/**
 	 * Display a ResourceModel and allow user to update it.
 	 *
-	 * @param resourceModel
+	 * @param resource
 	 * @return updated ResourceModel or null if resourceModel in parameter was
 	 *         null
 	 */
 	public void displayResource() {
-		if (resourceModel != null) {
-			nameTxt.setText(resourceModel.getName());
-			urlTxt.setText(resourceModel.getArchive_url());
-			sfIdTxt.setText(resourceModel.getSourcefileid());
-			gbifPackageIdTxt.setText((resourceModel.getGbif_package_id()));
+		if (resource != null) {
+			nameTxt.setText(resource.getName());
+			urlTxt.setText(resource.getArchive_url());
+			sfIdTxt.setText(resource.getSourcefileid());
+			gbifPackageIdTxt.setText((resource.getGbif_package_id()));
 		}
 		// Add resource, set gbifPackageId and source file id editable:
 		else {
@@ -188,28 +192,67 @@ public class ResourceDialog extends AbstractDialog {
 		String gbifPackageId = gbifPackageIdTxt.getText();
 		String publisherName = (String) publishersCmbBox.getSelectedItem();
 
+		PublisherModel publisher = null;
+
 		// This is a new resource, initialize resourceModel
 		if (!isEdition) {
-			resourceModel = new DwcaResourceModel();
+			resource = new DwcaResourceModel();
+			// Set record_count to 0 by default:
+			resource.setRecord_count(0);
 		}
 
-		if (StringUtils.isNotBlank(nameValue) && StringUtils.isNotBlank(urlValue) && StringUtils.isNotBlank(sourceFileIdValue)) {
-			resourceModel.setName(nameValue);
-			resourceModel.setArchive_url(urlValue);
-			resourceModel.setSourcefileid(sourceFileIdValue);
-			resourceModel.setGbif_package_id(gbifPackageId);
+		if (StringUtils.isNotBlank(nameValue) && StringUtils.isNotBlank(urlValue)
+				&& StringUtils.isNotBlank(sourceFileIdValue)) {
+			resource.setName(nameValue);
+			resource.setArchive_url(urlValue);
+			resource.setSourcefileid(sourceFileIdValue);
+			resource.setGbif_package_id(gbifPackageId);
 			// Check if it has been set a valid publisher:
-
-			if (!publisherName.equalsIgnoreCase(""))
-				resourceModel.setPublisher(getPublisherFromName(publisherName));
-			if (!isEdition) {
-				// Set record_count to 0 by default:
-				resourceModel.setRecord_count(0);
+			if (!publisherName.equalsIgnoreCase("")) {
+				publisher = getPublisherFromName(publisherName);
+				// Resource already has a publisher:
+				PublisherModel currentPublisher = resource.getPublisher();
+				if (currentPublisher != null) {
+					// Resource is being associated to another publisher, must
+					// update previous publisher record counts:
+					if (!resource.getPublisher().getName().equalsIgnoreCase(publisherName)) {
+						// Update record count for previous publisher:
+						Integer recordCount = currentPublisher.getRecord_count() - resource.getRecord_count();
+						currentPublisher.setRecord_count(recordCount);
+						stepController.updatePublisherModel(currentPublisher);
+					}
+				}
+				// Set new publisher to the resource
+				resource.setPublisher(publisher);
+				// Update record count for new publisher:
+				Integer recordCount = publisher.getRecord_count() + resource.getRecord_count();
+				publisher.setRecord_count(recordCount);
+				// Update new publisher information:
+				stepController.updatePublisherModel(publisher);
 			}
+			// In this case, the user is setting the resource to a state where
+			// it belongs to no
+			// publisher.
+			else {
+				PublisherModel currentPublisher = resource.getPublisher();
+				if (currentPublisher != null) {
+					resource.setPublisher(null);
+					// Update record count for previous publisher:
+					Integer recordCount = currentPublisher.getRecord_count() - resource.getRecord_count();
+					currentPublisher.setRecord_count(recordCount);
+					stepController.updatePublisherModel(currentPublisher);
+				}
+			}
+			// Save resource updates to db:
+			stepController.updateResourceModel(resource);
+			// Update resources' occurrence publishername field:
+			resourcesPanel.publisherNameUpdate(publisherName);
+			// Reload publishers' combo box:
+			publishersCmbBox = new JComboBox<String>();
+			initPublishersComboBox();
 			exitValue = JOptionPane.OK_OPTION;
 			dispose();
-		}
-		else {
+		} else {
 			JOptionPane.showMessageDialog(this, Messages.getString("resourceView.resource.error.missing.msg"),
 					Messages.getString("resourceView.resource.error.title"), JOptionPane.ERROR_MESSAGE);
 		}
@@ -234,8 +277,7 @@ public class ResourceDialog extends AbstractDialog {
 	 */
 	private void initPublishersComboBox() {
 		// Retrieve available resources list:
-		List<PublisherModel> publishers = stepController
-				.getPublisherModelList();
+		List<PublisherModel> publishers = stepController.getPublisherModelList();
 
 		// Add blank item:
 		publishersCmbBox.addItem("");
@@ -252,8 +294,8 @@ public class ResourceDialog extends AbstractDialog {
 			publishersCmbBox.addItem(name);
 		}
 
-		if (isEdition && resourceModel.getPublisher() != null) {
-			publishersCmbBox.setSelectedItem(resourceModel.getPublisher().getName());
+		if (isEdition && resource.getPublisher() != null) {
+			publishersCmbBox.setSelectedItem(resource.getPublisher().getName());
 		}
 	}
 
@@ -282,6 +324,6 @@ public class ResourceDialog extends AbstractDialog {
 	 * @return
 	 */
 	public DwcaResourceModel getResourceModel() {
-		return this.resourceModel;
+		return this.resource;
 	}
 }

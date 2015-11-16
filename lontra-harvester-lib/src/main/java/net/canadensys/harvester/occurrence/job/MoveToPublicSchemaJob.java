@@ -3,6 +3,8 @@ package net.canadensys.harvester.occurrence.job;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import net.canadensys.harvester.AbstractProcessingJob;
 import net.canadensys.harvester.ItemTaskIF;
 import net.canadensys.harvester.occurrence.SharedParameterEnum;
@@ -10,10 +12,9 @@ import net.canadensys.harvester.occurrence.model.JobStatusModel;
 import net.canadensys.harvester.occurrence.model.JobStatusModel.JobStatus;
 import net.canadensys.harvester.occurrence.task.ComputeGISDataTask;
 import net.canadensys.harvester.occurrence.task.PostProcessOccurrenceTask;
+import net.canadensys.harvester.occurrence.task.PublisherNameUpdateTask;
 import net.canadensys.harvester.occurrence.task.RecordImportTask;
 import net.canadensys.harvester.occurrence.task.ReplaceOldOccurrenceTask;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This job allows to move all the data from the buffer schema to the public
@@ -41,7 +42,7 @@ public class MoveToPublicSchemaJob extends AbstractProcessingJob {
 
 	@Autowired
 	private ItemTaskIF postProcessOccurrenceTask;
-
+	
 	public MoveToPublicSchemaJob() {
 		super(UUID.randomUUID().toString());
 		sharedParameters = new HashMap<SharedParameterEnum, Object>();

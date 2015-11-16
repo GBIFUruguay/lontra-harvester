@@ -9,8 +9,9 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -27,6 +28,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import net.canadensys.dataportal.occurrence.model.DwcaResourceModel;
+import net.canadensys.dataportal.occurrence.model.PublisherModel;
+import net.canadensys.harvester.occurrence.SharedParameterEnum;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF;
 import net.canadensys.harvester.occurrence.controller.StepControllerIF.JobType;
 import net.canadensys.harvester.occurrence.model.JobStatusModel;
@@ -50,6 +53,7 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 	private JButton moveToPublicBtn = null;
 	private JButton addResourceBtn = null;
 	private JButton editResourceBtn = null;
+	private JButton removeResourceBtn = null;
 	private JButton computeUniqueValuesBtn = null;
 	private JLabel statusLbl = null;
 	private JTextField bufferSchemaTxt = null;
@@ -62,8 +66,14 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 	private final StepControllerIF stepController;
 
 	private List<DwcaResourceModel> knownResources;
-
+	
 	public ResourcesPanel(StepControllerIF stepController, HarvesterViewModel harvesterViewModel) {
+		
+		editResourceBtn = new JButton(Messages.getString("view.button.edit.resource"));
+		importBtn = new JButton(Messages.getString("view.button.import"));
+		addResourceBtn = new JButton(Messages.getString("view.button.add.resource"));
+		removeResourceBtn = new JButton(Messages.getString("view.button.remove.resource"));
+		
 		this.stepController = stepController;
 		// register to receive all updates to the model
 		harvesterViewModel.addPropertyChangeListener(this);
@@ -88,7 +98,7 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 		initResourceComboBox();
 		c.gridx = 0;
 		c.gridy = ++lineIdx;
-		c.gridwidth = 4;
+		c.gridwidth = 5;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		// c.anchor = GridBagConstraints.NORTH;
 		this.add(resourcesCmbBox, c);
@@ -99,7 +109,7 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 		c.gridwidth = 1;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.NORTHEAST;
-		importBtn = new JButton(Messages.getString("view.button.import"));
+		
 		importBtn.setToolTipText(Messages.getString("view.button.import.tooltip"));
 		importBtn.setEnabled(false);
 		importBtn.setVisible(true);
@@ -113,7 +123,7 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 
 		// View/edit resource button:
 		c.gridx = 2;
-		editResourceBtn = new JButton(Messages.getString("view.button.edit.resource"));
+		
 		editResourceBtn.setToolTipText(Messages.getString("view.button.edit.resource.tooltip"));
 		editResourceBtn.setVisible(true);
 		editResourceBtn.setEnabled(false);
@@ -128,7 +138,6 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 		// Add resource button:
 		// c.gridy = ++lineIdx;
 		c.gridx = 3;
-		addResourceBtn = new JButton(Messages.getString("view.button.add.resource"));
 		addResourceBtn.setToolTipText(Messages.getString("view.button.add.resource.tooltip"));
 		addResourceBtn.setEnabled(true);
 		addResourceBtn.setVisible(true);
@@ -140,10 +149,28 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 		});
 		this.add(addResourceBtn, c);
 
+		// Remove resource button:
+		c.gridx = 4;
+		removeResourceBtn.setToolTipText(Messages.getString("view.button.remove.resource.tooltip"));
+		removeResourceBtn.setEnabled(false);
+		removeResourceBtn.setVisible(true);
+		removeResourceBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// Check if the user is sure, then trigger removal.
+				int response = JOptionPane.showConfirmDialog(null,
+						Messages.getString("resourcePanel.deletion.confirmation.dialog"));
+				if (response == JOptionPane.YES_OPTION) {
+					onRemoveDwcaResource();
+				}
+			}
+		});
+		this.add(removeResourceBtn, c);
+
 		// UI separator
 		c.gridx = 0;
 		c.gridy = ++lineIdx;
-		c.gridwidth = 4;
+		c.gridwidth = 5;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add(new JSeparator(), c);
 
@@ -156,7 +183,7 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 		// DwcA text field name display:
 		bufferSchemaTxt = new JTextField();
 		bufferSchemaTxt.setEnabled(false);
-		c.gridwidth = 3;
+		c.gridwidth = 4;
 		c.gridx = 0;
 		c.gridy = ++lineIdx;
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -175,7 +202,7 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 			}
 		});
 		c.gridwidth = 1;
-		c.gridx = 3;
+		c.gridx = 4;
 		c.anchor = GridBagConstraints.NORTHEAST;
 		c.fill = GridBagConstraints.NONE;
 		this.add(moveToPublicBtn, c);
@@ -191,7 +218,7 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 			}
 		});
 		c.gridwidth = 1;
-		c.gridx = 3;
+		c.gridx = 4;
 		c.gridy = ++lineIdx;
 		c.anchor = GridBagConstraints.NORTHEAST;
 		c.fill = GridBagConstraints.NONE;
@@ -219,7 +246,7 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 		// UI separator
 		c.gridx = 0;
 		c.gridy = ++lineIdx;
-		c.gridwidth = 4;
+		c.gridwidth = 5;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add(new JSeparator(), c);
 
@@ -238,7 +265,7 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 
 		// UI line break
 		c.gridy = ++lineIdx;
-		c.gridwidth = 4;
+		c.gridwidth = 5;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add(new JSeparator(), c);
 
@@ -253,7 +280,7 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 		consoleTxtArea = new JTextArea();
 		consoleTxtArea.setRows(15);
 		c.gridy = ++lineIdx;
-		c.gridwidth = 4;
+		c.gridwidth = 5;
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
@@ -293,27 +320,27 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 
 	private void onImportDwcDone(JobStatus status) {
 		switch (status) {
-			case DONE:
-				statusLbl.setIcon(null);
-				bufferSchemaTxt.setText(resourceToImport.getSourcefileid());
-				updateStatusLabel(Messages.getString("view.info.status.importDone"));
-				// If auto move is set, start move:
-				if (moveChkBox.getSelectedObjects() == null) {
-					moveToPublicBtn.setEnabled(true);
-				}
-				break;
-			case ERROR:
-				statusLbl.setIcon(null);
-				updateStatusLabel(Messages.getString("view.info.status.error.importError"));
-				JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.error.details"),
-						Messages.getString("view.info.status.error"), JOptionPane.ERROR_MESSAGE);
-				break;
-			case CANCEL:
-				statusLbl.setIcon(null);
-				updateStatusLabel(Messages.getString("view.info.status.canceled"));
-				break;
-			default:
-				break;
+		case DONE:
+			statusLbl.setIcon(null);
+			bufferSchemaTxt.setText(resourceToImport.getSourcefileid());
+			updateStatusLabel(Messages.getString("view.info.status.importDone"));
+			// If auto move is set, start move:
+			if (moveChkBox.getSelectedObjects() == null) {
+				moveToPublicBtn.setEnabled(true);
+			}
+			break;
+		case ERROR:
+			statusLbl.setIcon(null);
+			updateStatusLabel(Messages.getString("view.info.status.error.importError"));
+			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.error.details"),
+					Messages.getString("view.info.status.error"), JOptionPane.ERROR_MESSAGE);
+			break;
+		case CANCEL:
+			statusLbl.setIcon(null);
+			updateStatusLabel(Messages.getString("view.info.status.canceled"));
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -332,15 +359,14 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 	private void onMoveDone(JobStatus status) {
 		statusLbl.setIcon(null);
 		if (JobStatus.DONE == status) {
-			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.moveCompleted"), Messages.getString("view.info.status.info"),
-					JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.moveCompleted"),
+					Messages.getString("view.info.status.info"), JOptionPane.INFORMATION_MESSAGE);
 			bufferSchemaTxt.setText("");
 			statusLbl.setText(Messages.getString("view.info.status.moveDone"));
 			statusLbl.setForeground(Color.BLUE);
-		}
-		else {
-			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.error.details"), Messages.getString("view.info.status.error"),
-					JOptionPane.ERROR_MESSAGE);
+		} else {
+			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.error.details"),
+					Messages.getString("view.info.status.error"), JOptionPane.ERROR_MESSAGE);
 			statusLbl.setText(Messages.getString("view.info.status.error.moveError"));
 		}
 	}
@@ -348,15 +374,14 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 	private void onUpdateDone(JobStatus status) {
 		statusLbl.setIcon(null);
 		if (JobStatus.DONE == status) {
-			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.updateDone"), Messages.getString("view.info.status.info"),
-					JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.updateDone"),
+					Messages.getString("view.info.status.info"), JOptionPane.INFORMATION_MESSAGE);
 			bufferSchemaTxt.setText("");
 			statusLbl.setText(Messages.getString("view.info.status.updateDone"));
 			statusLbl.setForeground(Color.BLUE);
-		}
-		else {
-			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.error.details"), Messages.getString("view.info.status.error"),
-					JOptionPane.ERROR_MESSAGE);
+		} else {
+			JOptionPane.showMessageDialog(this, Messages.getString("view.info.status.error.details"),
+					Messages.getString("view.info.status.error"), JOptionPane.ERROR_MESSAGE);
 			statusLbl.setText(Messages.getString("view.info.status.error.updateError"));
 		}
 	}
@@ -377,13 +402,13 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 					if (!selectedResource.equalsIgnoreCase("")) {
 						editResourceBtn.setEnabled(true);
 						importBtn.setEnabled(true);
-					}
-					else {
+						removeResourceBtn.setEnabled(true);
+					} else {
 						editResourceBtn.setEnabled(false);
 						importBtn.setEnabled(false);
+						removeResourceBtn.setEnabled(false);
 					}
 				}
-				orderResources();
 			}
 		});
 		orderResources();
@@ -418,10 +443,10 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 					public Void doInBackground() {
 						try {
 							if (resourceToImport != null) {
-								stepController.importDwcA(resourceToImport.getId(), moveChkBox.isSelected(), uniqueValuesChkBox.isSelected());
+								stepController.importDwcA(resourceToImport.getId(), moveChkBox.isSelected(),
+										uniqueValuesChkBox.isSelected());
 							}
-						}
-						catch (Exception e) {
+						} catch (Exception e) {
 							// should not get there but just in case
 							e.printStackTrace();
 						}
@@ -454,8 +479,7 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 				// not:
 				if (uniqueValuesChkBox.getSelectedObjects() != null) {
 					stepController.moveToPublicSchema(resourceToImport.getId(), true);
-				}
-				else {
+				} else {
 					stepController.moveToPublicSchema(resourceToImport.getId(), false);
 				}
 				return true;
@@ -517,8 +541,7 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 				if (!stepController.updateResourceModel(erd.getResourceModel())) {
 					JOptionPane.showMessageDialog(this, Messages.getString("resourceView.resource.error.save.msg"),
 							Messages.getString("resourceView.resource.error.title"), JOptionPane.ERROR_MESSAGE);
-				}
-				else {
+				} else {
 					// Resource has been changed successfully, update database:
 					// Update database after move
 					// C.G. disabled, see comments in refreshResource
@@ -585,20 +608,99 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 		swingWorker.execute();
 	}
 
+	/**
+	 * Describes actions to be taken once a resource is selected and the remove
+	 * resource button is pushed
+	 */
+	public void onRemoveDwcaResource() {
+		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
+			@Override
+			public Boolean doInBackground() {
+				// Update status:
+				removeResourceBtn.setEnabled(false);
+				statusLbl.setIcon(loadingImg);
+				statusLbl.setForeground(Color.ORANGE);
+				updateStatusLabel(Messages.getString("view.info.status.remove.resource"));
+				// Start removing resource and dependencies
+				String selectedResource = (String) resourcesCmbBox.getSelectedItem();
+				// Get resource to be edited based on selected item:
+				DwcaResourceModel resourceToRemove = null;
+				for (DwcaResourceModel resource : stepController.getResourceModelList()) {
+					if (resource.getName().equalsIgnoreCase(selectedResource))
+						resourceToRemove = resource;
+				}
+				Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
+				sharedParameters.put(SharedParameterEnum.RESOURCE_MODEL, resourceToRemove);
+				
+				// Update publisher records, in case the resource belongs to some publisher:
+				PublisherModel publisher = resourceToRemove.getPublisher();
+				//Save amount of records to be removed:
+				Integer records = resourceToRemove.getRecord_count();
+
+				if (publisher != null) {
+					publisher.setRecord_count(publisher.getRecord_count() - records);
+					stepController.updatePublisherModel(publisher);					
+				}
+				stepController.removeDwcaResource(sharedParameters);
+				return true;
+			}
+
+			@Override
+			protected void done() {
+				// Update status:
+				statusLbl.setIcon(null);
+				statusLbl.setForeground(Color.BLUE);
+				updateStatusLabel(Messages.getString("view.info.status.remove.resource.done"));
+				// Fetch updated resources:
+				orderResources();
+			}
+		};
+		swingWorker.execute();
+	}
+
+	public void publisherNameUpdate(final String publisherName) {
+		final SwingWorker<Boolean, Object> swingWorker = new SwingWorker<Boolean, Object>() {
+			@Override
+			public Boolean doInBackground() {
+				// Update status:
+				updateStatusLabel(Messages.getString("view.info.status.publisherNameUpdate"));
+				// Start removing resource and dependencies
+				String selectedResource = (String) resourcesCmbBox.getSelectedItem();
+				// Get resource to be edited based on selected item:
+				DwcaResourceModel resourceToUpdate = null;
+				for (DwcaResourceModel resource : stepController.getResourceModelList()) {
+					if (resource.getName().equalsIgnoreCase(selectedResource))
+						resourceToUpdate = resource;
+				}
+
+				// Update publisher records, in case the resource belongs to some publisher:
+				Map<SharedParameterEnum, Object> sharedParameters = new HashMap<SharedParameterEnum, Object>();
+				sharedParameters.put(SharedParameterEnum.PUBLISHER_NAME, publisherName);
+				sharedParameters.put(SharedParameterEnum.RESOURCE_ID, resourceToUpdate.getId());
+
+				stepController.publisherNameUpdate(sharedParameters);
+				return true;
+			}
+
+			@Override
+			protected void done() {}
+		};
+		swingWorker.execute();
+	}
+	
 	public void orderResources() {
 		// Retrieve available resources list:
 		List<DwcaResourceModel> resources = stepController.getResourceModelList();
-
+		// Clean resources box and reload updated data
+		resourcesCmbBox.removeAllItems();
+		// Add empty entry for first item
+		resourcesCmbBox.addItem("");
 		// Add an item for each resource name:
 		ArrayList<String> names = new ArrayList<String>();
-		for (DwcaResourceModel resource : resources) {
+		for (DwcaResourceModel resource : resources)
 			names.add(resource.getName());
-		}
-		// Reorder alphabetically:
-		Collections.sort(names);
-		for (String name : names) {
+		for (String name : names)
 			resourcesCmbBox.addItem(name);
-		}
 	}
 
 	private void updateProgressText(final String text) {
@@ -612,15 +714,11 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (JobStatusModel.CURRENT_STATUS_EXPLANATION_PROPERTY.equals(evt
-				.getPropertyName())) {
+		if (JobStatusModel.CURRENT_STATUS_EXPLANATION_PROPERTY.equals(evt.getPropertyName())) {
 			appendConsoleText(">" + (String) evt.getNewValue() + END_LINE);
-		}
-		else if (JobStatusModel.CURRENT_JOB_PROGRESS_PROPERTY.equals(evt
-				.getPropertyName())) {
+		} else if (JobStatusModel.CURRENT_JOB_PROGRESS_PROPERTY.equals(evt.getPropertyName())) {
 			updateProgressText((String) evt.getNewValue());
-		}
-		else if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt.getPropertyName())) {
+		} else if (JobStatusModel.CURRENT_STATUS_PROPERTY.equals(evt.getPropertyName())) {
 			JobStatus jobStatus = (JobStatus) evt.getNewValue();
 			appendConsoleText("STATUS:" + jobStatus + END_LINE);
 
@@ -629,20 +727,19 @@ public class ResourcesPanel extends JPanel implements PropertyChangeListener {
 
 			if (jobStatus.isJobCompleted()) {
 				switch (jobType) {
-					case IMPORT_DWC:
-						onImportDwcDone(jobStatus);
-						break;
-					case MOVE_TO_PUBLIC:
-						onMoveDone(jobStatus);
-						break;
-					case COMPUTE_UNIQUE:
-						break;
+				case IMPORT_DWC:
+					onImportDwcDone(jobStatus);
+					break;
+				case MOVE_TO_PUBLIC:
+					onMoveDone(jobStatus);
+					break;
+				case COMPUTE_UNIQUE:
+					break;
 
-					default:
-						break;
+				default:
+					break;
 				}
-			}
-			else if (JobStatus.RUNNING == jobStatus && JobType.MOVE_TO_PUBLIC == jobType) {
+			} else if (JobStatus.RUNNING == jobStatus && JobType.MOVE_TO_PUBLIC == jobType) {
 				onMoveStarted();
 			}
 			// TODO handle import started the same way

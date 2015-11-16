@@ -47,11 +47,12 @@ public class OccurrenceHarvesterMainView {
 
 	public void initView() {
 
-		// Initialize the resources panel:
-		resourcesPanel = new ResourcesPanel(stepController, harvesterViewModel);
-
 		// Initialize the publishers panel:
 		publishersPanel = new PublishersPanel(stepController);
+		
+		// Setup stepController with  
+		// Initialize the resources panel:
+		resourcesPanel = new ResourcesPanel(stepController, harvesterViewModel);
 
 		// Initialize main frame:
 		harvesterFrame = new JFrame(Messages.getString("view.title"));
@@ -99,6 +100,30 @@ public class OccurrenceHarvesterMainView {
 		redirectSystemStreams();
 
 		checkForOutdatedResources();
+	}
+
+	public ResourcesPanel getResourcesPanel() {
+		return resourcesPanel;
+	}
+
+	public void setResourcesPanel(ResourcesPanel resourcesPanel) {
+		this.resourcesPanel = resourcesPanel;
+	}
+
+	public PublishersPanel getPublishersPanel() {
+		return publishersPanel;
+	}
+
+	public void setPublishersPanel(PublishersPanel publishersPanel) {
+		this.publishersPanel = publishersPanel;
+	}
+
+	public HarvesterViewModel getHarvesterViewModel() {
+		return harvesterViewModel;
+	}
+
+	public void setHarvesterViewModel(HarvesterViewModel harvesterViewModel) {
+		this.harvesterViewModel = harvesterViewModel;
 	}
 
 	/**
