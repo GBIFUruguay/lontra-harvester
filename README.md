@@ -1,5 +1,7 @@
 #lontra-harvester
 
+[![Join the chat at https://gitter.im/WingLongitude/lontra-harvester](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/WingLongitude/lontra-harvester?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Harvester used to feed the data portals based on [canadensys-explorer](https://github.com/Canadensys/canadensys-explorer) from occurrence Darwin Core Archive. The ingested data are processed using the [narwhal-processor](https://github.com/Canadensys/narwhal-processor).
 
 Code Status
