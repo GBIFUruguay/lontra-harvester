@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>winglongitude</groupId>
 		<artifactId>winglongitude-lontra</artifactId>
-		<version>1.3-SNAPSHOT</version>
+		<version>1.3</version>
 	</parent>
 	
 	<artifactId>lontra-harvester-ui</artifactId>
