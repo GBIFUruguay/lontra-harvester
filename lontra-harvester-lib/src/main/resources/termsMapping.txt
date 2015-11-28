@@ -1,0 +1,2 @@
+#tab separated: term<tab>term
+http://purl.org/dc/terms/rights	http://purl.org/dc/terms/license
