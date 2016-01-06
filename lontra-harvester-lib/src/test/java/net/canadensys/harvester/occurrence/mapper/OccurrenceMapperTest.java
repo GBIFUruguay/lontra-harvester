@@ -36,7 +36,7 @@ public class OccurrenceMapperTest {
 		// ensure we do not map invalid characters
 		assertEquals("test country", rawModel.getCountry());
 		
-		// ensure the mapping rights - license was applied
+		// ensure the mapping rights -> license was applied
 		assertEquals("CC0", rawModel.getLicense());
 	}
 
