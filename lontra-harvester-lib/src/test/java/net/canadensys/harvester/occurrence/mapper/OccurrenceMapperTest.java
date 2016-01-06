@@ -26,6 +26,7 @@ public class OccurrenceMapperTest {
 
 		properties.put("id", "1");
 		properties.put("country", "test country" + NULL_CHAR);
+		properties.put("http://purl.org/dc/terms/rights", "CC0");
 
 		OccurrenceRawModel rawModel = occMapper.mapElement(properties);
 
@@ -34,6 +35,9 @@ public class OccurrenceMapperTest {
 
 		// ensure we do not map invalid characters
 		assertEquals("test country", rawModel.getCountry());
+		
+		// ensure the mapping rights - license was applied
+		assertEquals("CC0", rawModel.getLicense());
 	}
 
 }
