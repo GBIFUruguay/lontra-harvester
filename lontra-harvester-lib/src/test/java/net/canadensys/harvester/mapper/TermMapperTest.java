@@ -13,7 +13,7 @@ public class TermMapperTest {
 
 	@Test
 	public void testTermMapping() {
-		assertEquals(DcTerm.license, TermMapper.getInstance().getTermMapping(DcTerm.rights));
+		assertEquals("license", TermMapper.getInstance().getTermMapping(DcTerm.rights));
 		// Test with a Term we know we do not have a mappin for
 		assertNull(TermMapper.getInstance().getTermMapping(DcTerm.accrualPeriodicity));
 	}
