@@ -1,0 +1,24 @@
+04 Aug 2015 10:33:11,095 ERROR RSSIPTFeedDAO:55 - java.net.ConnectException: Connection refused
+04 Aug 2015 10:37:26,036 ERROR RSSIPTFeedDAO:55 - java.net.ConnectException: Connection refused
+04 Aug 2015 10:47:18,374 FATAL PrepareDwcaTask:173 - java.net.ConnectException: Connection refused
+04 Aug 2015 10:47:18,983 FATAL DwcaEmlReader:62 - Can't open DwcaEmlReader
+org.gbif.dwca.io.UnkownDelimitersException: Unable to detect field delimiter
+	at org.gbif.io.CSVReaderFactory.buildArchiveFile(CSVReaderFactory.java:129)
+	at org.gbif.io.CSVReaderFactory.build(CSVReaderFactory.java:46)
+	at org.gbif.dwca.io.ArchiveFactory.readFileHeaders(ArchiveFactory.java:396)
+	at org.gbif.dwca.io.ArchiveFactory.openArchiveDataFile(ArchiveFactory.java:301)
+	at org.gbif.dwca.io.ArchiveFactory.openArchive(ArchiveFactory.java:320)
+	at net.canadensys.harvester.occurrence.reader.DwcaEmlReader.openReader(DwcaEmlReader.java:58)
+	at net.canadensys.harvester.occurrence.step.StreamEmlContentStep.preStep(StreamEmlContentStep.java:56)
+	at net.canadensys.harvester.AbstractProcessingJob.executeStepSequentially(AbstractProcessingJob.java:64)
+	at net.canadensys.harvester.occurrence.job.ImportDwcaJob.doJob(ImportDwcaJob.java:87)
+	at net.canadensys.harvester.impl.DefaultCLIService$2.run(DefaultCLIService.java:106)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+06 Jun 2019 00:18:58,347 ERROR SqlExceptionHelper:146 - ERROR: relation "dwca_resource" does not exist
+  Position: 1405
+09 Jun 2019 20:03:56,187 ERROR SqlExceptionHelper:146 - ERROR: relation "dwca_resource" does not exist
+  Position: 1405
+09 Jun 2019 20:05:09,077 ERROR SqlExceptionHelper:146 - ERROR: relation "dwca_resource" does not exist
+  Position: 1405
